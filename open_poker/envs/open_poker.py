@@ -1,3 +1,6 @@
+
+
+
 import gym
 from gym import spaces
 import pygame
@@ -5,10 +8,21 @@ import numpy as np
 import logging
 
 import open_poker.envs.gnome_poker 
+import open_poker.envs.poker_util as poker_util
+
+import sys, os
+sys.path.append(os.path.dirname(poker_util .__file__)) 
+
+from open_poker.envs.poker_util.agent import Agent
 
 from open_poker.envs.poker_util.phase import Phase
+from open_poker.envs.poker_util.initialize_game_elements import initialize_game_element
 from open_poker.envs.poker_util.tournament_status import TournamentStatus
 from open_poker.envs.poker_util.logging_info import log_file_create
+
+from open_poker.envs.poker_util.agents import example_agent_check_fold, example_agent_random, example_agent_call, example_agent_raise_bet
+from open_poker.envs.poker_util.agents import agent_call_AJ, agent_raise_AJ, agent_call_toppair_AJ, agent_raise_aggressive_AJ
+from open_poker.envs.poker_util.agents import agent_call_AJ_flop, background_agent_v1, background_agent_v2
 
 
 logger = log_file_create('./test.log')
@@ -196,6 +210,14 @@ class OpenPokerEnv(gym.Env):
             "bet": self._get_bet_info()
         }
 
+    def set_up_board(self, player_decision_agents):
+        """
+        The function to set up game elements`
+        :param player_decision_agents: dictionary of player name and its corresponding agent
+        :return: game elements
+        :rtype: dict
+        """
+        return initialize_game_element(player_decision_agents)
 
     def _get_info(self):
 
@@ -209,7 +231,14 @@ class OpenPokerEnv(gym.Env):
         # We need the following line to seed self.np_random
         super().reset(seed=seed)
 
-        
+        player_decision_agents = dict()
+        player_decision_agents['player_raise'] = Agent(**example_agent_raise_bet.decision_agent_methods)
+        player_decision_agents['player_call'] = Agent(**example_agent_call.decision_agent_methods)
+        player_decision_agents['player_random'] = Agent(**example_agent_random.decision_agent_methods)
+
+        self.board = self.set_up_board(player_decision_agents)
+
+        print(self.board.keys())
 
         observation = self._get_obs()
         info = self._get_info()

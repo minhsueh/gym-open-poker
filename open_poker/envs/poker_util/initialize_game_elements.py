@@ -1,3 +1,4 @@
+import sys
 from card import Card
 from chip import Chip
 from player import Player
@@ -9,7 +10,8 @@ from card_utility_actions import (is_royal_flush, is_straight, is_one_pair, is_t
 from card_utility_actions import (get_royal_flush, get_straight, get_flush, get_two_pair, get_one_pair, get_full_house,
                                   get_high_card, get_straight_flush, get_four_of_a_kind, get_three_of_a_kind)
 from collections import deque
-import sys
+
+import logging
 
 logger = logging.getLogger('open_poker.envs.poker_util.logging_info.init_game_elements')
 
@@ -28,6 +30,33 @@ def initialize_game_element(player_decision_agents):
       
     """
     game_elements = dict()
+    game_elements['num2color'] = {
+        1: 'white',
+        5: 'red',
+        10: 'blue',
+        25: 'green',
+        100: 'black',
+        500: 'purple',
+        1000: 'orange'
+    }
+    game_elements['num2weight'] = {
+        1: 7.5,
+        5: 8.5,
+        10: 9.0,
+        25: 11.5,
+        100: 13,
+        500: 13.5,
+        1000: 14.0
+    }
+    game_elements['amount2cnt'] = {
+        1: 10,
+        5: 1,
+        10: 0,
+        25: 1,
+        100: 0,
+        500: 2,
+        1000: 0
+    }
     
 
     _initialize_cards(game_elements)
@@ -215,4 +244,4 @@ def _initialize_game_history_structs(game_elements):
 
 
 def _initialize_rules(game_elements):
-
+    pass
