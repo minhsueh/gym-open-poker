@@ -6,10 +6,15 @@ from board import Board
 from helper_functions import *
 from card_utility_actions import calculate_best_hand
 from card_utility_actions import (is_royal_flush, is_straight, is_one_pair, is_two_pair, is_flush, is_full_house,
-                                  is_straight_flush, is_three_of_a_kind, is_four_of_a_kind)
+                                  is_straight_flush, is_three_of_a_kind, is_four_of_a_kind, is_high_card)
 from card_utility_actions import (get_royal_flush, get_straight, get_flush, get_two_pair, get_one_pair, get_full_house,
                                   get_high_card, get_straight_flush, get_four_of_a_kind, get_three_of_a_kind)
 from collections import deque
+
+from phase import Phase
+from tournament_status import TournamentStatus
+import dealer
+
 
 import logging
 
@@ -49,12 +54,12 @@ def initialize_game_element(player_decision_agents):
         1000: 14.0
     }
     game_elements['amount2cnt'] = {
-        1: 10,
-        5: 1,
-        10: 0,
-        25: 1,
+        1: 0,
+        5: 2,
+        10: 9,
+        25: 0,
         100: 0,
-        500: 2,
+        500: 0,
         1000: 0
     }
     
@@ -67,7 +72,7 @@ def initialize_game_element(player_decision_agents):
     # initialized chips when initialized players
     _initialize_players(game_elements, player_decision_agents)
     logger.debug('Successfully instantiated and initialized players.')
-
+    dealer.print_cash_info(game_elements)
 
     _initialize_board(game_elements)
     logger.debug('Successfully instantiated and initialized board.')
@@ -82,13 +87,37 @@ def initialize_game_element(player_decision_agents):
 
     # game_elements['type'] = "game_elements"
     # game_elements['hands_of_players'] = [dict()]  # each game result in dict, -1 should be least game
-    # game_elements['small_blind_amount'] = 1  # this could increase as number of games increase
-    # game_elements['big_blind_pay_from_baseline'] = 2  # if small_blind_amount is 1, big blind pay 1 * 2
-
-    # used for all in condition, and player out of money during the game
+    game_elements['small_blind_amount'] = 5  # this could increase as number of games increase
+    game_elements['big_blind_pay_from_baseline'] = 2  # if small_blind_amount is 1, big blind pay 1 * 2
+    game_elements['big_blind_amount'] = game_elements['small_blind_amount'] * game_elements['big_blind_pay_from_baseline']
+    game_elements['small_bet'] = game_elements['big_blind_amount'] # in pre-flop and flop
+    game_elements['big_bet_factor_from_small_bet'] = 2
+    game_elements['big_bet'] = game_elements['big_blind_amount'] * game_elements['big_bet_factor_from_small_bet'] # in turn and river
+    
     game_elements['players_dict'] = {player.player_name:player for player in game_elements['players']}
-    game_elements['number_of_players'] = len(game_elements['players_dict'] )
+    game_elements['total_number_of_players'] = len(game_elements['players_dict'] )
+    game_elements['active_player'] = game_elements['total_number_of_players']
 
+    # gnome poker variables
+    # game_elements['game_idx'] = 1
+    # game_elements['dealer_position'] = 0
+    game_elements['cur_phase'] = Phase.PRE_FLOP
+    game_elements['cur_phase_idx'] = 0
+    game_elements['tournament_status'] = TournamentStatus.TRUNCATED
+    game_elements['max_raise_count'] = 3
+
+    # round parameter
+    # game_elements['highest_raise_position'] = None
+    game_elements['current_betting_idx'] = None
+    game_elements['current_bet_count'] = 0
+    game_elements['current_raise_count'] = 0
+    game_elements['num_active_player_on_table'] = game_elements['total_number_of_players']
+    game_elements['player_last_move'] = None
+    game_elements['players_last_move_list'] = ['NONE'] * len(game_elements['players']) 
+    game_elements['small_blind_postiion_idx'] = None
+    game_elements['big_blind_postiion_idx'] = None
+
+    game_elements['early_stop'] = False
 
 
     # define hand rank order
@@ -102,8 +131,9 @@ def initialize_game_element(player_decision_agents):
         'three_of_a_kind': 4,
         'two_pairs': 3,
         'one_pair': 2,
-        'highest_card': 1
+        'high_card': 1
     }
+    game_elements['hand_type_list'] = sorted(game_elements['hand_rank_type'].keys(), key=lambda x: game_elements['hand_rank_type'][x], reverse = True)
 
     # define hand rank functions
     game_elements['hand_rank_funcs'] = [
@@ -115,11 +145,14 @@ def initialize_game_element(player_decision_agents):
         (is_straight, get_straight, 'straight'),
         (is_three_of_a_kind, get_three_of_a_kind, 'three_of_a_kind'),
         (is_two_pair, get_two_pair, 'two_pairs'),
-        (is_one_pair, get_one_pair, 'one_pair')
+        (is_one_pair, get_one_pair, 'one_pair'),
+        (is_high_card, get_high_card, 'high_card')
     ]
 
     # define numbers rank order, initially the number is itself
-    game_elements['numbers_rank_type'] = {i: i for i in range(1, 14)}
+    game_elements['numbers_rank_type'] = {i: i for i in range(2, 14)}
+    game_elements['numbers_rank_type'][1] = 14
+
 
     game_elements['find_winner'] = getattr(sys.modules[__name__], 'find_winner')
     game_elements['calculate_best_hand'] = getattr(sys.modules[__name__], 'calculate_best_hand')
@@ -194,7 +227,7 @@ def _initialize_cards(game_elements):
     """
     nums = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']
     suits = ['club',  'diamond', 'heart', 'spade']
-    colors = ['black', 'black', 'red', 'red']
+    colors = ['black', 'red', 'red', 'black']
     temp_deck = [(num, suit, color) for num in nums for suit, color in zip(suits, colors)]
 
     deck = list()

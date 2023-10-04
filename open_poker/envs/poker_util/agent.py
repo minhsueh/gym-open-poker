@@ -19,22 +19,22 @@ class Agent:
         :return: return successful_action code if all functions are properly set up; otherwise, return failure_code
         """
         if not self.make_pre_flop_moves:
-            print(f'Agent did not initialized properly. Return failure_code.')
+            logger.debug(f'Agent did not initialized properly. Return failure_code.')
             return flag_config_dict['failure_code']
         if not self.make_flop_moves:
-            print(f'Agent did not initialized properly. Return failure_code.')
+            logger.debug(f'Agent did not initialized properly. Return failure_code.')
             return flag_config_dict['failure_code']
         if not self.make_turn_moves:
-            print(f'Agent did not initialized properly. Return failure_code.')
+            logger.debug(f'Agent did not initialized properly. Return failure_code.')
             return flag_config_dict['failure_code']
         if not self.make_river_moves:
-            print(f'Agent did not initialized properly. Return failure_code.')
+            logger.debug(f'Agent did not initialized properly. Return failure_code.')
             return flag_config_dict['failure_code']
         if not self.make_computing_best_hand_moves:
-            print(f'Agent did not initialized properly. Return failure_code.')
+            logger.debug(f'Agent did not initialized properly. Return failure_code.')
             return flag_config_dict['failure_code']
         if not self.make_continue_game_moves:
-            print(f'Agent did not initialized properly. Return failure_code.')
+            logger.debug(f'Agent did not initialized properly. Return failure_code.')
             return flag_config_dict['failure_code']
 
         # now, all functions are set up properly
@@ -50,6 +50,6 @@ class Agent:
         if self.is_running:
             self.is_running = False
         else:
-            print('Trying to shutdown an agent has been shutdown before. Return failure code.')
+            logger.debug('Trying to shutdown an agent has been shutdown before. Return failure code.')
             return flag_config_dict['failure_code']
         return flag_config_dict['successful_action']

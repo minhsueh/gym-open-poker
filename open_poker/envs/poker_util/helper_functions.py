@@ -1,5 +1,6 @@
 from collections import deque
-
+import logging
+logger = logging.getLogger('open_poker.envs.poker_util.logging_info.helper_functions')
 
 def is_first_player_in_this_round(player, current_gameboard):
     """
@@ -28,10 +29,10 @@ def find_winner(current_gameboard):
     :param current_gameboard:
     :return: winner
     """
-    print('Board: comparing hands of those player below...')
+    logger.debug('Board: comparing hands of those player below...')
     res = current_gameboard['hands_of_players'][-1]
     for k, v in res.items():
-        print(f'{k} hand ---> {", ".join(map(str, v[1]))}')
+        logger.debug(f'{k} hand ---> {", ".join(map(str, v[1]))}')
 
     # firstly, check rank type of all players
     candidate_list = list()
@@ -107,7 +108,7 @@ def assign_pot_to_only_winner(current_gameboard, winner):
         raise Exception
 
     board = current_gameboard['board']
-    print(f'Board: moving total amount ${board.total_cash_on_table} on the table to {winner}')
+    logger.debug(f'Board: moving total amount ${board.total_cash_on_table} on the table to {winner}')
     if board.side_pot:  # there is at least one player all-in in the game
         for p in current_gameboard['players']:
             board.side_pot[p.player_name] = p.bet_amount_each_game
@@ -129,7 +130,7 @@ def assign_pot_to_only_winner(current_gameboard, winner):
                 # if there are side pot remaining, we should return those chips to original player
                 for name, money in board.side_pot.items():
                     if money > 0:
-                        print(f'Board: we should give ${money} chips to {name} as side pot remaining')
+                        logger.debug(f'Board: we should give ${money} chips to {name} as side pot remaining')
                         cur_player = current_gameboard['players_dict'][name]
                         cur_player += money
                         chips = chips_combination_given_amount_for_pot(board.pot, money, current_gameboard)
@@ -154,7 +155,7 @@ def split_pot_for_euqal_hand(current_gameboard, winners):
 
     board = current_gameboard['board']
     total_per_winner = board.total_cash_on_table / len(winners)
-    print(f'Board: amount each winner could get is {total_per_winner}')
+    logger.debug(f'Board: amount each winner could get is {total_per_winner}')
 
     for amount, chips_list in board.pot.items():
         chips_list = set(chips_list)
@@ -187,36 +188,36 @@ def remove_player_from_queue_if_lost(current_gamebaord):
         updated_queue.append(player)
     current_gamebaord['players'] = updated_queue
     if lost_players:
-        print(f'Board: those player(s) are out of game {"; ".join(lost_players)}')
-    print(f'Board: there are {len(updated_queue)} players remaining on the table')
+        logger.debug(f'Board: those player(s) are out of game {"; ".join(lost_players)}')
+    logger.debug(f'Board: there are {len(updated_queue)} players remaining on the table')
 
 
 def print_cash_info(current_gameboard):
-    print('*********************************************************')
-    print('                       Cash Info              ')
+    logger.debug('*********************************************************')
+    logger.debug('                       Cash Info              ')
     for p in current_gameboard['players']:
         total = 0
         for amount, chips_list in p.chips.items():
             total += amount * len(chips_list)
-        print(f'{p.player_name} cash info (current_cash/chips): {p.current_cash}/{total}')
-    print('*********************************************************')
+        logger.debug(f'{p.player_name} cash info (current_cash/chips): {p.current_cash}/{total}')
+    logger.debug('*********************************************************')
 
 
 def print_chips_info(chips):
     total = 0
-    print('*************************************')
-    print('             Chips Info              ')
+    logger.debug('*************************************')
+    logger.debug('             Chips Info              ')
     for amount, chips_list in chips.items():
         total += amount * len(chips_list)
-        print(f'chip amount: {amount}; number of chips: {len(chips_list)}')
-    print(f'Total amount of those chips: {total}')
-    print('*************************************')
+        logger.debug(f'chip amount: {amount}; number of chips: {len(chips_list)}')
+    logger.debug(f'Total amount of those chips: {total}')
+    logger.debug('*************************************')
 
 
 def print_winner_count_in_one_game_instance(winner_of_hands):
-    print('During this tournament, players\' hands of winning count below:')
+    logger.debug('During this tournament, players\' hands of winning count below:')
     for key, value in winner_of_hands.items():
-        print(f'{key} wins {value} times')
+        logger.debug(f'{key} wins {value} times')
 
 
 def end_game_and_begin_next(current_gameboard, show_community_cards=True):
@@ -274,7 +275,28 @@ def find_only_left_winner(current_gameboard):
         winners.append(p)
 
     if len(winners) > 1:
-        print('Error: more than one player without fold')
+        logger.debug('Error: more than one player without fold')
         raise Exception
 
     return [w.player_name for w in winners]
+
+
+
+def get_high_card(total_hand, suits, values):
+    """
+    get 5 cards of high cards
+    :param total_hand:
+    :param suits:
+    :param values:
+    :return:
+    """
+    hand = []
+    if 1 in values:
+        hand.append(1)
+        return hand + sorted(values, key=lambda x: -x)[:4]
+    return sorted(values, key=lambda x: -x)[:5]
+
+
+
+
+

@@ -2,6 +2,11 @@ from card_utility_actions import *
 from action_choices import *
 import numpy as np
 
+from phase import Phase
+import logging
+
+logger = logging.getLogger('open_poker.envs.poker_util.logging_info.board')
+
 
 class Board:
     def __init__(self, dealer_name, total_cash, pot, side_pot, deck, deck_idx, num_active_player_on_table):
@@ -16,6 +21,12 @@ class Board:
         self.current_highest_bet = 0  # previous bet in the current round
         self.buy_in_amount = 40  # 20 times to 100 times of force bet of big blind
         self.num_active_player_on_table = num_active_player_on_table  # number of player could act in a hand
+        self.game_idx = 1
+        self.dealer_position = 0
+        
+        self.pots = [[0] * num_active_player_on_table]
+        self.pots_attendee = [[]]
+
 
     def assign_dealer(self, player_name):
         """
@@ -32,7 +43,7 @@ class Board:
         :return:
         """
         if self.deck_idx + num > len(self.deck):
-            print('Error: cannot deal more cards')
+            logger.debug('Error: cannot deal more cards')
             raise Exception
 
         self.deck_idx += num
@@ -45,13 +56,13 @@ class Board:
         """
         self.current_highest_bet = max(self.current_highest_bet, new_bet)
 
-    def reset_board_each_game(self, current_gameboard):
+    def reset_board_each_game_old(self, current_gameboard):
         """
         run this function after each river round to re-shuffle the deck for next game
         :return:
         """
         if current_gameboard['cur_phase'] != 'concluding_phase':
-            print('Board: we are in the wrong phase to reset board each game')
+            logger.debug('Board: we are in the wrong phase to reset board each game')
             raise Exception
 
         self.deck_idx = 0
@@ -60,8 +71,36 @@ class Board:
         self.pot = dict()
         self.side_pot = dict()
         self.community_cards = list()
+        self.num_active_player_on_table = len(current_gameboard['players']) 
+        np.random.shuffle(self.deck)
+
+    def reset_board_each_game(self, current_gameboard):
+        """
+        Args:
+            current_gameboard
+
+        Returns:
+            None
+
+        """
+        self.deck_idx = 0
+        self.total_cash_on_table = 0
+        self.current_highest_bet = 0
+        self.pot = dict()
+        self.side_pot = dict()
+        self.community_cards = list()
         self.num_active_player_on_table = len(current_gameboard['players'])
         np.random.shuffle(self.deck)
+        self.game_idx += 1
+        # update dealer_position:
+        dealer_position = self.dealer_position
+        
+        while(True):
+            dealer_position = (dealer_position+1)%len(current_gameboard['players'])
+            if current_gameboard['players'][dealer_position].status != 'lost':
+                self.dealer_position = dealer_position
+                break
+
 
     def reset_board_each_round(self, current_gameboard):
         self.players_made_decisions = list()
@@ -74,7 +113,7 @@ class Board:
         :return:
         """
         if amount < 0:
-            print('Error: try to add 0 or negative value into the board')
+            logger.debug('Error: try to add 0 or negative value into the board')
             raise Exception
 
         self.total_cash_on_table += amount
@@ -86,10 +125,10 @@ class Board:
         :return:
         """
         if not chips:
-            print('Error: cannot add empty chips to the pot')
+            logger.debug('Error: cannot add empty chips to the pot')
             raise Exception
 
-        print('Board: adding chips into the pot')
+        logger.debug('Board: adding chips into the pot')
         for amount, chips_list in chips.items():
             if amount not in self.pot:
                 self.pot[amount] = set()
@@ -105,18 +144,19 @@ class Board:
         """
         num_cards = number_cards_to_draw(phase)
         if self.deck_idx + num_cards > len(self.deck):
-            print('Error: cannot deal more hold cards, since no more card in the deck')
+            logger.debug()
+            logger.debug('Error: cannot deal more hold cards, since no more card in the deck')
             raise Exception
-        if phase != 'pre_flop_phase':
-            print('Error: cannot deal hole cards in the current phase')
+        if phase != Phase.PRE_FLOP:
+            logger.debug('Error: cannot deal hole cards in the current phase = ' + str(phase))
             raise Exception
 
         hole_cards = self.deck[self.deck_idx: self.deck_idx+num_cards]
         self.assign_deck_idx(num_cards)
         player.assign_hole_cards(hole_cards)
-        print(f'{player.player_name} gets hole cards:')
+        logger.debug(f'{player.player_name} gets hole cards:')
         for c in hole_cards:
-            print(f'---> {c}')
+            logger.debug(f'---> {c}')
 
     def deal_community_card(self, phase, current_gameboard):
         """
@@ -129,15 +169,15 @@ class Board:
 
         num_cards = number_cards_to_draw(phase)
         if self.deck_idx + num_cards > len(self.deck):
-            print('Error: cannot deal more communities cards')
+            logger.debug('Error: cannot deal more communities cards')
             raise Exception
 
         community_cards = self.deck[self.deck_idx: self.deck_idx+num_cards]
         self.assign_deck_idx(num_cards)
         self.community_cards.extend(community_cards)
-        print(f'Current community cards on the table:')
+        logger.debug(f'Current community cards on the table:')
         for c in self.community_cards:
-            print(f'---> {c}')
+            logger.debug(f'---> {c}')
 
     def deal_community_card_by_number(self, num):
         """
@@ -149,15 +189,15 @@ class Board:
         self.burn_card()
 
         if self.deck_idx + num > len(self.deck):
-            print('Error: cannot deal more communities cards')
+            logger.debug('Error: cannot deal more communities cards')
             raise Exception
 
         community_cards = self.deck[self.deck_idx: self.deck_idx+num]
         self.assign_deck_idx(num)
         self.community_cards.extend(community_cards)
-        print(f'Current community cards on the table:')
+        logger.debug(f'Current community cards on the table:')
         for c in self.community_cards:
-            print(f'---> {c}')
+            logger.debug(f'---> {c}')
 
     def burn_card(self, num=1):
         """
@@ -166,11 +206,11 @@ class Board:
         :return:
         """
         if self.deck_idx + num > len(self.deck):
-            print('Error: cannot burn more cards')
+            logger.debug('Error: cannot burn more cards')
             raise Exception
 
         self.assign_deck_idx(num)
-        print(f'Board: burn {num} cards before dealing community cards')
+        logger.debug(f'Board: burn {num} cards before dealing community cards')
 
 
     def charge_buy_in(self, player, current_gameboard):
@@ -195,24 +235,42 @@ class Board:
         :return:
         """
         if not winners:
-            print('Error: cannot find all-in result since no winner provided')
+            logger.debug('Error: cannot find all-in result since no winner provided')
             raise Exception
         if not self.side_pot or not self.pot:
-            print('Error: nothing in the side pot/main pot, something went wrong')
+            logger.debug('Error: nothing in the side pot/main pot, something went wrong')
             raise Exception
 
-        print(f'Board: computing side pot since there are players all-in in this game')
+        logger.debug(f'Board: computing side pot since there are players all-in in this game')
         res = dict()
         for name in self.side_pot.keys():
             res[name] = 0
 
         if not has_equal_hand:  # only one winner
-            print(f'Board: {winners} is the only one winner for computing all-in')
+            logger.debug(f'Board: {winners} is the only one winner for computing all-in')
             winner_money_in_pot = self.side_pot[winners]
             for name, amount in self.side_pot.items():
                 res[winners] += min(winner_money_in_pot, amount)
                 self.side_pot[name] -= amount
         else:  # more than one winner
-            print(f'Board: there are more than one winners for computing all-in')
+            logger.debug(f'Board: there are more than one winners for computing all-in')
 
         return res
+
+
+
+    # =========
+
+    def remain_deck_number(self):
+        """ calculate the remain card number in deck
+=
+
+        Args:
+            
+
+        Returns:
+            int: 
+            
+        """
+        return(52 - self.deck_idx)
+
