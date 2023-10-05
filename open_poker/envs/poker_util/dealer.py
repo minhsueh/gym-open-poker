@@ -5,6 +5,7 @@ from action import Action
 from card_utility_actions import get_best_hand, get_number_rank
 import copy
 import logging
+import collections
 
 logger = logging.getLogger('open_poker.envs.poker_util.logging_info.dealer')
 
@@ -366,12 +367,11 @@ def check_betting_over(current_gameboard):
 
 
 
-
-
-
-
-def conclude_round(current_gameboard):
+def initialize_round(current_gameboard):
     """ 
+    current_gameboard['player_pot']
+
+
 
     Args:
         current_gameboard
@@ -385,9 +385,89 @@ def conclude_round(current_gameboard):
 
 
     # initialize player.current_money_in_pot
+    current_gameboard['board']['player_pot'] = collections.defaultdict(int)
+
     for p in current_gameboard['players']:
         if p.status != 'lost':
             p.bet_amount_each_round = 0
+
+
+
+
+
+def conclude_round(current_gameboard):
+    """ 
+    1. put the bet into pot
+    2. if there are all-in player, make a side pot
+    
+    in the betting, we will use current_gameboard['board']['player_pot'] to store the amount player spent
+
+    we will use current_gameboard['board']['pots_amount_list'] and current_gameboard['board']['pots_attendee_list'] to keep track on 
+    pot amount and attendee.
+
+
+
+    Args:
+        current_gameboard
+
+    Returns:
+        
+
+    """
+    # check if there are all-in players
+    player_pot = current_gameboard['player_pot'] # this is a dictionary with key being player name and value being amount
+
+
+
+
+    all_in_players_list = [] # each element: (player_name, all_in_amount)
+    for p_idx, p in enumerate(current_gameboard['players']):
+        if players_last_move_list[p_idx] == 'AII-IN'
+            all_in_players_list.append((p.player_name, player_pot[p.player_name]))
+    all_in_players_list.sort(key = lambda x: x[1], reverse = True) # sort all_in_amount in decending order
+
+    # All-in -> side pot
+    cur_side_pot_amount_list = []
+    cur_side_pot_attendee_list = []
+    if all_in_players_list:
+        while(all_in_players_list):
+            all_in_player, all_in_amount = all_in_players.pop()
+            side_attendee = set()
+            for p_idx, p in enumerate(current_gameboard['players']):
+                if player_pot[player_name] > all_in_amount: 
+                    player_pot[player_name] -= all_in_amount
+                    side_attendee.add(player_name)
+
+            cur_side_pot_amount_list.append(all_in_amount*len(side_attendee))
+            cur_side_pot_attendee_list.append(side_attendee)
+
+
+
+    # main pot if there is no ALL-IN, or rightmost side pot(only these people are active)
+    cur_main_pot_amount = 0
+    cur_main_pot_attendee = set()
+    fold_count = 0
+    for p_idx, p in enumerate(current_gameboard['players']):
+        if p in player_pot:
+            # might be fold, bet and call
+            cur_main_pot_amount += player_pot[p.player_name]
+            if current_gameboard['players_last_move_list'] != 'FOLD':
+                cur_main_pot_attendee.add(p.player_name)
+            else:
+                fold_count += 1
+
+    # recheck 
+    assert fold_count + len(cur_main_pot_attendee) == len(current_gameboard['board']['pots_attendee_list'][-1])
+
+    # put the above two into current_gameboard['board']['pots_amount_list'] and current_gameboard['pots_attendee_list']
+    # These might inlcude player who is fold, should recheck again in find_winner(conclude_game)
+
+    current_gameboard['board']['pots_amount_list'][-1] += cur_main_pot_amount 
+
+    if cur_side_pot_amount_list:
+        current_gameboard['board']['pots_amount_list'] += cur_side_pot_amount_list
+        current_gameboard['board']['pots_attendee_list'] += cur_side_pot_attendee_list
+
 
 
 

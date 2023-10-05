@@ -24,9 +24,11 @@ class Board:
         self.game_idx = 1
         self.dealer_position = 0
         
-        self.pots = [[0] * num_active_player_on_table]
-        self.pots_attendee = [[]]
 
+
+        self.player_pot = collections.defaultdict(int)
+        self.pots_amount_list = []
+        self.pots_attendee_list = []
 
     def assign_dealer(self, player_name):
         """
