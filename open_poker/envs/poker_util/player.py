@@ -73,7 +73,7 @@ class Player:
         self.status = assign_to
         current_gameboard['board'].num_active_player_on_table -= 1
 
-        current_gameboard['players_last_move_list'][self.position] = 'LOSE'
+        current_gameboard['board'].players_last_move_list[self.position] = 'LOSE'
 
 
     def assign_to_fold(self, current_gameboard):
@@ -367,14 +367,14 @@ class Player:
 
         # check if it is fold already
         for player_idx, player in enumerate(current_gameboard['players']):
-            if player.player_name == self.player_name and current_gameboard['players_last_move_list'][player_idx] == 'FOLD':
+            if player.player_name == self.player_name and current_gameboard['board'].players_last_move_list[player_idx] == 'FOLD':
                 return(allowable_actions)
 
 
 
         # big blind
 
-        if current_gameboard['current_raise_count'] == 0 and self.position == current_gameboard['big_blind_postiion_idx']:
+        if current_gameboard['board'].current_raise_count == 0 and self.position == current_gameboard['board'].big_blind_postiion_idx:
             allowable_actions.add(check)
 
         allowable_actions.add(fold)  # can fold in any case
@@ -437,19 +437,19 @@ class Player:
 
         # check if it is fold already
         for player_idx, player in enumerate(current_gameboard['players']):
-            if player.player_name == self.player_name and current_gameboard['players_last_move_list'][player_idx] == 'FOLD':
+            if player.player_name == self.player_name and current_gameboard['board'].players_last_move_list[player_idx] == 'FOLD':
                 return(allowable_actions)
 
         allowable_actions.add(fold)
 
 
-        if current_gameboard['current_bet_count'] == 0:
+        if current_gameboard['board'].current_bet_count == 0:
             allowable_actions.add(bet)
             allowable_actions.add(check)
-        elif current_gameboard['current_bet_count'] == 1 and current_gameboard['current_raise_count'] < current_gameboard['max_raise_count']:
+        elif current_gameboard['board'].current_bet_count == 1 and current_gameboard['board'].current_raise_count < current_gameboard['max_raise_count']:
             allowable_actions.add(raise_bet)
             allowable_actions.add(call)
-        elif current_gameboard['current_bet_count'] == 1 and current_gameboard['current_raise_count'] == current_gameboard['max_raise_count']:
+        elif current_gameboard['board'].current_bet_count == 1 and current_gameboard['board'].current_raise_count == current_gameboard['max_raise_count']:
             allowable_actions.add(call)
         else:
             raise
@@ -502,19 +502,19 @@ class Player:
 
         # check if it is fold already
         for player_idx, player in enumerate(current_gameboard['players']):
-            if player.player_name == self.player_name and current_gameboard['players_last_move_list'][player_idx] == 'FOLD':
+            if player.player_name == self.player_name and current_gameboard['board'].players_last_move_list[player_idx] == 'FOLD':
                 return(allowable_actions)
 
         allowable_actions.add(fold)
 
 
-        if current_gameboard['current_bet_count'] == 0:
+        if current_gameboard['board'].current_bet_count == 0:
             allowable_actions.add(bet)
             allowable_actions.add(check)
-        elif current_gameboard['current_bet_count'] == 1 and current_gameboard['current_bet_count'] < current_gameboard['max_raise_count']:
+        elif current_gameboard['board'].current_bet_count == 1 and current_gameboard['board'].current_bet_count < current_gameboard['max_raise_count']:
             allowable_actions.add(raise_bet)
             allowable_actions.add(call)
-        elif current_gameboard['current_raise_count'] == 1 and current_gameboard['current_bet_count'] == current_gameboard['max_raise_count']:
+        elif current_gameboard['board'].current_raise_count == 1 and current_gameboard['board'].current_bet_count == current_gameboard['max_raise_count']:
             allowable_actions.add(call)
         else:
             raise
@@ -567,19 +567,19 @@ class Player:
 
         # check if it is fold already
         for player_idx, player in enumerate(current_gameboard['players']):
-            if player.player_name == self.player_name and current_gameboard['players_last_move_list'][player_idx] == 'FOLD':
+            if player.player_name == self.player_name and current_gameboard['board'].players_last_move_list[player_idx] == 'FOLD':
                 return(allowable_actions)
         
         allowable_actions.add(fold)
 
 
-        if current_gameboard['current_bet_count'] == 0:
+        if current_gameboard['board'].current_bet_count == 0:
             allowable_actions.add(bet)
             allowable_actions.add(check)
-        elif current_gameboard['current_bet_count'] == 1 and current_gameboard['current_bet_count'] < current_gameboard['max_raise_count']:
+        elif current_gameboard['board'].current_bet_count == 1 and current_gameboard['board'].current_bet_count < current_gameboard['max_raise_count']:
             allowable_actions.add(raise_bet)
             allowable_actions.add(call)
-        elif current_gameboard['current_raise_count'] == 1 and current_gameboard['current_bet_count'] == current_gameboard['max_raise_count']:
+        elif current_gameboard['board'].current_raise_count == 1 and current_gameboard['board'].current_bet_count == current_gameboard['max_raise_count']:
             allowable_actions.add(call)
         else:
             raise

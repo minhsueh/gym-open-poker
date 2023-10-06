@@ -1,6 +1,7 @@
 from card_utility_actions import *
 from action_choices import *
 import numpy as np
+import collections
 
 from phase import Phase
 import logging
@@ -10,25 +11,35 @@ logger = logging.getLogger('open_poker.envs.poker_util.logging_info.board')
 
 class Board:
     def __init__(self, dealer_name, total_cash, pot, side_pot, deck, deck_idx, num_active_player_on_table):
-        self.dealer = dealer_name
-        self.total_cash_on_table = total_cash
-        self.pot = pot
-        self.side_pot = side_pot  # only use for all-in situation
+        # self.dealer = dealer_name
+        # self.total_cash_on_table = total_cash
+        # self.pot = pot
+        # self.side_pot = side_pot  # only use for all-in situation
         self.deck = deck
         self.deck_idx = deck_idx  # record which card has been used in the deck. e.x deck[deck_idx: deck_idx+2] as hole card
         self.community_cards = list()
-        self.players_made_decisions = list()  # players who have made decision on the table
-        self.current_highest_bet = 0  # previous bet in the current round
-        self.buy_in_amount = 40  # 20 times to 100 times of force bet of big blind
+        # self.players_made_decisions = list()  # players who have made decision on the table
+        # self.current_highest_bet = 0  # previous bet in the current round
+        # self.buy_in_amount = 40  # 20 times to 100 times of force bet of big blind
         self.num_active_player_on_table = num_active_player_on_table  # number of player could act in a hand
         self.game_idx = 1
         self.dealer_position = 0
-        
+
+
+
+        self.cur_phase = Phase.PRE_FLOP
 
 
         self.player_pot = collections.defaultdict(int)
-        self.pots_amount_list = []
-        self.pots_attendee_list = []
+        self.pots_amount_list = [0]
+        self.pots_attendee_list = ['player_'+str(i) for i in range(1, num_active_player_on_table+1)]
+
+        self.current_betting_idx = 0
+        self.current_bet_count = 0
+        self.current_raise_count = 0
+        self.players_last_move_list = ['NONE'] * num_active_player_on_table
+        self.small_blind_postiion_idx = 1
+        self.big_blind_postiion_idx = 2
 
     def assign_dealer(self, player_name):
         """
@@ -86,12 +97,12 @@ class Board:
 
         """
         self.deck_idx = 0
-        self.total_cash_on_table = 0
-        self.current_highest_bet = 0
-        self.pot = dict()
-        self.side_pot = dict()
         self.community_cards = list()
-        self.num_active_player_on_table = len(current_gameboard['players'])
+        active_player_count = 0
+        for p in current_gameboard['players']:
+            if p.status != 'lost':
+                active_player_count += 1
+        self.num_active_player_on_table = active_player_count
         np.random.shuffle(self.deck)
         self.game_idx += 1
         # update dealer_position:
@@ -118,24 +129,8 @@ class Board:
             logger.debug('Error: try to add 0 or negative value into the board')
             raise Exception
 
-        self.total_cash_on_table += amount
+        self.pots_amount_list[-1] += amount
 
-    def add_chips_to_pot(self, chips):
-        """
-        once a player bets, we should put these chips into the pot
-        :param chips:
-        :return:
-        """
-        if not chips:
-            logger.debug('Error: cannot add empty chips to the pot')
-            raise Exception
-
-        logger.debug('Board: adding chips into the pot')
-        for amount, chips_list in chips.items():
-            if amount not in self.pot:
-                self.pot[amount] = set()
-            for c in copy.copy(chips_list):
-                self.pot[amount].add(c)
 
     def deal_hole_cards(self, player, phase, current_gameboard):
         """
@@ -215,49 +210,8 @@ class Board:
         logger.debug(f'Board: burn {num} cards before dealing community cards')
 
 
-    def charge_buy_in(self, player, current_gameboard):
-        """
-        if player want to join the table, they have to pay the buy in amount
-        :param player: player needed to be charged
-        :param current_gameboard:
-        :return:
-        """
-        player.current_cash -= self.buy_in_amount
-        chips, remaining = chips_combination_given_amount(player, self.buy_in_amount, current_gameboard)
-        if remaining > 0:
-            raise Exception
 
 
-    def calculate_all_in_result(self, winners, has_equal_hand=False):
-        """
-        If someone all-in during the game, use this function to compute side pot which show how much
-        each player could get if they win their hands
-        :param winners:
-        :param has_equal_hand:
-        :return:
-        """
-        if not winners:
-            logger.debug('Error: cannot find all-in result since no winner provided')
-            raise Exception
-        if not self.side_pot or not self.pot:
-            logger.debug('Error: nothing in the side pot/main pot, something went wrong')
-            raise Exception
-
-        logger.debug(f'Board: computing side pot since there are players all-in in this game')
-        res = dict()
-        for name in self.side_pot.keys():
-            res[name] = 0
-
-        if not has_equal_hand:  # only one winner
-            logger.debug(f'Board: {winners} is the only one winner for computing all-in')
-            winner_money_in_pot = self.side_pot[winners]
-            for name, amount in self.side_pot.items():
-                res[winners] += min(winner_money_in_pot, amount)
-                self.side_pot[name] -= amount
-        else:  # more than one winner
-            logger.debug(f'Board: there are more than one winners for computing all-in')
-
-        return res
 
 
 

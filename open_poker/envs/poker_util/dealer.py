@@ -27,10 +27,10 @@ def change_phase(current_gameboard):
 
     """
 
-    phase_idx = int(current_gameboard['cur_phase'].value)
+    phase_idx = int(current_gameboard['board'].cur_phase.value)
     new_phase_idx = (phase_idx + 1) % 4
     new_phase = Phase(new_phase_idx)
-    current_gameboard['cur_phase'] = new_phase
+    current_gameboard['board'].cur_phase = new_phase
     logger.debug('The phase changed to ' + str(new_phase))
     return(new_phase)
     
@@ -51,7 +51,7 @@ def check_and_deal_hole_cards(current_gameboard):
 
 
     """
-    if current_gameboard['cur_phase'] == Phase.PRE_FLOP:
+    if current_gameboard['board'].cur_phase == Phase.PRE_FLOP:
         logger.debug('======================================================')
         logger.debug(f'Game{current_gameboard["board"].game_idx} is starting.')
         logger.debug('Current dealer position = ' + str(current_gameboard['board'].dealer_position) + '(0-indexed), dealer is ' + str(current_gameboard['players'][current_gameboard['board'].dealer_position].player_name))
@@ -82,12 +82,12 @@ def check_and_deal_hole_cards(current_gameboard):
 
 
             if player.status != 'lost':
-                current_gameboard['board'].deal_hole_cards(player, current_gameboard['cur_phase'], current_gameboard)
+                current_gameboard['board'].deal_hole_cards(player, current_gameboard['board'].cur_phase, current_gameboard)
                 count_blind += 1
 
                 logger.debug('Current deck has {} cards.'.format(current_gameboard['board'].remain_deck_number()))
     else:
-        raise ('The cur_phase at the funciton reset should only be Phase.PRE_FLOP, current value = ' + str(current_gameboard['cur_phase']))
+        raise ('The cur_phase at the funciton reset should only be Phase.PRE_FLOP, current value = ' + str(current_gameboard['board'].cur_phase))
 
 def check_and_deal_community_card(current_gameboard):
     """ We will put card_utility_actions.number_cards_to_draw in this function and use board.deal_community_card_by_number 
@@ -103,10 +103,10 @@ def check_and_deal_community_card(current_gameboard):
 
     """
     num_cards_to_deal = -1
-    if current_gameboard['cur_phase'] == Phase.PRE_FLOP:
+    if current_gameboard['board'].cur_phase == Phase.PRE_FLOP:
         print('Should not deal community card in pre_flop phase!')
         raise
-    elif current_gameboard['cur_phase'] == Phase.FLOP:
+    elif current_gameboard['board'].cur_phase == Phase.FLOP:
         num_cards_to_deal = 3
     else:
         num_cards_to_deal =  1
@@ -126,7 +126,7 @@ def force_small_big_blind_bet(current_gameboard):
         None
 
     """
-    if current_gameboard['cur_phase'] == Phase.PRE_FLOP:
+    if current_gameboard['board'].cur_phase == Phase.PRE_FLOP:
         logger.debug(f'Current hand in game: {current_gameboard["board"].game_idx}')
         logger.debug('------------Dealer is forcing small and bid blind bet ------------')
 
@@ -160,7 +160,7 @@ def force_small_big_blind_bet(current_gameboard):
         
 
     else:
-        raise ('The cur_phase at the funciton reset should only be Phase.PRE_FLOP, current value = ' + str(current_gameboard['cur_phase']))
+        raise ('The cur_phase at the funciton reset should only be Phase.PRE_FLOP, current value = ' + str(current_gameboard['board'].cur_phase))
 
 
 def betting(current_gameboard, phase):
@@ -197,7 +197,7 @@ def initialize_betting(current_gameboard):
 
     logger.debug('------------Dealer is initializing the betting parameters. ------------')
 
-    phase = current_gameboard['cur_phase']
+    phase = current_gameboard['board'].cur_phase
 
     # put into local variables for better readability
     dealer_position = current_gameboard['board'].dealer_position
@@ -228,21 +228,21 @@ def initialize_betting(current_gameboard):
         # just to make sure current_betting_idx is updated
         raise ('current_betting_idx is not initializing, please check!')
 
-    if current_gameboard['cur_phase'] != Phase.PRE_FLOP:
+    if current_gameboard['board'].cur_phase != Phase.PRE_FLOP:
         current_gameboard['current_bet_count'] = 0
     current_gameboard['current_raise_count'] = 0
     current_gameboard['num_active_player_on_table'] = counter
     for idx, player in enumerate(current_gameboard['players']):
-        if current_gameboard['cur_phase'] == Phase.PRE_FLOP and current_gameboard['small_blind_postiion_idx'] == idx:
-            current_gameboard['players_last_move_list'][idx] = 'SMALL_BLIND'
-        elif current_gameboard['cur_phase'] == Phase.PRE_FLOP and current_gameboard['big_blind_postiion_idx'] == idx:
-            current_gameboard['players_last_move_list'][idx] = 'BIG_BLIND'
+        if current_gameboard['board'].cur_phase == Phase.PRE_FLOP and current_gameboard['small_blind_postiion_idx'] == idx:
+            current_gameboard['board'].players_last_move_list[idx] = 'SMALL_BLIND'
+        elif current_gameboard['board'].cur_phase == Phase.PRE_FLOP and current_gameboard['big_blind_postiion_idx'] == idx:
+            current_gameboard['board'].players_last_move_list[idx] = 'BIG_BLIND'
         elif player.status == 'lost':
-            current_gameboard['players_last_move_list'][idx] = 'LOSE'
-        elif current_gameboard['players_last_move_list'][idx] == 'FOLD':
+            current_gameboard['board'].players_last_move_list[idx] = 'LOSE'
+        elif current_gameboard['board'].players_last_move_list[idx] == 'FOLD':
             continue
         else:
-            current_gameboard['players_last_move_list'][idx] = 'NONE'
+            current_gameboard['board'].players_last_move_list[idx] = 'NONE'
 
 
     
@@ -260,7 +260,7 @@ def initialize_betting(current_gameboard):
 def _get_players_last_move_list_string(current_gameboard):
     """ 
 
-    phrase current_gameboard['players_last_move_list'] into string and return
+    phrase current_gameboard['board'].players_last_move_list into string and return
 
     Args:
         current_gameboard
@@ -275,7 +275,7 @@ def _get_players_last_move_list_string(current_gameboard):
     assert current_gameboard['big_blind_postiion_idx'] is not None
 
     players_last_move_list_string = ""
-    for idx, last_move in enumerate(current_gameboard['players_last_move_list']):
+    for idx, last_move in enumerate(current_gameboard['board'].players_last_move_list):
         
         if last_move is None:
             players_last_move_list_string += 'None, '
@@ -288,8 +288,8 @@ def check_betting_over(current_gameboard):
     We do not need to consider the sequence because it should be handled in the function open_poker._betting
 
     
-    1. check current_gameboard['players_last_move_list']
-        (a) only one player stayed in game, i.e., current_gameboard['players_last_move_list'] has only one non-fold or non-lose
+    1. check current_gameboard['board'].players_last_move_list
+        (a) only one player stayed in game, i.e., current_gameboard['board'].players_last_move_list has only one non-fold or non-lose
         (b) all players check 
         (c) all other players call and only one play is bet/raise_bet 
         (d) in pre-flop, all CALL and big blind check
@@ -320,7 +320,7 @@ def check_betting_over(current_gameboard):
     count_raise_bet = 0
     count_fold = 0
     count_none = 0
-    for move in current_gameboard['players_last_move_list']:
+    for move in current_gameboard['board'].players_last_move_list:
         if move in ['NONE', 'SMALL_BLIND', 'BIG_BLIND']:
             count_none += 1
         elif move == 'LOSE':
@@ -357,7 +357,7 @@ def check_betting_over(current_gameboard):
         # 1(c)
         logger.debug('One player raised/bet and all others call, the betting is over.')
         return(True)
-    elif current_gameboard['cur_phase'] == Phase.PRE_FLOP and count_check + count_call == player_stayed_count or count_raise_bet + count_call == player_stayed_count:
+    elif current_gameboard['board'].cur_phase == Phase.PRE_FLOP and count_check + count_call == player_stayed_count or count_raise_bet + count_call == player_stayed_count:
         # 1(d)
         logger.debug('In pre_flop phase, all players called and big blind checked, the betting is over.')
         return(True)
@@ -369,7 +369,7 @@ def check_betting_over(current_gameboard):
 
 def initialize_round(current_gameboard):
     """ 
-    current_gameboard['player_pot']
+    current_gameboard['board'].player_pot
 
 
 
@@ -415,14 +415,14 @@ def conclude_round(current_gameboard):
 
     """
     # check if there are all-in players
-    player_pot = current_gameboard['player_pot'] # this is a dictionary with key being player name and value being amount
+    player_pot = current_gameboard['board'].player_pot # this is a dictionary with key being player name and value being amount
 
 
 
 
     all_in_players_list = [] # each element: (player_name, all_in_amount)
     for p_idx, p in enumerate(current_gameboard['players']):
-        if players_last_move_list[p_idx] == 'AII-IN'
+        if current_gameboard['board'].players_last_move_list[p_idx] == 'AII-IN':
             all_in_players_list.append((p.player_name, player_pot[p.player_name]))
     all_in_players_list.sort(key = lambda x: x[1], reverse = True) # sort all_in_amount in decending order
 
@@ -451,22 +451,22 @@ def conclude_round(current_gameboard):
         if p in player_pot:
             # might be fold, bet and call
             cur_main_pot_amount += player_pot[p.player_name]
-            if current_gameboard['players_last_move_list'] != 'FOLD':
+            if current_gameboard['board'].players_last_move_list != 'FOLD':
                 cur_main_pot_attendee.add(p.player_name)
             else:
                 fold_count += 1
 
     # recheck 
-    assert fold_count + len(cur_main_pot_attendee) == len(current_gameboard['board']['pots_attendee_list'][-1])
+    assert fold_count + len(cur_main_pot_attendee) == len(current_gameboard['board'].pots_attendee_list[-1])
 
     # put the above two into current_gameboard['board']['pots_amount_list'] and current_gameboard['pots_attendee_list']
     # These might inlcude player who is fold, should recheck again in find_winner(conclude_game)
 
-    current_gameboard['board']['pots_amount_list'][-1] += cur_main_pot_amount 
+    current_gameboard['board'].pots_amount_list[-1] += cur_main_pot_amount 
 
     if cur_side_pot_amount_list:
-        current_gameboard['board']['pots_amount_list'] += cur_side_pot_amount_list
-        current_gameboard['board']['pots_attendee_list'] += cur_side_pot_attendee_list
+        current_gameboard['board'].pots_amount_list += cur_side_pot_amount_list
+        current_gameboard['board'].pots_attendee_list += cur_side_pot_attendee_list
 
 
 
@@ -552,7 +552,7 @@ def conclude_game(current_gameboard):
     for player in current_gameboard['players']:
         player.reset_player_each_game(current_gameboard)
     # reset players_last_move_list
-    current_gameboard['players_last_move_list'] = ['NONE'] * len(current_gameboard['players']) 
+    current_gameboard['board'].players_last_move_list = ['NONE'] * len(current_gameboard['players']) 
 
 
     current_gameboard['board'].pots = [[0] * len(current_gameboard['players'])]
@@ -653,7 +653,7 @@ def log_ranking(current_gameboard):
             hand_string = hand_string[:-2]
             logger.debug(player.player_name + "'s rank = " + str(rank) + ', which have hand = ' + hand_string)
         else:
-            logger.debug(player.player_name + " has no rank becasue it status = " + current_gameboard['players_last_move_list'][player_idx])
+            logger.debug(player.player_name + " has no rank becasue it status = " + current_gameboard['board'].players_last_move_list[player_idx])
 
 def log_best_card(current_gameboard):
     """
@@ -665,7 +665,7 @@ def log_best_card(current_gameboard):
 
     """
     number_rank = get_number_rank()
-    for idx, move in enumerate(current_gameboard['players_last_move_list']):
+    for idx, move in enumerate(current_gameboard['board'].players_last_move_list):
         player = current_gameboard['players'][idx]
         community_cards = current_gameboard['board'].community_cards
         hole_cards = player.hole_cards
@@ -697,7 +697,7 @@ def get_rank_dict(current_gameboard):
     """
     final ranking_list looks like: [[(player_name, total_hand)], [(), ()]]
     process:
-    iterate player in current_gameboard['players_last_move_list']:
+    iterate player in current_gameboard['board'].players_last_move_list:
         if player is active:
 
 
@@ -714,7 +714,7 @@ def get_rank_dict(current_gameboard):
     hand_type_list = current_gameboard['hand_type_list']
     ranking_dic = {hand_type:[] for hand_type in hand_type_list}
 
-    for idx, move in enumerate(current_gameboard['players_last_move_list']):
+    for idx, move in enumerate(current_gameboard['board'].players_last_move_list):
         player = current_gameboard['players'][idx]
         if move not in ['FOLD', 'LOST']:
 

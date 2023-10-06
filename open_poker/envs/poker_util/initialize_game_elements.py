@@ -93,29 +93,32 @@ def initialize_game_element(player_decision_agents):
     game_elements['small_bet'] = game_elements['big_blind_amount'] # in pre-flop and flop
     game_elements['big_bet_factor_from_small_bet'] = 2
     game_elements['big_bet'] = game_elements['big_blind_amount'] * game_elements['big_bet_factor_from_small_bet'] # in turn and river
-    
+    game_elements['max_raise_count'] = 3
+
+
     game_elements['players_dict'] = {player.player_name:player for player in game_elements['players']}
     game_elements['total_number_of_players'] = len(game_elements['players_dict'] )
     game_elements['active_player'] = game_elements['total_number_of_players']
 
     # gnome poker variables
-    # game_elements['game_idx'] = 1
-    # game_elements['dealer_position'] = 0
-    game_elements['cur_phase'] = Phase.PRE_FLOP
-    game_elements['cur_phase_idx'] = 0
-    game_elements['tournament_status'] = TournamentStatus.TRUNCATED
-    game_elements['max_raise_count'] = 3
+    #game_elements['cur_phase'] = Phase.PRE_FLOP
+    #game_elements['cur_phase_idx'] = 0
+    #game_elements['tournament_status'] = TournamentStatus.TRUNCATED
+    
 
     # round parameter
+    # not use
     # game_elements['highest_raise_position'] = None
-    game_elements['current_betting_idx'] = None
-    game_elements['current_bet_count'] = 0
-    game_elements['current_raise_count'] = 0
-    game_elements['num_active_player_on_table'] = game_elements['total_number_of_players']
-    game_elements['player_last_move'] = None
-    game_elements['players_last_move_list'] = ['NONE'] * len(game_elements['players']) 
-    game_elements['small_blind_postiion_idx'] = None
-    game_elements['big_blind_postiion_idx'] = None
+    # game_elements['num_active_player_on_table'] = game_elements['total_number_of_players']
+    # game_elements['player_last_move'] = None
+
+    # put into board
+    # game_elements['current_betting_idx'] = 0
+    # game_elements['current_bet_count'] = 0
+    # game_elements['current_raise_count'] = 0
+    # game_elements['players_last_move_list'] = ['NONE'] * len(game_elements['players']) 
+    # game_elements['small_blind_postiion_idx'] = None
+    # game_elements['big_blind_postiion_idx'] = None
 
     game_elements['early_stop'] = False
 

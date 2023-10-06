@@ -30,7 +30,7 @@ def null_action():
 #     :return:
 #     """
 #     logger.debug(f'{player.player_name} are {condition}, deal all of community cards and find winner')
-#     cur_phase = current_gameboard['cur_phase']
+#     cur_phase = current_gameboard['board'].cur_phase
 #     if cur_phase == 'pre_flop_phase':
 #         current_gameboard['board'].deal_community_card_by_number(5)
 #     elif cur_phase == 'flop_phase':
@@ -38,53 +38,11 @@ def null_action():
 #     elif cur_phase == 'turn_phase':
 #         current_gameboard['board'].deal_community_card_by_number(1)
 #
-#     current_gameboard['cur_phase'] = 'concluding_phase'
+#     current_gameboard['board'].cur_phase = 'concluding_phase'
 #     current_gameboard[condition] = True
 
 
-def call_old(player, current_gameboard):
-    """
-    The action of player who would like to match previous bet on the table
-    :param player:
-    :param current_gameboard:
-    :return:
-    """
-    logger.debug(f'{player.player_name} decides to make a --- Call ---')
-    is_first_player = is_first_player_in_this_round(player, current_gameboard)
-    bet_to_follow = current_gameboard['board'].current_highest_bet
 
-    # if player if small/big blind, the bet to follow should reduce
-    if (player.small_blind or player.big_blind) and current_gameboard['cur_phase'] == 'pre_flop_phase':
-        bet_to_follow -= player.bet_amount_each_round
-        logger.debug(f'{player.player_name} is small/big blind, the bet to follow reduced to {bet_to_follow}')
-        if bet_to_follow == 0:
-            logger.debug(f'{player.player_name} is small/big blind and try to call with ${bet_to_follow}')
-            return flag_config_dict['successful_action']
-
-    if bet_to_follow > player.current_cash:
-        logger.debug(f'{player.player_name} current cash {player.current_cash} is smaller than bet want to follow')
-        return flag_config_dict['failure_code']
-    elif not current_gameboard['board'].players_made_decisions and not is_first_player:
-        logger.debug(f'{player.player_name}: cannot call at this time since no others bet previously...')
-        return flag_config_dict['failure_code']
-    elif not current_gameboard['board'].current_highest_bet and not is_first_player:
-        logger.debug(f'{player.player_name}: cannot call at this time since previous bet is 0...')
-        return flag_config_dict['failure_code']
-
-    logger.debug(f'{player.player_name} wants to call with amount: {bet_to_follow}')
-
-    total_bet = remove_chips_from_player_hand(player, bet_to_follow, 'call', current_gameboard)
-    if not total_bet or total_bet < bet_to_follow:
-        logger.debug(f'{player.player_name} does not have enough chips to call')
-        return flag_config_dict['failure_code']
-    elif total_bet != bet_to_follow:
-        logger.debug(f'{player.player_name}: bet to follow is different from total bet I want')
-        return flag_config_dict['failure_code']
-
-    # transfer that amount of money into table
-    transfer_chips_from_player_to_board(player, current_gameboard, bet_to_follow)
-
-    return flag_config_dict['successful_action']
 
 def call(player, current_gameboard):
     """ 
@@ -150,12 +108,12 @@ def call(player, current_gameboard):
         return flag_config_dict['failure_code']
 
     # check player's current_cash is larger than bet_to_follow
-    if current_gameboard['cur_phase'] in [Phase.PRE_FLOP, Phase.FLOP]:
+    if current_gameboard['board'].cur_phase in [Phase.PRE_FLOP, Phase.FLOP]:
         raise_amount = current_gameboard['small_bet']
-    elif current_gameboard['cur_phase'] in [Phase.TURN, Phase.RIVER]:
+    elif current_gameboard['board'].cur_phase in [Phase.TURN, Phase.RIVER]:
         raise_amount = current_gameboard['big_bet']
     else:
-        print('cur_phase is invalid, current value = ' + str(current_gameboard['cur_phase']))
+        print('cur_phase is invalid, current value = ' + str(current_gameboard['board'].cur_phase))
         raise
 
     already_bet = player.bet_amount_each_round
@@ -173,153 +131,22 @@ def call(player, current_gameboard):
 
     # 
     player.current_cash -= bet_to_follow
+
+    #
+    current_gameboard['board'].player_pot[player.player_name] += bet_to_follow
+
     # perform call
     current_gameboard['board'].add_total_cash_on_table(bet_to_follow)
 
     return flag_config_dict['successful_action']
 
 
-def match_highest_bet_on_the_table(player, current_gameboard):
-    """
-    at the end of each round, if already bet chips but the amount is smaller than the current highest bet on the
-    table. In order to continue the game, player should match that bet now
-    :param player:
-    :param current_gameboard:
-    :return:
-    """
-    logger.debug(f'{player.player_name} decides to --- Match ---')
-    amount_to_match = current_gameboard['board'].current_highest_bet - player.bet_amount_each_round
-
-    if amount_to_match > player.current_cash:
-        logger.debug(f'{player.player_name}: current cash {player.current_cash} is smaller than amount want to match')
-        return flag_config_dict['failure_code']
-    elif player.bet_amount_each_round >= current_gameboard['board'].current_highest_bet:
-        logger.debug(f'{player.player_name}: my bet is greater than or equal to the highest bet, something go wrong')
-        return flag_config_dict['failure_code']
-
-    total_bet = remove_chips_from_player_hand(player, amount_to_match, 'call', current_gameboard)
-    if not total_bet or total_bet < amount_to_match:
-        logger.debug(f'{player.player_name} does not have enough chips to match')
-        return flag_config_dict['failure_code']
-
-    transfer_chips_from_player_to_board(player, current_gameboard, amount_to_match)
-    logger.debug(f'{player.player_name} pays ${amount_to_match} chips to match the highest bet $'
-          f'{current_gameboard["board"].current_highest_bet} on the table')
-
-    return flag_config_dict['successful_action']
 
 
-def remove_chips_from_player_hand_old(player, amount_of_bet, new_decision, current_gameboard):
-    """
-    the function used to remove that amount of chips from player
-    reduce the corresponding cash from player, and put chips in a side temporarily which would be move to dealer later
-    assign new current decision status to the player
-    :param player: player object
-    :param amount_of_bet: amount of money remove from player
-    :param new_decision: decision status
-    :return: amount of money removed
-    """
-    chips, remaining = chips_combination_given_amount(player, amount_of_bet, current_gameboard)
-    if not chips or remaining > 0:
-        return None  # return failure_code at this time
-
-    player.assign_current_decision(new_decision)
-    player.reduce_current_cash(amount_of_bet - remaining)
-    player.add_bet_amount_each_round(amount_of_bet - remaining)
-    player.bet_amount_each_game += amount_of_bet - remaining
-
-    total_bet = 0
-    for amount, chips_list in chips.items():
-        total_bet += amount * len(chips_list)
-        player.add_current_bet(amount, chips_list)
-    return total_bet  # get proper amount of money from this player
-
-def remove_chips_from_player_hand(player, amount_of_bet, new_decision, current_gameboard):
-    """ 
-
-    Args:
-        player(Player)
-        amount_of_bet(int)
-        new_decision(str)
-        current_gameboard
-
-    Returns:
-        (int):amount of money removed
-
-    """
-    chips, remaining = chips_combination_given_amount(player, amount_of_bet, current_gameboard)
-    if not chips or remaining > 0:
-        return None  # return failure_code at this time
-
-    player.assign_current_decision(new_decision)
-    player.reduce_current_cash(amount_of_bet - remaining)
-    player.add_bet_amount_each_round(amount_of_bet - remaining)
-    player.bet_amount_each_game += amount_of_bet - remaining
-
-    total_bet = 0
-    for amount, chips_list in chips.items():
-        total_bet += amount * len(chips_list)
-        player.add_current_bet(amount, chips_list)
-    return total_bet  # get proper amount of money from this player
 
 
-def transfer_chips_from_player_to_board(player, current_gameboard, total_bet):
-    """
-    add amount of money to the dealer, and also update current highest bet on the table in this round
-    remove player chips from his/her hand
-    :param player: player object
-    :param current_gameboard: current gameboard
-    :param total_bet: amount of bet to add
-    :return: None
-    """
-    current_gameboard['board'].add_total_cash_on_table(total_bet)
-    current_gameboard['board'].compare_for_highest_bet(total_bet)
-    current_gameboard['board'].add_chips_to_pot(player.current_bet)
-    player.current_bet = dict()
 
 
-def raise_bet_old(player, current_gameboard, amount_to_raise):
-    """
-    In this action, player would like to bet a higher amount then previous bet on the table
-    :param player:
-    :param current_gameboard:
-    :return:
-    """
-    logger.debug(f'{player.player_name} decides to --- Raise Bet ---')
-    highest_bet = current_gameboard['board'].current_highest_bet
-
-    if not highest_bet:
-        logger.debug(f'{player.player_name}: there is no bet previously, I cannot raise a bet')
-        return flag_config_dict['failure_code']
-    # minimum raise should be the size of last bet
-    elif current_gameboard['cur_phase'] == 'pre_flop_phase' and not highest_bet:
-        if amount_to_raise < current_gameboard['small_blind_amount'] * current_gameboard['big_blind_pay_from_baseline']:
-            logger.debug(f'{player.player_name}: minimum raise bet should be at least size of last bet')
-            return flag_config_dict['failure_code']
-    elif amount_to_raise < highest_bet:
-        logger.debug(f'{player.player_name}: minimum raise bet should be at least size of last bet')
-        return flag_config_dict['failure_code']
-
-    # new amount after raise with certain amount
-    new_bet = highest_bet + amount_to_raise
-    if new_bet > player.current_cash:
-        logger.debug(f'{player.player_name}: current cash {player.current_cash} is smaller than bet {new_bet}')
-        return flag_config_dict['failure_code']
-
-    total_bet = remove_chips_from_player_hand(player, new_bet, 'raise_bet', current_gameboard)
-    # if do not have enough money, just put as much as player current has
-    if not total_bet or total_bet < new_bet:
-        logger.debug(f'{player.player_name} does not have enough chips to raise bet')
-        return flag_config_dict['failure_code']
-
-    logger.debug(f'{player.player_name}: I will bet with amount ${new_bet}')
-    if total_bet != new_bet:
-        logger.debug(f'{player.player_name}: do not properly raise a bet with corrected amount')
-        return flag_config_dict['failure_code']
-
-    transfer_chips_from_player_to_board(player, current_gameboard, new_bet)
-
-    return flag_config_dict['successful_action']
 
 
 def raise_bet(player, current_gameboard, amount_to_raise):
@@ -376,15 +203,16 @@ def raise_bet(player, current_gameboard, amount_to_raise):
         logger.debug(f'{player.player_name}: it has reached the max_raise_count = ' + str(current_gameboard['max_raise_count']))
         return flag_config_dict['failure_code'] 
 
-    if current_gameboard['cur_phase'] in [Phase.PRE_FLOP, Phase.FLOP]:
+    if current_gameboard['board'].cur_phase in [Phase.PRE_FLOP, Phase.FLOP]:
         raise_amount = current_gameboard['small_bet']
-    elif current_gameboard['cur_phase'] in [Phase.TURN, Phase.RIVER]:
+    elif current_gameboard['board'].cur_phase in [Phase.TURN, Phase.RIVER]:
         raise_amount = current_gameboard['big_bet']
     else:
         raise
 
     bet_to_follow = raise_amount * (current_gameboard['current_bet_count'] + current_gameboard['current_raise_count'])
 
+    current_gameboard['board'].player_pot[player.player_name] += bet_to_follow
 
     highest_bet = current_gameboard['board'].current_highest_bet
 
@@ -392,7 +220,7 @@ def raise_bet(player, current_gameboard, amount_to_raise):
         logger.debug(f'{player.player_name}: there is no bet previously, I cannot raise a bet')
         return flag_config_dict['failure_code']
     # minimum raise should be the size of last bet
-    elif current_gameboard['cur_phase'] == 'pre_flop_phase' and not highest_bet:
+    elif current_gameboard['board'].cur_phase == 'pre_flop_phase' and not highest_bet:
         if amount_to_raise < current_gameboard['small_blind_amount'] * current_gameboard['big_blind_pay_from_baseline']:
             logger.debug(f'{player.player_name}: minimum raise bet should be at least size of last bet')
             return flag_config_dict['failure_code']
@@ -426,22 +254,7 @@ def raise_bet(player, current_gameboard, amount_to_raise):
     return flag_config_dict['successful_action']
 
 
-def fold_old(player, current_gameboard):
-    """
-    player decide to end the participation in the current hand
-    :param player: player object
-    :param current_gameboard: current gameboard
-    :return:
-    """
-    logger.debug(f'{player.player_name} decides to --- Fold ---')
-    if player.is_fold:
-        logger.debug(f'{player.player_name}: already fold in previous round, cannot fold again')
-        return flag_config_dict['failure_code']
 
-    player.assign_current_decision('fold')
-    player.assign_to_fold(current_gameboard)
-
-    return flag_config_dict['successful_action']
 
 def fold(player, current_gameboard):
     """ 
@@ -468,15 +281,6 @@ def fold(player, current_gameboard):
 
 
 
-def check_old(player, current_gameboard):
-    """
-    Player decide to pass on the chance to bet
-    :param player:
-    :param current_gameboard:
-    :return:
-    """
-    logger.debug(f'{player.player_name} decides to --- Check ---')
-    return flag_config_dict["check"]
 
 def check(player, current_gameboard):
     """ 
@@ -497,42 +301,7 @@ def check(player, current_gameboard):
 
 
 
-def bet_old(player, current_gameboard, first_bet):
-    """
-    the first player who decides to bet a certain amount of money in the round
-    minimum number to bet is 20 times of big blind and maximum number to bet is 100 times of big blind
-    :param player:
-    :param current_gameboard:
-    :return:
-    """
-    logger.debug(f'{player.player_name} decides to --- Bet ---')
-    prev_bet = current_gameboard['board'].current_highest_bet
-    minimum_bet = 20 * current_gameboard['small_blind_amount'] * current_gameboard['big_blind_pay_from_baseline']
-    maximum_bet = 100 * current_gameboard['small_blind_amount'] * current_gameboard['big_blind_pay_from_baseline']
 
-    if prev_bet:
-        logger.debug(f'{player.player_name}: I cannot bet since there is a bet ${prev_bet} before')
-        return flag_config_dict['failure_code']
-    elif first_bet > player.current_cash:
-        logger.debug(f'{player.player_name}: current cash {player.current_cash} is smaller than {first_bet}')
-        return flag_config_dict['failure_code']
-    elif first_bet < minimum_bet or first_bet > maximum_bet:
-        logger.debug(f'{player.player_name}: initial bet should in range {minimum_bet} ~ {maximum_bet}')
-        return flag_config_dict['failure_code']
-
-    total_bet = remove_chips_from_player_hand(player, first_bet, 'bet', current_gameboard)
-    if not total_bet or total_bet < first_bet:
-        logger.debug(f'{player.player_name} does not have enough chips to bet')
-        return flag_config_dict['failure_code']
-
-    logger.debug(f'{player.player_name}: as the first player, I bet with chips ${first_bet}')
-    if total_bet != first_bet:
-        logger.debug(f'{player.player_name}: bet number is different as you want, something go wrong...')
-        return flag_config_dict['failure_code']
-
-    transfer_chips_from_player_to_board(player, current_gameboard, first_bet)
-
-    return flag_config_dict['successful_action']
 
 def bet(player, current_gameboard, first_bet):
     """ 
@@ -557,7 +326,7 @@ def bet(player, current_gameboard, first_bet):
         return flag_config_dict['failure_code']
 
 
-    
+
     total_bet = remove_chips_from_player_hand(player, first_bet, 'bet', current_gameboard)
     if not total_bet or total_bet < first_bet:
         logger.debug(f'{player.player_name} does not have enough chips to bet')
