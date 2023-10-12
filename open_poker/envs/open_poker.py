@@ -9,7 +9,7 @@ import logging
 import math
 import time
 
-import open_poker.envs.gnome_poker 
+
 import open_poker.envs.poker_util as poker_util
 
 import sys, os
