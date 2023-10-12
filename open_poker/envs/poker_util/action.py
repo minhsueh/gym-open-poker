@@ -9,7 +9,10 @@ class Action(Enum):
     RAISE_BET = 2
     CHECK = 3
     FOLD = 4
-    SMALL_BLIND = 5
-    BIG_BLIND = 6
+    ALL_IN = 5
+    SMALL_BLIND = 6
+    BIG_BLIND = 7
+    LOST = 8
+
 
 

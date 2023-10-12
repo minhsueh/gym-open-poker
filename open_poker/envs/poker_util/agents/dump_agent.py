@@ -64,7 +64,7 @@ def make_flop_moves(player, current_gameboard, allowable_actions, code):
     params['player'] = player
     params['current_gameboard'] = current_gameboard
 
-    
+
     if check in allowable_actions:
         return check, params
     else:

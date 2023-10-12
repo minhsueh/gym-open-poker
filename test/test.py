@@ -9,7 +9,9 @@ from open_poker.envs.poker_util.agents import agent_call_AJ_flop, background_age
 # background_agents_list = [example_agent_call, example_agent_call, example_agent_call]
 background_agents_list = [dump_agent, dump_agent, dump_agent, dump_agent]
 
-env = gym.make("open_poker/OpenPoker-v0", background_agents_list=background_agents_list, render_mode='human')
+SLEEP = False
+
+env = gym.make("open_poker/OpenPoker-v0", background_agents_list=background_agents_list, render_mode='human', sleep_mode=SLEEP)
 observation, info = env.reset(seed=42)
 print(observation)
 """

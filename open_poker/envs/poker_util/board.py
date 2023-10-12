@@ -2,6 +2,8 @@ from card_utility_actions import *
 from action_choices import *
 import numpy as np
 import collections
+from action import Action
+
 
 from phase import Phase
 import logging
@@ -21,7 +23,7 @@ class Board:
         # self.players_made_decisions = list()  # players who have made decision on the table
         # self.current_highest_bet = 0  # previous bet in the current round
         # self.buy_in_amount = 40  # 20 times to 100 times of force bet of big blind
-        self.num_active_player_on_table = num_active_player_on_table  # number of player could act in a hand
+        # self.num_active_player_on_table = num_active_player_on_table  # number of player could act in a hand
         self.game_idx = 1
         self.dealer_position = 0
 
@@ -29,15 +31,16 @@ class Board:
 
         self.cur_phase = Phase.PRE_FLOP
 
-
-        self.player_pot = collections.defaultdict(int)
-        self.pots_amount_list = [0]
-        self.pots_attendee_list = ['player_'+str(i) for i in range(1, num_active_player_on_table+1)]
+        # parameters to keep track on the total betting
+        self.player_pot = collections.defaultdict(int) # how much did each player spend in the current round
+        self.players_last_move_list = [Action.NONE] * num_active_player_on_table # keep track on last move of each player
+        self.pots_amount_list = [0] # the total amount on the table, it will be update in function conclude round. The size might differ if there are side pot.
+        self.pots_attendee_list = [set(['player_'+str(i) for i in range(1, num_active_player_on_table+1)])] # who is attend in corresponding pot in pots_amount_list. The size should be same as pots_amount_list.
+        
 
         self.current_betting_idx = 0
         self.current_bet_count = 0
         self.current_raise_count = 0
-        self.players_last_move_list = ['NONE'] * num_active_player_on_table
         self.small_blind_postiion_idx = 1
         self.big_blind_postiion_idx = 2
 
@@ -69,23 +72,7 @@ class Board:
         """
         self.current_highest_bet = max(self.current_highest_bet, new_bet)
 
-    def reset_board_each_game_old(self, current_gameboard):
-        """
-        run this function after each river round to re-shuffle the deck for next game
-        :return:
-        """
-        if current_gameboard['cur_phase'] != 'concluding_phase':
-            logger.debug('Board: we are in the wrong phase to reset board each game')
-            raise Exception
 
-        self.deck_idx = 0
-        self.total_cash_on_table = 0
-        self.current_highest_bet = 0
-        self.pot = dict()
-        self.side_pot = dict()
-        self.community_cards = list()
-        self.num_active_player_on_table = len(current_gameboard['players']) 
-        np.random.shuffle(self.deck)
 
     def reset_board_each_game(self, current_gameboard):
         """
@@ -96,24 +83,50 @@ class Board:
             None
 
         """
+
+        # deck
         self.deck_idx = 0
         self.community_cards = list()
-        active_player_count = 0
+        np.random.shuffle(self.deck)
+
+        # pots_attendee_list
+        attendee = set()
         for p in current_gameboard['players']:
             if p.status != 'lost':
-                active_player_count += 1
-        self.num_active_player_on_table = active_player_count
-        np.random.shuffle(self.deck)
-        self.game_idx += 1
+                attendee.add(p.player_name)
+        current_gameboard['board'].pots_attendee_list = [attendee]
+
+        # pots_amount_list
+        current_gameboard['board'].pots_amount_list = [0]
+
+        # reset players_last_move_list
+        for move_idx in range(len(current_gameboard['players'])):
+            if current_gameboard['board'].players_last_move_list[move_idx] != Action.FOLD:
+                current_gameboard['board'].players_last_move_list[move_idx] = Action.NONE
+
+        # player_pot
+        self.player_pot = collections.defaultdict(int)
+
         # update dealer_position:
         dealer_position = self.dealer_position
-        
+        total_number_of_players = current_gameboard['total_number_of_players']
+
         while(True):
-            dealer_position = (dealer_position+1)%len(current_gameboard['players'])
+            dealer_position = (dealer_position+1)%total_number_of_players
             if current_gameboard['players'][dealer_position].status != 'lost':
                 self.dealer_position = dealer_position
                 break
 
+         # update big and small blind:
+        counter = 0
+        for idx in range(dealer_position + 1, dealer_position + total_number_of_players + 1):
+            player = current_gameboard['players'][idx % total_number_of_players]
+            if player.status != 'lost':
+                counter += 1
+                if counter == 1:
+                    current_gameboard['board'].small_blind_postiion_idx = idx % total_number_of_players
+                elif counter == 2:
+                    current_gameboard['board'].big_blind_postiion_idx = idx % total_number_of_players
 
     def reset_board_each_round(self, current_gameboard):
         self.players_made_decisions = list()

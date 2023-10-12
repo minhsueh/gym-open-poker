@@ -91,7 +91,8 @@ class OpenPokerEnv(gym.Env):
             small_bet=2,
             big_bet=4,
             render_mode=None,
-            size=5):
+            size=5,
+            sleep_mode=True):
         """
         PARAMS:
             number_of_players(int): The number of player join the game.
@@ -113,7 +114,7 @@ class OpenPokerEnv(gym.Env):
         self.big_bet = big_bet
         self.small_blind = small_bet//2
         self.big_blind = small_bet
-
+        self.buy_in = 100
 
 
         # Limit Texas Hold'em poker rules
@@ -121,7 +122,7 @@ class OpenPokerEnv(gym.Env):
 
         
 
-
+        self.sleep_mode = sleep_mode
 
         # restrictions
         self.bankroll_limit = 1500
@@ -129,10 +130,10 @@ class OpenPokerEnv(gym.Env):
 
 
         # gnome poker variables
-        self.dealer_position = 0
-        self.raise_count = 0
-        self.cur_phase = Phase.PRE_FLOP
-        self.tournament_status = TournamentStatus.TRUNCATED
+        # self.dealer_position = 0
+        # self.raise_count = 0
+        # self.cur_phase = Phase.PRE_FLOP
+        # self.tournament_status = TournamentStatus.TRUNCATED
 
 
         # Global level: Player's bankroll. spaces.Box. size = (number_of_players,)  
@@ -149,24 +150,25 @@ class OpenPokerEnv(gym.Env):
                 "position": spaces.Box(0, self.number_of_players-1, shape=(2,), dtype=np.int64),
                 "hole_cards": spaces.Box(1, 52, shape=(2,), dtype=np.int64), 
                 "community_card": spaces.Box(-1, 52, shape=(5,), dtype=np.int64), 
-                "bet": spaces.Box(-1, 4, shape=(self.number_of_players,), dtype=np.int64)
+                "action": spaces.Box(-1, 5, shape=(self.number_of_players,), dtype=np.int64),
+                "pot_amount": spaces.Box(0, self.buy_in*self.number_of_players, shape=(1,), dtype=np.int64)
             }
         )
 
         # We have 7 actions, corresponding to "call", "bet", "raise", "check", "fold"
-        self.action_space = spaces.Discrete(5, start=0)
-
+        self.action_space = spaces.Discrete(6, start=0)
         """
         TBM
         """
         self._action_encoder = {
-            'LOSE': -1,
-            'NONE': -1,
-            'CALL': 0,
-            'BET': 1,
-            'RAISE_BET': 2,
-            'CHECK': 3,
-            'FOLD': 4
+            Action.LOST: -1,
+            Action.NONE: -1,
+            Action.CALL: 0,
+            Action.BET: 1,
+            Action.RAISE_BET: 2,
+            Action.CHECK: 3,
+            Action.FOLD: 4,
+            Action.ALL_IN: 5
         }
 
 
@@ -188,7 +190,7 @@ class OpenPokerEnv(gym.Env):
         self.window = None
         self.clock = None
         self.window_width = 1000  # The width of the PyGame window
-        self.window_height = 500  # The height of the PyGame window
+        self.window_height = 600  # The height of the PyGame window
         
     def _action_decoder(self, player, action):
         """
@@ -350,11 +352,11 @@ class OpenPokerEnv(gym.Env):
 
         return(np.array(current_community_card + [-1] * (5 - len(current_community_card)), dtype=np.int64))
 
-    def _get_bet_info(self):
+    def _get_action_info(self):
         # size = self.number_of_players
         players_last_move_list_encode = []
         for move in self.game_elements['board'].players_last_move_list:
-            if move in ['SMALL_BLIND', 'BIG_BLIND']:
+            if move in [Action.SMALL_BLIND, Action.BIG_BLIND, Action.NONE]:
                 # which mean they didn't move
                 players_last_move_list_encode.append(-1)
             else:
@@ -362,6 +364,22 @@ class OpenPokerEnv(gym.Env):
 
 
         return(np.array(players_last_move_list_encode, dtype=np.int64))
+
+    def _get_pot_amount(self):
+        # get the amount (included main pot and side pot)
+
+        total_amount = 0
+
+        # amount in previous round
+        total_amount += sum(self.game_elements['board'].pots_amount_list) 
+        
+        # amount in current round
+
+        for player_name in self.game_elements['board'].player_pot:
+            total_amount += self.game_elements['board'].player_pot[player_name]
+
+
+        return(np.array([total_amount]))
 
 
     def _get_obs(self):
@@ -372,17 +390,18 @@ class OpenPokerEnv(gym.Env):
             "position": self._get_position_info(),
             "hole_cards": self._get_hole_cards_info(),
             "community_card": self._get_community_card_info(),
-            "bet": self._get_bet_info()
+            "action": self._get_action_info(),
+            "pot_amount": self._get_pot_amount()
         }
 
-    def set_up_board(self, player_decision_agents):
+    def set_up_board(self, player_decision_agents, random_seed):
         """
         The function to set up game elements`
         :param player_decision_agents: dictionary of player name and its corresponding agent
         :return: game elements
         :rtype: dict
         """
-        return initialize_game_element(player_decision_agents)
+        return initialize_game_element(player_decision_agents, random_seed)
 
     def _get_info(self):
 
@@ -393,7 +412,7 @@ class OpenPokerEnv(gym.Env):
         'BET': 1,
         'RAISE_BET': 2,
         'CHECK': 3,
-        'FOLD': 4
+        Action.FOLD: 4
 
         for idx, player in enumerate(self.game_elements['players']):
             if player.player_name == 'player_1' and idx == ((self.game_elements['dealer_position']+1)%self.game_elements['number_of_players']):
@@ -424,7 +443,7 @@ class OpenPokerEnv(gym.Env):
 
         allowable_string = [action.__name__ for action in allowable_actions]
         action_masks = []
-        for action in ['call', 'bet', 'raise_bet', 'check', 'fold']:
+        for action in ['call', 'bet', 'raise_bet', 'check', 'fold', 'all_in']:
             if action in allowable_string:
                 action_masks.append(1)
             else:
@@ -445,17 +464,15 @@ class OpenPokerEnv(gym.Env):
 
     def reset(self, seed=None, options=None):
         # We need the following line to seed self.np_random
-
-
-
-        
-
-        self.game_elements = self.set_up_board(self.player_decision_agents)
+        super().reset(seed=seed)
+        np.random.seed(seed)
+        self.game_elements = self.set_up_board(self.player_decision_agents, random_seed=seed)
 
         if self.render_mode == "human":
             self.render()
-            time.sleep(1)
 
+
+        """
         super().reset(seed=seed)
         np.random.seed(seed)
         np.random.shuffle(self.game_elements['players'])
@@ -466,8 +483,12 @@ class OpenPokerEnv(gym.Env):
             player.position = idx
             player_seq += player.player_name + ' -> '
         logger.debug(player_seq[:-4])
+        """
+        # This is the start of tournament, no need to initialize game
+        # dealer.initialize_game(self.game_elements)
 
-
+        # 
+        dealer.initialize_round(self.game_elements)
 
         # Deal the hole card
         dealer.check_and_deal_hole_cards(self.game_elements)
@@ -478,10 +499,10 @@ class OpenPokerEnv(gym.Env):
         # initialize_betting
         dealer.initialize_betting(self.game_elements)
 
-
+        
 
         # start perform pre-flop betting
-        if self.game_elements['players'][self.game_elements['current_betting_idx']].player_name != 'player_1':
+        if self.game_elements['players'][self.game_elements['board'].current_betting_idx].player_name != 'player_1':
             self._betting()
 
 
@@ -490,8 +511,8 @@ class OpenPokerEnv(gym.Env):
 
 
         if self.render_mode == "human":
-            self._render_frame()
-            time.sleep(1)
+            self.render()
+
 
         return observation, info
 
@@ -538,66 +559,67 @@ class OpenPokerEnv(gym.Env):
                 break
         assert player is not None
 
-
         execute_res = self.execute_player_1_action(player, action)
+
+        # invalid move -> lost immediately
         if execute_res:
             return(execute_res[0])
+
+        if self.render_mode == "human":
+            self.render()
 
         while(True):
             # continue betting
             if not dealer.check_betting_over(self.game_elements):
-                 # continue betting
+                # continue betting
                 is_over = self._betting()
-                if not is_over and self.game_elements['board'].players_last_move_list[player_idx] != 'FOLD':
+
+                if not is_over and self.game_elements['board'].players_last_move_list[player_idx] != Action.FOLD:
                     observation = self._get_obs()
                     reward = 0
                     terminated = False
                     truncated = False
                     info = self._get_info()
+                    print(self.game_elements['board'].current_betting_idx)
                     if self.render_mode == "human":
                         self.render()
-                        time.sleep(1)
+
                     return observation, reward, terminated, truncated, info
                 elif not is_over:
                     # player_1 fold
                     continue
             else:
 
-                dealer.conclude_round(self.game_elements)
-                # The betting is over, change the phase
-                new_phase = dealer.change_phase(self.game_elements)
+                early_stop = dealer.conclude_round(self.game_elements)
+                if not early_stop:
+                    # The betting is over, change the phase
+                    new_phase = dealer.change_phase(self.game_elements)
 
                 # 
-                if new_phase != Phase.PRE_FLOP:
-                    # deal community card
-                    dealer.check_and_deal_community_card(self.game_elements)
-
-                    # initialize_betting
-                    dealer.initialize_betting(self.game_elements)
-
-                    # betting
-                    self._betting()
-                    if self.render_mode == "human":
-                        self.render()
-                        time.sleep(1)
-                    if self.game_elements['board'].players_last_move_list[player_idx] != 'FOLD':
-                        return self._get_obs(), 0, False, False, self._get_info()
+                
 
 
-                elif new_phase == Phase.PRE_FLOP or current_gameboard['early_stop']:
+                if early_stop or new_phase == Phase.PRE_FLOP:
                     # conclude this game
-                    dealer.find_winner(self.game_elements)
-            
-                    dealer.log_best_card(self.game_elements)
-                    dealer.log_ranking(self.game_elements)
+                    if not early_stop:
+                        dealer.log_best_card(self.game_elements)
+                        dealer.log_ranking(self.game_elements)
                     is_end = dealer.conclude_game(self.game_elements)
 
                     if is_end:
                         if self.render_mode == "human":
                             self.render()
+
                         return self._get_obs(), 0, True, False, self._get_info()
 
                     # srart the new game
+
+                    #
+                    dealer.initialize_game(self.game_elements)
+
+                    #
+                    dealer.initialize_round(self.game_elements)
+
                     # Deal the hole card
                     dealer.check_and_deal_hole_cards(self.game_elements)
 
@@ -606,9 +628,28 @@ class OpenPokerEnv(gym.Env):
 
                     # initialize_betting
                     dealer.initialize_betting(self.game_elements)
+                elif new_phase != Phase.PRE_FLOP:
+
+                    dealer.initialize_round(self.game_elements)
+
+                    # deal community card
+                    dealer.check_and_deal_community_card(self.game_elements)
+
+                    # initialize_betting
+                    dealer.initialize_betting(self.game_elements)
+
+                    # betting
+                    self._betting()
+                    # if self.render_mode == "human":
+                    #    self.render()
+
+
+                    if self.game_elements['board'].players_last_move_list[player_idx] != Action.FOLD:
+                        if self.render_mode == "human":
+                            self.render()
+                        return self._get_obs(), 0, False, False, self._get_info()
   
-        if self.render_mode == "human":
-            self.render()
+
 
 
 
@@ -619,16 +660,16 @@ class OpenPokerEnv(gym.Env):
 
         # execute player_1's action
         code = player._execute_action(action_to_execute, parameters, self.game_elements)
-        last_move = action_to_execute.__name__.upper()
-        current_betting_idx = self.game_elements['current_betting_idx']
+        last_move = Action[action_to_execute.__name__.upper()]
+        current_betting_idx = self.game_elements['board'].current_betting_idx
         total_number_of_players = self.game_elements['total_number_of_players']
 
         if code == flag_config_dict['failure_code']:
             logger.debug(f'Board: {player.player_name} tries an invalid move, assign to lost')
-            self.game_elements['board'].players_last_move_list[current_betting_idx] = 'LOSE'
+            self.game_elements['board'].players_last_move_list[current_betting_idx] = Action.LOST
             player.assign_status(self.game_elements, 'lost')
             current_betting_idx = (current_betting_idx + 1) % total_number_of_players
-            self.game_elements['current_betting_idx'] = current_betting_idx
+            self.game_elements['board'].current_betting_idx = current_betting_idx
             logger.debug('The current players_last_move_list is: ' + str(_get_players_last_move_list_string(self.game_elements)))
 
             if self.render_mode == "human":
@@ -636,11 +677,14 @@ class OpenPokerEnv(gym.Env):
             return [self._get_obs(), -100, True, False, self._get_info()]
 
         
-        self.game_elements['board'].players_last_move_list[current_betting_idx] = last_move
+
+        # self.game_elements['board'].players_last_move_list[current_betting_idx] = last_move
+        dealer.update_player_last_move(self.game_elements, player.player_name, last_move)
+
         logger.debug(f'Board: {player.player_name} do the {last_move}')
         dealer.print_single_player_cash_info(self.game_elements, player.player_name)
         current_betting_idx = (current_betting_idx + 1) % total_number_of_players
-        self.game_elements['current_betting_idx'] = current_betting_idx
+        self.game_elements['board'].current_betting_idx = current_betting_idx
         logger.debug('The current players_last_move_list is: ' + str(_get_players_last_move_list_string(self.game_elements)))
         return([])
 
@@ -673,50 +717,52 @@ class OpenPokerEnv(gym.Env):
         # start from current_betting_idx: current_betting_idx + total_number_of_players
         # record every action
         # determine stop betting or return to player_1
-        current_betting_idx = self.game_elements['current_betting_idx']
+        current_betting_idx = self.game_elements['board'].current_betting_idx
         total_number_of_players = self.game_elements['total_number_of_players']
         while(not dealer.check_betting_over(self.game_elements)):
-            if self.render_mode == "human":
-                self.render()
-                time.sleep(1)
+            
+
             player = self.game_elements['players'][current_betting_idx]
-            if player.status != 'lose':
+            if player.status != 'lost':
                 logger.debug(player.player_name + ' start to move.')
-                if player.player_name == 'player_1' and self.game_elements['board'].players_last_move_list[current_betting_idx] != 'FOLD':
+                if player.player_name == 'player_1' and self.game_elements['board'].players_last_move_list[current_betting_idx] != Action.FOLD:
                     # this is gym user, return and wait for the next step
                     return(False) # meaning the betting is still continue
-                elif player.player_name == 'player_1':
+                elif self.game_elements['board'].players_last_move_list[current_betting_idx] == Action.FOLD:
+                    
+                    # fold
                     current_betting_idx = (current_betting_idx + 1) % total_number_of_players
-                    self.game_elements['current_betting_idx'] = current_betting_idx
+                    self.game_elements['board'].current_betting_idx = current_betting_idx
                     continue
-
                 else:
+
                     code, last_move  = self._get_background_agent_action(player, self.game_elements['board'].cur_phase)
                     if code == flag_config_dict['failure_code']:
                         logger.debug(f'Board: {player.player_name} tries an invalid move, assign to lost')
-                        self.game_elements['board'].players_last_move_list[current_betting_idx] = 'LOSE'
+                        self.game_elements['board'].players_last_move_list[current_betting_idx] = Action.LOST
                         player.assign_status(self.game_elements, 'lost')
                         current_betting_idx = (current_betting_idx + 1) % total_number_of_players
-                        self.game_elements['current_betting_idx'] = current_betting_idx
+                        self.game_elements['board'].current_betting_idx = current_betting_idx
                         logger.debug('The current players_last_move_list is: ' + str(_get_players_last_move_list_string(self.game_elements)))
                         continue
                     self.game_elements['board'].players_last_move_list[current_betting_idx] = last_move
                     logger.debug(f'Board: {player.player_name} do the {last_move}')
                     dealer.print_single_player_cash_info(self.game_elements, player.player_name)
-
+            if self.render_mode == "human":
+                self.render()
 
             current_betting_idx = (current_betting_idx + 1) % total_number_of_players
-            self.game_elements['current_betting_idx'] = current_betting_idx
+            self.game_elements['board'].current_betting_idx = current_betting_idx
             logger.debug('The current players_last_move_list is: ' + str(_get_players_last_move_list_string(self.game_elements)))
         logger.debug('This betting is over.')
-        if self.render_mode == "human":
-            self.render()
-            time.sleep(1)
+        #if self.render_mode == "human":
+        #    self.render()
+
         return(True) # meaning the betting is over
 
         
     
-    def _get_background_agent_action(self, player, phase):
+    def _get_background_agent_action(self, cur_player, phase):
         """ 
         use 
             self.game_elements['player_last_move']
@@ -729,7 +775,7 @@ class OpenPokerEnv(gym.Env):
 
         
         Args:
-            player(Player)
+            cur_player(Player)
             phase(Phase)
             
         Returns:
@@ -737,26 +783,30 @@ class OpenPokerEnv(gym.Env):
         Raises:
         """
         if phase == Phase.PRE_FLOP:
-            code = player.make_pre_flop_moves(self.game_elements)
+            code = cur_player.make_pre_flop_moves(self.game_elements)
         elif phase == Phase.FLOP:
-            code = player.make_flop_moves(self.game_elements)
+            code = cur_player.make_flop_moves(self.game_elements)
         elif phase == Phase.TURN:
-            code = player.make_turn_moves(self.game_elements)
+            code = cur_player.make_turn_moves(self.game_elements)
         elif phase == Phase.RIVER:
-            code = player.make_river_moves(self.game_elements)
+            code = cur_player.make_river_moves(self.game_elements)
         else:
             raise('This phase is invalid, current = ' + str(phase))
 
 
-        player_last_move = self.game_elements['player_last_move']
+        for player_idx, player in enumerate(self.game_elements['players']):
+            if player.player_name == cur_player.player_name:
+                break
+
+        player_last_move = self.game_elements['board'].players_last_move_list[player_idx]
 
         if player_last_move is None:
             raise ('player_last_move is wrong. please check')
 
 
-        self.game_elements['player_last_move'] = None
 
-        return(code, player_last_move.upper())
+
+        return(code, player_last_move)
 
 
 
@@ -764,7 +814,10 @@ class OpenPokerEnv(gym.Env):
 
     def render(self):
         if self.render_mode == "human":
+            if self.sleep_mode:
+                time.sleep(1)
             return self._render_frame()
+
 
 
     def _render_frame(self):
@@ -818,7 +871,7 @@ class OpenPokerEnv(gym.Env):
         player_info_b = self.window_height*4.5/5
         card_info_a = self.window_width*2.5/5
         card_info_b = self.window_height*2.5/5
-        line_spacing = self.window_height/25
+        line_spacing = self.window_height/30
         board_center_x = self.window_width/2
         board_center_y = self.window_height/2
         board_x = board_center_x - board_a/2
@@ -914,10 +967,12 @@ class OpenPokerEnv(gym.Env):
         community_card_info_x_y = [(community_card_x + i*(card_img_width+card_spacing), community_card_y) for i in range(5)]
 
 
+
         player_list = [player.player_name for player in self.game_elements['players']]
         for pidx in range(len(player_list)):
 
             # player info
+
             player_string_list = [player_list[pidx]]
             if player_list[pidx] == 'player_1':
                 player_string_list.append('(you)')
@@ -928,8 +983,8 @@ class OpenPokerEnv(gym.Env):
             if pidx == dealer_idx:
                 player_string_list.append('(dealer)')
             last_move = self.game_elements['board'].players_last_move_list[pidx]
-            if last_move not in ['LOST', 'NONE']:
-                player_string_list.append(last_move)
+            if last_move not in [Action.LOST, Action.NONE]:
+                player_string_list.append(last_move.name)
             
 
             for player_info_idx in range(len(player_string_list)):
@@ -957,7 +1012,7 @@ class OpenPokerEnv(gym.Env):
 
 
         # pot
-        pot_amount_string = "Pot: $" + str(self.game_elements['board'].pots_amount_list[-1])
+        pot_amount_string = "Pot: $" + str(self._get_pot_amount()[0])
         text_surface = font.render(pot_amount_string, True, text_color)
         self.window.blit(text_surface, text_surface.get_rect(center = (board_center_x, dealer_card_rect.bottom + card_img_height/2)))
 
@@ -968,22 +1023,25 @@ class OpenPokerEnv(gym.Env):
 
 
         # action mask
-        action_masks = self._get_info()['action_masks'].tolist()
-        action_box_x_y = [(action_box_x, action_box_y + i*(action_box_height+action_box_spacing)) for i in range(5)]
+        current_betting_idx = self.game_elements['board'].current_betting_idx
+        if self.game_elements['players'][current_betting_idx].player_name == 'player_1' and self.game_elements['board'].players_last_move_list[current_betting_idx] != Action.FOLD:
+            action_masks = self._get_info()['action_masks'].tolist()
+            action_list = ['Call(0)', 'Bet(1)', 'Raise_bet(2)', 'Check(3)', 'Fold(4)', 'ALL IN(5)']
+            action_box_x_y = [(action_box_x, action_box_y + i*(action_box_height+action_box_spacing)) for i in range(len(action_list))]
 
-        for action_idx, action in enumerate(['Call(0)', 'Bet(1)', 'Raise_bet(2)', 'Check(3)', 'Fold(4)']):
-            if action_masks[action_idx] == 1:
-                # allow action
-                text_backgound_color = (7, 250, 2)
-                text_color = (0, 0, 0)
-            else:
-                # not allow action
-                text_backgound_color = (250, 2, 2)
-                text_color = (181, 184, 178)
+            for action_idx, action in enumerate(['Call(0)', 'Bet(1)', 'Raise_bet(2)', 'Check(3)', 'Fold(4)', 'ALL IN(5)']):
+                if action_masks[action_idx] == 1:
+                    # allow action
+                    text_backgound_color = (7, 250, 2)
+                    text_color = (0, 0, 0)
+                else:
+                    # not allow action
+                    text_backgound_color = (250, 2, 2)
+                    text_color = (181, 184, 178)
 
-            text = font.render(action, True, text_color, text_backgound_color)
-            text_rect = text.get_rect(topleft=action_box_x_y[action_idx])
-            self.window.blit(text, text_rect)
+                text = font.render(action, True, text_color, text_backgound_color)
+                text_rect = text.get_rect(topleft=action_box_x_y[action_idx])
+                self.window.blit(text, text_rect)
 
 
 

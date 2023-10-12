@@ -14,6 +14,7 @@ from collections import deque
 from phase import Phase
 from tournament_status import TournamentStatus
 import dealer
+import numpy as np
 
 
 import logging
@@ -22,11 +23,12 @@ logger = logging.getLogger('open_poker.envs.poker_util.logging_info.init_game_el
 
 
 
-def initialize_game_element(player_decision_agents):
+def initialize_game_element(player_decision_agents, random_seed):
     """Initialization function for cards, player, board, history, and rules
 
     Args:
         player_decision_agents:
+        random_seet(int)
 
     Returns:
         game_element variable which contains all elements to use during the game
@@ -34,45 +36,41 @@ def initialize_game_element(player_decision_agents):
     Raises:
       
     """
+    np.random.seed(random_seed)
+
     game_elements = dict()
-    game_elements['num2color'] = {
-        1: 'white',
-        5: 'red',
-        10: 'blue',
-        25: 'green',
-        100: 'black',
-        500: 'purple',
-        1000: 'orange'
-    }
-    game_elements['num2weight'] = {
-        1: 7.5,
-        5: 8.5,
-        10: 9.0,
-        25: 11.5,
-        100: 13,
-        500: 13.5,
-        1000: 14.0
-    }
-    game_elements['amount2cnt'] = {
-        1: 0,
-        5: 2,
-        10: 9,
-        25: 0,
-        100: 0,
-        500: 0,
-        1000: 0
-    }
+
+
+    game_elements['small_blind_amount'] = 5  # this could increase as number of games increase
+    game_elements['big_blind_pay_from_baseline'] = 2  # if small_blind_amount is 1, big blind pay 1 * 2
+    game_elements['big_blind_amount'] = game_elements['small_blind_amount'] * game_elements['big_blind_pay_from_baseline']
+    game_elements['small_bet'] = game_elements['big_blind_amount'] # in pre-flop and flop
+    game_elements['big_bet_factor_from_small_bet'] = 2
+    game_elements['big_bet'] = game_elements['big_blind_amount'] * game_elements['big_bet_factor_from_small_bet'] # in turn and river
+    game_elements['max_raise_count'] = 3
+
+    game_elements['buy_in_amount'] = 100
+
+    game_elements['early_stop'] = False
     
 
     _initialize_cards(game_elements)
     logger.debug('Successfully instantiated and initialized cards.')
 
-
-
     # initialized chips when initialized players
     _initialize_players(game_elements, player_decision_agents)
     logger.debug('Successfully instantiated and initialized players.')
-    dealer.print_cash_info(game_elements)
+    np.random.shuffle(game_elements['players'])
+    np.random.shuffle(game_elements['deck'])
+    player_seq = ""
+    for idx, player in enumerate(game_elements['players']):
+        player.position = idx
+        player_seq += player.player_name + ' -> '
+    logger.debug(player_seq[:-4])
+    game_elements['players_dict'] = {player.player_name:player for player in game_elements['players']}
+    game_elements['total_number_of_players'] = len(game_elements['players_dict'])
+    game_elements['active_player'] = game_elements['total_number_of_players']
+    
 
     _initialize_board(game_elements)
     logger.debug('Successfully instantiated and initialized board.')
@@ -84,21 +82,10 @@ def initialize_game_element(player_decision_agents):
     _initialize_rules(game_elements)
     logger.debug('Successfully instantiated and initialized rules.')
 
+    dealer.print_player_info(game_elements)
 
     # game_elements['type'] = "game_elements"
     # game_elements['hands_of_players'] = [dict()]  # each game result in dict, -1 should be least game
-    game_elements['small_blind_amount'] = 5  # this could increase as number of games increase
-    game_elements['big_blind_pay_from_baseline'] = 2  # if small_blind_amount is 1, big blind pay 1 * 2
-    game_elements['big_blind_amount'] = game_elements['small_blind_amount'] * game_elements['big_blind_pay_from_baseline']
-    game_elements['small_bet'] = game_elements['big_blind_amount'] # in pre-flop and flop
-    game_elements['big_bet_factor_from_small_bet'] = 2
-    game_elements['big_bet'] = game_elements['big_blind_amount'] * game_elements['big_bet_factor_from_small_bet'] # in turn and river
-    game_elements['max_raise_count'] = 3
-
-
-    game_elements['players_dict'] = {player.player_name:player for player in game_elements['players']}
-    game_elements['total_number_of_players'] = len(game_elements['players_dict'] )
-    game_elements['active_player'] = game_elements['total_number_of_players']
 
     # gnome poker variables
     #game_elements['cur_phase'] = Phase.PRE_FLOP
@@ -120,7 +107,7 @@ def initialize_game_element(player_decision_agents):
     # game_elements['small_blind_postiion_idx'] = None
     # game_elements['big_blind_postiion_idx'] = None
 
-    game_elements['early_stop'] = False
+    
 
 
     # define hand rank order
@@ -157,12 +144,17 @@ def initialize_game_element(player_decision_agents):
     game_elements['numbers_rank_type'][1] = 14
 
 
-    game_elements['find_winner'] = getattr(sys.modules[__name__], 'find_winner')
-    game_elements['calculate_best_hand'] = getattr(sys.modules[__name__], 'calculate_best_hand')
-    game_elements['assign_pot_to_only_winner'] = getattr(sys.modules[__name__], 'assign_pot_to_only_winner')
+    #game_elements['find_winner'] = getattr(sys.modules[__name__], 'find_winner')
+    #game_elements['calculate_best_hand'] = getattr(sys.modules[__name__], 'calculate_best_hand')
+    #game_elements['assign_pot_to_only_winner'] = getattr(sys.modules[__name__], 'assign_pot_to_only_winner')
 
     # extra actions
     game_elements['extra_action'] = {}
+
+
+
+
+
 
     return game_elements
 
@@ -193,7 +185,6 @@ def _initialize_players(game_elements, player_decision_agents):
     :param player_decision_agents: dict of player name as its corresponding agent object
     :return: None
     """
-    amount2cnt = game_elements['amount2cnt']
 
     players = deque()
     for player_name, agent in player_decision_agents.items():
@@ -208,9 +199,7 @@ def _initialize_players(game_elements, player_decision_agents):
         player_args['agent'] = agent
         player_args['current_decision'] = None
 
-        chips = _initialize_chips(game_elements, amount2cnt=amount2cnt)
-        player_args['chips'] = chips
-        player_args['current_cash'] = sum([chip.amount for amount_set in chips.values() for chip in amount_set])
+        player_args['current_cash'] = game_elements['buy_in_amount']
         players.append(Player(**player_args))
     game_elements['players'] = players
 
