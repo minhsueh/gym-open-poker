@@ -542,9 +542,9 @@ def conclude_game(current_gameboard):
 
     """
     
-    
+    main_pot_attendee = current_gameboard['board'].pots_attendee_list[0]
+
     # assign money
-    # main pot
     for pot_idx in range(len(current_gameboard['board'].pots_amount_list)):
         money_amount = current_gameboard['board'].pots_amount_list[pot_idx]
         player_list = current_gameboard['board'].pots_attendee_list[pot_idx]
@@ -564,6 +564,16 @@ def conclude_game(current_gameboard):
                 player.assign_status(current_gameboard, 'lost')
             elif player.current_cash < 0:
                 raise
+
+    # showdown: record every player's card in main_pot_attendee
+    showdown_list = []
+    for player in current_gameboard['players']:
+        if player.player_name in main_pot_attendee:
+            hands = copy.deepcopy(player.hole_cards)
+        else:
+            hands = [None, None]
+        showdown_list.append(hands)
+    current_gameboard['board'].previous_showdown = showdown_list
 
     # check how many player left
     if len(live_player_list) == 1:

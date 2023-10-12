@@ -239,7 +239,7 @@ class OpenPokerEnv(gym.Env):
         return(action_function, parameters)
 
 
-    def _card_decoder(self, card):
+    def _card_encoder(self, card):
         """ decode Card object into int
         Args:
             card: Card object
@@ -341,14 +341,14 @@ class OpenPokerEnv(gym.Env):
 
         card_list = []
         for card in hole_cards:
-            card_list.append(self._card_decoder(card))
+            card_list.append(self._card_encoder(card))
         return(np.array(card_list, dtype=np.int64))
 
     def _get_community_card_info(self):
         # [flop1. flop2, flop3, turn, river]
         current_community_card = []
         for card in self.game_elements['board'].community_cards:
-            current_community_card.append(self._card_decoder(card))
+            current_community_card.append(self._card_encoder(card))
 
         return(np.array(current_community_card + [-1] * (5 - len(current_community_card)), dtype=np.int64))
 
@@ -449,10 +449,26 @@ class OpenPokerEnv(gym.Env):
             else:
                 action_masks.append(0)
 
+        # showdown
+        showdown = []
+        if self.game_elements['board'].previous_showdown:
+            for hands in self.game_elements['board'].previous_showdown:
+                tem_hand = []
+                for card in hands:
+                    if card:
+                        tem_hand.append(self._card_encoder(card))
+                    else:
+                        tem_hand.append(-1)
+                showdown.append(tem_hand)
+
+
+
+
 
 
         # return
         output_info_dict['action_masks'] = np.array(action_masks)
+        output_info_dict['previous_showdown'] = showdown
 
         return(output_info_dict)
 
@@ -580,7 +596,6 @@ class OpenPokerEnv(gym.Env):
                     terminated = False
                     truncated = False
                     info = self._get_info()
-                    print(self.game_elements['board'].current_betting_idx)
                     if self.render_mode == "human":
                         self.render()
 

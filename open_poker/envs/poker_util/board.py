@@ -43,6 +43,8 @@ class Board:
         self.current_raise_count = 0
         self.small_blind_postiion_idx = 1
         self.big_blind_postiion_idx = 2
+        
+        self.previous_showdown = None
 
     def assign_dealer(self, player_name):
         """

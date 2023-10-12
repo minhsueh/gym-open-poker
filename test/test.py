@@ -13,7 +13,11 @@ SLEEP = False
 
 env = gym.make("open_poker/OpenPoker-v0", background_agents_list=background_agents_list, render_mode='human', sleep_mode=SLEEP)
 observation, info = env.reset(seed=42)
+print('============================')
+print('---observation---')
 print(observation)
+print('---info---')
+print(info)
 """
 for _ in range(1000):
     action = env.action_space.sample()
@@ -44,12 +48,18 @@ print(observation)
 
 """
 while(True):
-    print('--------------------------')
+    print('============================')
     print('Enter your action:')
-    user_action = int(input())
-    print('---------')
-    observation, reward, terminated, truncated, info = env.step(user_action)
+    user_action = input()
+    if int(user_action) not in range(6):
+        print('It is not a valid action, current value = ' + user_action)
+        continue
+    #print('----------------')
+    observation, reward, terminated, truncated, info = env.step(int(user_action))
+    print('---observation---')
     print(observation)
+    print('---info---')
+    print(info)
     if terminated or truncated:
         print('LOSTTTTTTTTTTT!')
         break
