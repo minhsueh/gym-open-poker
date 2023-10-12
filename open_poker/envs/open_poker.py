@@ -15,12 +15,13 @@ import open_poker.envs.poker_util as poker_util
 import sys, os
 sys.path.append(os.path.dirname(poker_util .__file__)) 
 
+"""
 from open_poker.envs.poker_util.agent import Agent
 
 from open_poker.envs.poker_util.phase import Phase
 from open_poker.envs.poker_util.action_choices import (check, bet, raise_bet, fold, call)
-from open_poker.envs.poker_util.initialize_game_elements import initialize_game_element
-from open_poker.envs.poker_util.tournament_status import TournamentStatus
+#from open_poker.envs.poker_util.initialize_game_elements import initialize_game_element
+# from open_poker.envs.poker_util.tournament_status import TournamentStatus
 from open_poker.envs.poker_util.logging_info import log_file_create
 from open_poker.envs.poker_util.flag_config import flag_config_dict
 from open_poker.envs.poker_util.dealer import _get_players_last_move_list_string
@@ -28,12 +29,24 @@ from open_poker.envs.poker_util.dealer import _get_players_last_move_list_string
 from open_poker.envs.poker_util.agents import example_agent_check_fold, example_agent_random, example_agent_call, example_agent_raise_bet
 from open_poker.envs.poker_util.agents import agent_call_AJ, agent_raise_AJ, agent_call_toppair_AJ, agent_raise_aggressive_AJ
 from open_poker.envs.poker_util.agents import agent_call_AJ_flop, background_agent_v1, background_agent_v2
+"""
+from open_poker.envs.poker_util.action_choices import (check, bet, raise_bet, fold, call)
+from open_poker.envs.poker_util.logging_info import log_file_create
+
+from agent import Agent
+# from action_choices import (check, bet, raise_bet, fold, call)
+#from logging_info import log_file_create
+from flag_config import flag_config_dict
+from dealer import _get_players_last_move_list_string
+
+
 
 from phase import Phase
 from action import Action
 import action_choices
 from card import Card
 import dealer
+from initialize_game_elements import initialize_game_element
 
 
 logger = log_file_create('./test.log')
@@ -82,7 +95,7 @@ class OpenPokerEnv(gym.Env):
     """
 
     def __init__(self, 
-            background_agents_list: list=[example_agent_raise_bet, example_agent_raise_bet, example_agent_raise_bet], 
+            background_agents_list: list, 
  
 
 
@@ -92,7 +105,8 @@ class OpenPokerEnv(gym.Env):
             big_bet=4,
             render_mode=None,
             size=5,
-            sleep_mode=True):
+            sleep_mode=True,
+            seed=None):
         """
         PARAMS:
             number_of_players(int): The number of player join the game.
@@ -191,6 +205,9 @@ class OpenPokerEnv(gym.Env):
         self.clock = None
         self.window_width = 1000  # The width of the PyGame window
         self.window_height = 600  # The height of the PyGame window
+
+
+        
         
     def _action_decoder(self, player, action):
         """
@@ -251,7 +268,7 @@ class OpenPokerEnv(gym.Env):
 
 
         """
-        assert isinstance(card, Card)
+        #assert isinstance(card, Card)
         if card.suit == 'spade':
             suit_idx = 0
         elif card.suit == 'heart':
@@ -483,6 +500,7 @@ class OpenPokerEnv(gym.Env):
         super().reset(seed=seed)
         np.random.seed(seed)
         self.game_elements = self.set_up_board(self.player_decision_agents, random_seed=seed)
+
 
         if self.render_mode == "human":
             self.render()

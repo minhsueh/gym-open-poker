@@ -85,7 +85,6 @@ class Board:
             None
 
         """
-
         # deck
         self.deck_idx = 0
         self.community_cards = list()

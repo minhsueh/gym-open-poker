@@ -392,8 +392,8 @@ def initialize_game(current_gameboard):
 
     """
     # game index
-    current_gameboard['board'].game_idx += 1
 
+    current_gameboard['board'].game_idx += 1
 
     # reset board
     current_gameboard['board'].reset_board_each_game(current_gameboard)
@@ -724,7 +724,7 @@ def log_best_card(current_gameboard):
                 best_hand_string += str(best_num)
                 best_hand_string += ', '
             best_hand_string = best_hand_string[:-2]
-            logger.debug(player.player_name + 'has total hands = (' + total_hand_string + '), having ' + rank_type2 + ' where best hand is ' + best_hand_string)
+            logger.debug(player.player_name + ' has total hands = (' + total_hand_string + '), having ' + rank_type2 + ' where best hand is ' + best_hand_string)
 
         else:
             logger.debug(player.player_name + 'is inactive, but has total hands = (' + total_hand_string + ')')
@@ -824,10 +824,10 @@ def compare_two_hands(current_gameboard, hand1, hand2):
     res = 0
     # Two players have the same rank_type, we need to check hand1 and hand2 one by one
     for card_idx in range(5):
-        if hand1[card_idx] > hand2[card_idx]:
+        if number_rank[hand1[card_idx]] > number_rank[hand2[card_idx]]:
             res = 1
             break
-        elif hand1[card_idx] < hand2[card_idx]:
+        elif number_rank[hand1[card_idx]] < number_rank[hand2[card_idx]]:
             res = -1
             break
     return(res)

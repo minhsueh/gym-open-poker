@@ -61,7 +61,6 @@ def initialize_game_element(player_decision_agents, random_seed):
     _initialize_players(game_elements, player_decision_agents)
     logger.debug('Successfully instantiated and initialized players.')
     np.random.shuffle(game_elements['players'])
-    np.random.shuffle(game_elements['deck'])
     player_seq = ""
     for idx, player in enumerate(game_elements['players']):
         player.position = idx
@@ -206,7 +205,7 @@ def _initialize_players(game_elements, player_decision_agents):
 
 def _initialize_cards(game_elements):
     """Initialization card into game_elements object
-    We 
+     
 
     Args:
         None

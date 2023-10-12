@@ -5,14 +5,19 @@ from open_poker.envs.poker_util.agents import example_agent_check_fold, example_
 from open_poker.envs.poker_util.agents import agent_call_AJ, agent_raise_AJ, agent_call_toppair_AJ, agent_raise_aggressive_AJ
 from open_poker.envs.poker_util.agents import agent_call_AJ_flop, background_agent_v1, background_agent_v2, dump_agent
 
+from open_poker.wrappers import CardDistHigh, CardDistLow
+
+
+
 
 # background_agents_list = [example_agent_call, example_agent_call, example_agent_call]
 background_agents_list = [dump_agent, dump_agent, dump_agent, dump_agent]
 
 SLEEP = False
 
-env = gym.make("open_poker/OpenPoker-v0", background_agents_list=background_agents_list, render_mode='human', sleep_mode=SLEEP, seed=42)
-observation, info = env.reset()
+env = CardDistHigh(gym.make("open_poker/OpenPoker-v0", background_agents_list=background_agents_list, render_mode='human', sleep_mode=SLEEP))
+# env = CardDistLow(gym.make("open_poker/OpenPoker-v0", background_agents_list=background_agents_list, render_mode='human', sleep_mode=SLEEP))
+observation, info = env.reset(seed=42)
 print('============================')
 print('---observation---')
 print(observation)
