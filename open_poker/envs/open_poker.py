@@ -501,7 +501,7 @@ class OpenPokerEnv(gym.Env):
         logger.debug(player_seq[:-4])
         """
         # This is the start of tournament, no need to initialize game
-        # dealer.initialize_game(self.game_elements)
+        dealer.initialize_game(self.game_elements)
 
         # 
         dealer.initialize_round(self.game_elements)

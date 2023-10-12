@@ -24,8 +24,8 @@ class Board:
         # self.current_highest_bet = 0  # previous bet in the current round
         # self.buy_in_amount = 40  # 20 times to 100 times of force bet of big blind
         # self.num_active_player_on_table = num_active_player_on_table  # number of player could act in a hand
-        self.game_idx = 1
-        self.dealer_position = 0
+        self.game_idx = 0
+        self.dealer_position = -1
 
 
 
@@ -43,7 +43,7 @@ class Board:
         self.current_raise_count = 0
         self.small_blind_postiion_idx = 1
         self.big_blind_postiion_idx = 2
-        
+
         self.previous_showdown = None
 
     def assign_dealer(self, player_name):
@@ -103,7 +103,7 @@ class Board:
 
         # reset players_last_move_list
         for move_idx in range(len(current_gameboard['players'])):
-            if current_gameboard['board'].players_last_move_list[move_idx] != Action.FOLD:
+            if current_gameboard['board'].players_last_move_list[move_idx] != Action.LOST and current_gameboard['players'][move_idx].status != 'lost':
                 current_gameboard['board'].players_last_move_list[move_idx] = Action.NONE
 
         # player_pot
