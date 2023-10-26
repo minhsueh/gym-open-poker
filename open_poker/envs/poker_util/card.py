@@ -13,6 +13,7 @@ class Card:
         :param active:
         :param color:
         """
+        assert suit in ['club', 'diamond', 'heart', 'spade']
         self.suit = suit                # clubs, diamonds, hearts, spades
         self.number = number            # 1,2,3,4,5,6,7,8,9,10,11,12,13
         self.active_card = active       # 1: in the deck     0: in the muck

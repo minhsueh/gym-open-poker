@@ -91,7 +91,7 @@ def calculate_best_hand(current_gameboard, player):
     for c in total_hand:
         logger.debug(c)
 
-    rank_type, hand = check_hands(current_gameboard, total_hand, suits, values, player)
+    rank_type, hand = check_hands(current_gameboard, total_hand, player)
 
     # recording best hand with corresponding player name
     current_gameboard['hands_of_players'][-1][player.player_name] = (rank_type, hand)
@@ -111,48 +111,34 @@ def get_best_hand(current_gameboard, total_hand):
 
     """
     
-    if len(total_hand) != 7:
-        raise Exception
+    # if len(total_hand) != 7:
+    #    raise Exception
 
-    suits = [card.get_suit() for card in total_hand]
-    values = [card.get_number() for card in total_hand]
-    # for c in total_hand:
-    #     logger.debug(c)
+    
 
     hand_rank_functions = current_gameboard['hand_rank_funcs']
     hand = rank_type = None
 
     # loop start from the highest rank to the lowest, so always the highest would be return
     for cur_check_func, cur_get_func, rank_name in hand_rank_functions:
-        if cur_check_func(total_hand, suits, values):  # detect a hand rank
-            hand = cur_get_func(total_hand, suits, values)
+        if cur_check_func(total_hand):  # detect a hand rank
+            hand = cur_get_func(total_hand)
             rank_type = rank_name
             break  # break if find one rank
 
     
     return rank_type, hand
 
-def check_hands(current_gameboard, total_hand, suits, values, player):
-    """
-    New version of check hand for flexibility with novelty
-    the function use to determine player current highest hand and hand's ranking type
-    as hand ranking: royal flush > straight flush > ... > one pair > highest card
-    the rank type are: 10, 9, ..., 2, 1 in order
-    :param current_gameboard:
-    :param total_hand:
-    :param suits:
-    :param values:
-    :param player:
-    :return:
-    """
+def check_hands(current_gameboard, total_hand, player):
+    
 
     hand_rank_functions = current_gameboard['hand_rank_funcs']
     hand = rank_type = None
 
     # loop start from the highest rank to the lowest, so always the highest would be return
     for cur_check_func, cur_get_func, rank_name in hand_rank_functions:
-        if cur_check_func(total_hand, suits, values):  # detect a hand rank
-            hand = cur_get_func(total_hand, suits, values)
+        if cur_check_func(total_hand):  # detect a hand rank
+            hand = cur_get_func(total_hand)
             rank_type = current_gameboard['hand_rank_type'][rank_name]
             logger.debug(f'{player.player_name} has {rank_name} in hand: {hand}!')
             break  # break if find one rank
@@ -233,13 +219,12 @@ extra rule for equal hand is that whose hand has the highest hand win:
 10. royal flush
 """
 
-def is_high_card(total_hand, suits, values):
+def is_high_card(total_hand):
     """
     In this case, it always retrun True
     Args:
         total_hand
-        suits
-        values
+
 
     Returns:
         True
@@ -248,28 +233,21 @@ def is_high_card(total_hand, suits, values):
     
     return True
 
-def is_one_pair(total_hand, suits, values):
-    """
-    if hand contains one pairs, return True. Otherwise, return False
-    :param total_hand: list of current contains class object
-    :param suits: list of current suits
-    :param values: list of current values
-    :return: True if have one pair, otherwise False
-    """
+def is_one_pair(total_hand):
+
+    suits = [card.get_suit() for card in total_hand]
+    values = [card.get_number() for card in total_hand]
+
     for num in set(values):
         if values.count(num) >= 2:
             return True
     return False
 
 
-def is_two_pair(total_hand, suits, values):
-    """
-    if hand contains two pairs, return True. Otherwise, return False
-    :param total_hand:
-    :param suits:
-    :param values:
-    :return:
-    """
+def is_two_pair(total_hand):
+    suits = [card.get_suit() for card in total_hand]
+    values = [card.get_number() for card in total_hand]
+
     cnt = 0
     for num in set(values):
         if values.count(num) >= 2:
@@ -277,34 +255,31 @@ def is_two_pair(total_hand, suits, values):
     return cnt >= 2
 
 
-def is_three_of_a_kind(total_hand, suits, values):
-    """
-    if hand contains three same number card, return True. Otherwise, return False
-    :param total_hand:
-    :param suits:
-    :param values:
-    :return:
-    """
+def is_three_of_a_kind(total_hand):
+    suits = [card.get_suit() for card in total_hand]
+    values = [card.get_number() for card in total_hand]
+
     for num in set(values):
         if values.count(num) >= 3:
             return True
     return False
 
 
-def is_straight(total_hand, suits, values):
+def is_straight(total_hand):
     """
     case1. A 13 12 11 10
     case2. normal
 
     Args:
         total_hand
-        suits
-        values
 
     Returns:
         True
 
     """
+    suits = [card.get_suit() for card in total_hand]
+    values = [card.get_number() for card in total_hand]
+
     # special case: A 13 12 11 10
     ace_high_count = 0
     for num in [1, 13, 12, 11, 10]:
@@ -334,28 +309,22 @@ def is_straight(total_hand, suits, values):
 
 
 
-def is_flush(total_hand, suits, values):
-    """
-    if hand contains 5 same suit, return True. Otherwise, return False
-    :param total_hand:
-    :param suits:
-    :param values:
-    :return:
-    """
+def is_flush(total_hand):
+    
+    suits = [card.get_suit() for card in total_hand]
+    values = [card.get_number() for card in total_hand]
+
+
     for suit in set(suits):
         if suits.count(suit) >= 5:
             return True
     return False
 
 
-def is_full_house(total_hand, suits, values):
-    """
-    if hand contains 3 same number cards and another 2 same number cards, return True. Otherwise, return False
-    :param total_hand:
-    :param suits:
-    :param values:
-    :return:
-    """
+def is_full_house(total_hand):
+    suits = [card.get_suit() for card in total_hand]
+    values = [card.get_number() for card in total_hand]
+
     three = 0
     pair = 0
     for num in set(values):
@@ -366,29 +335,19 @@ def is_full_house(total_hand, suits, values):
     return (three >= 1 and pair >= 1) or (three >= 2)
 
 
-def is_four_of_a_kind(total_hand, suits, values):
-    """
-    if hand contains 4 same number cards, return True. Otherwise, return False
-    :param total_hand:
-    :param suits:
-    :param values:
-    :return:
-    """
+def is_four_of_a_kind(total_hand):
+    suits = [card.get_suit() for card in total_hand]
+    values = [card.get_number() for card in total_hand]
+
     for num in set(values):
         if values.count(num) >= 4:
             return True
     return False
 
 
-def is_straight_flush(total_hand, suits, values):
-    """
-    if hand has flush and straight at same time, return True. Otherwise, return False
-    'club',  'diamond', 'heart', 'spade'
-    :param total_hand:
-    :param suits:
-    :param values:
-    :return:
-    """
+def is_straight_flush(total_hand):
+    suits = [card.get_suit() for card in total_hand]
+    values = [card.get_number() for card in total_hand]
      
 
 
@@ -412,20 +371,16 @@ def is_straight_flush(total_hand, suits, values):
                 hand.append(num)
     else:
         return False
-    return(is_straight(total_hand, suits, hand))
+    return(is_straight(total_hand))
 
 
-def is_royal_flush(total_hand, suits, values):
-    """
-    if hand is straight flush and number cards is 10, 11, 12, 13, and A, return True. Otherwise, return False
-    :param total_hand:
-    :param suits:
-    :param values:
-    :return:
-    """
+def is_royal_flush(total_hand):
+    suits = [card.get_suit() for card in total_hand]
+    values = [card.get_number() for card in total_hand]
+
     royal_num = [10, 11, 12, 13, 1]
     cnt = 0
-    if is_straight_flush(total_hand, suits, values):
+    if is_straight_flush(total_hand):
         for num in royal_num:
             if num in values:
                 cnt += 1
@@ -434,7 +389,7 @@ def is_royal_flush(total_hand, suits, values):
 
 # ======================== functions below use to get cards ========================
 # return below hand in descending order
-def get_high_card(total_hand, suits, values):
+def get_high_card(total_hand):
     """
     Just need to compare value only.
     Args:
@@ -446,23 +401,28 @@ def get_high_card(total_hand, suits, values):
         (list): five cards with value in descending order
 
     """
+    suits = [card.get_suit() for card in total_hand]
+    values = [card.get_number() for card in total_hand]
+
     number_rank = get_number_rank()
 
     return sorted(values, key=lambda x: -number_rank[x])[:5]
 
     
-def get_one_pair(total_hand, suits, values):
+def get_one_pair(total_hand):
     """
     Just need to compare value only.
     Args:
         total_hand
-        suits
-        values
+
 
     Returns:
         (list): five cards with value in descending order
 
     """
+    suits = [card.get_suit() for card in total_hand]
+    values = [card.get_number() for card in total_hand]
+
     number_rank = get_number_rank()
 
     hand = []
@@ -481,18 +441,20 @@ def get_one_pair(total_hand, suits, values):
     return hand
 
 
-def get_two_pair(total_hand, suits, values):
+def get_two_pair(total_hand):
     """
     Just need to compare value only.
     Args:
         total_hand
-        suits
-        values
+
 
     Returns:
         (list): five cards with value in descending order
 
     """
+    suits = [card.get_suit() for card in total_hand]
+    values = [card.get_number() for card in total_hand]
+
     number_rank = get_number_rank()
 
     hand = []
@@ -514,7 +476,7 @@ def get_two_pair(total_hand, suits, values):
     return hand
 
 
-def get_three_of_a_kind(total_hand, suits, values):
+def get_three_of_a_kind(total_hand):
     """
     Just need to compare value only.
     Args:
@@ -526,6 +488,9 @@ def get_three_of_a_kind(total_hand, suits, values):
         (list): five cards with value in descending order
 
     """
+    suits = [card.get_suit() for card in total_hand]
+    values = [card.get_number() for card in total_hand]
+
     number_rank = get_number_rank()
 
     hand = []
@@ -544,7 +509,7 @@ def get_three_of_a_kind(total_hand, suits, values):
     return hand
 
 
-def get_straight(total_hand, suits, values):
+def get_straight(total_hand):
     """
     special cases:
     1. A 13 12 11 10
@@ -559,6 +524,9 @@ def get_straight(total_hand, suits, values):
         (list): five cards with value in descending order
 
     """
+    suits = [card.get_suit() for card in total_hand]
+    values = [card.get_number() for card in total_hand]
+
     # special case: A 13 12 11 10
     ace_high_count = 0
     for num in [1, 13, 12, 11, 10]:
@@ -587,7 +555,7 @@ def get_straight(total_hand, suits, values):
 
 
 
-def get_flush(total_hand, suits, values):
+def get_flush(total_hand):
     """
 
     Args:
@@ -599,6 +567,10 @@ def get_flush(total_hand, suits, values):
         (list): five cards with value in descending order
 
     """
+
+    suits = [card.get_suit() for card in total_hand]
+    values = [card.get_number() for card in total_hand]
+
     number_rank = get_number_rank()
     hand = []
     res = ''
@@ -613,7 +585,7 @@ def get_flush(total_hand, suits, values):
     return sorted(hand, key=lambda x: -number_rank[x])[:5]
 
 
-def get_full_house(total_hand, suits, values):
+def get_full_house(total_hand):
     """
 
     Args:
@@ -625,6 +597,9 @@ def get_full_house(total_hand, suits, values):
         (list): five cards with value in descending order
 
     """
+    suits = [card.get_suit() for card in total_hand]
+    values = [card.get_number() for card in total_hand]
+
     number_rank = get_number_rank()
     hand = []
     pair, three = list(), list()
@@ -648,7 +623,7 @@ def get_full_house(total_hand, suits, values):
         return([three[0]] * 3 + [pair[0]] * 2)
 
 
-def get_four_of_a_kind(total_hand, suits, values):
+def get_four_of_a_kind(total_hand):
     """
 
     Args:
@@ -660,6 +635,10 @@ def get_four_of_a_kind(total_hand, suits, values):
         (list): five cards with value in descending order
 
     """
+
+    suits = [card.get_suit() for card in total_hand]
+    values = [card.get_number() for card in total_hand]
+
     number_rank = get_number_rank()
     hand = []
     for num in sorted(set(values), key=lambda x: -number_rank[x]):
@@ -679,24 +658,18 @@ def get_four_of_a_kind(total_hand, suits, values):
     return hand
 
 
-def get_straight_flush(total_hand, suits, values):
-    """
-    since we have check it is flush and straight previously, at this time we just need to get those straight number
-    :param total_hand:
-    :param suits:
-    :param values:
-    :return:
-    """
-    return get_straight(total_hand, suits, values)
+def get_straight_flush(total_hand):
+    
+
+    suits = [card.get_suit() for card in total_hand]
+    values = [card.get_number() for card in total_hand]
+
+    return get_straight(total_hand)
 
 
-def get_royal_flush(total_hand, suits, values):
-    """
-    since we have check it is royal flush previously, just need to get it's number
-    :param total_hand:
-    :param suits:
-    :param values:
-    :return:
-    """
-    return get_straight(total_hand, suits, values)
+def get_royal_flush(total_hand):
+    suits = [card.get_suit() for card in total_hand]
+    values = [card.get_number() for card in total_hand]
+
+    return get_straight(total_hand)
 

@@ -1,0 +1,23 @@
+# --------log file path--------
+log_file_path: './test1243.log'
+# --------visualization parameters--------
+render_mode: 'human'
+show_all_move_mode: False
+visualize_debug_mode: True
+# --------background agents--------
+background_agents_raw_list:
+  - agent_type: "agent_p"
+    number_of_agent: 2
+  - agent_type: "dump_agent"
+    number_of_agent: 2
+# --------general pokers rules--------
+# max_raise_count: 3
+# small_bet: 2
+# big_bet: 4
+# seed: 15
+# --------termination conditions--------
+# max_round_limitation: 999
+# max_game_limitation: 999
+# max_time_limitation: 999
+
+

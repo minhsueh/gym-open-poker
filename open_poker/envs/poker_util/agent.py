@@ -2,14 +2,11 @@ from flag_config import flag_config_dict
 
 
 class Agent:
-    def __init__(self, make_pre_flop_moves, make_flop_moves, make_turn_moves, make_river_moves,
-                 make_computing_best_hand_moves, make_continue_game_moves):
+    def __init__(self, make_pre_flop_moves, make_flop_moves, make_turn_moves, make_river_moves):
         self.make_pre_flop_moves = make_pre_flop_moves
         self.make_flop_moves = make_flop_moves
         self.make_turn_moves = make_turn_moves
         self.make_river_moves = make_river_moves
-        self.make_computing_best_hand_moves = make_computing_best_hand_moves
-        self.make_continue_game_moves = make_continue_game_moves
         self.is_running = False
         self._agent_memory = dict()
 
@@ -30,12 +27,7 @@ class Agent:
         if not self.make_river_moves:
             logger.debug(f'Agent did not initialized properly. Return failure_code.')
             return flag_config_dict['failure_code']
-        if not self.make_computing_best_hand_moves:
-            logger.debug(f'Agent did not initialized properly. Return failure_code.')
-            return flag_config_dict['failure_code']
-        if not self.make_continue_game_moves:
-            logger.debug(f'Agent did not initialized properly. Return failure_code.')
-            return flag_config_dict['failure_code']
+        
 
         # now, all functions are set up properly
         self.is_running = True

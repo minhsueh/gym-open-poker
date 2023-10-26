@@ -28,4 +28,13 @@ You decide to call, the cutoff calls, and the button calls. The four live player
 
 This same pattern of a maximum bet/raise of $2, capped at $8, applies for the flop betting round. For the turn and river betting rounds, the maximum bet/raise goes up to $4, capped at $16.
 
+
+
+
+---------------------------------------------
+Heads up game (only two players are active): in heads up, if the non-dealer would post the Small Blind and the dealer the Big Blind, then the non-dealer would act first both before and after the flop.
+(Ref: https://boardgames.stackexchange.com/questions/1617/texas-holdem-heads-up-blind-structure)
+
+
+
 """

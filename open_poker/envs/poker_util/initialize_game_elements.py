@@ -15,7 +15,7 @@ from phase import Phase
 from tournament_status import TournamentStatus
 import dealer
 import numpy as np
-
+import time
 
 import logging
 
@@ -53,6 +53,16 @@ def initialize_game_element(player_decision_agents, random_seed):
 
     game_elements['early_stop'] = False
     
+
+
+    # ------termination conditions------
+    game_elements['round_count'] = 0
+    game_elements['game_count'] = 0
+    game_elements['start_time'] = time.time()
+    game_elements['max_round_limitation'] = max_round_limitation
+    game_elements['max_game_limitation'] = max_game_limitation
+    game_elements['max_time_limitation'] = max_time_limitation
+
 
     _initialize_cards(game_elements)
     logger.debug('Successfully instantiated and initialized cards.')
@@ -189,7 +199,7 @@ def _initialize_players(game_elements, player_decision_agents):
     for player_name, agent in player_decision_agents.items():
         player_args = dict()
         player_args['player_name'] = player_name
-        player_args['status'] = 'waiting_for_move'  # win, lost, waiting_for_move
+        player_args['status'] = 'active'  # lost, active
         player_args['small_blind'] = False
         player_args['big_blind'] = False
         player_args['is_dealer'] = False

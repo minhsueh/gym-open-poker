@@ -6,6 +6,7 @@ from card_utility_actions import get_best_hand, get_number_rank
 import copy
 import logging
 import collections
+import time
 
 logger = logging.getLogger('open_poker.envs.poker_util.logging_info.dealer')
 
@@ -87,7 +88,8 @@ def check_and_deal_hole_cards(current_gameboard):
 
                 logger.debug('Current deck has {} cards.'.format(current_gameboard['board'].remain_deck_number()))
     else:
-        raise ('The cur_phase at the funciton reset should only be Phase.PRE_FLOP, current value = ' + str(current_gameboard['board'].cur_phase))
+        print('The cur_phase at the funciton reset should only be Phase.PRE_FLOP, current value = ' + str(current_gameboard['board'].cur_phase))
+        raise 
 
 def check_and_deal_community_card(current_gameboard):
     """ We will put card_utility_actions.number_cards_to_draw in this function and use board.deal_community_card_by_number 
@@ -134,27 +136,60 @@ def force_small_big_blind_bet(current_gameboard):
         dealer_position = current_gameboard['board'].dealer_position
         total_number_of_players = current_gameboard['total_number_of_players']
 
-        count_blind = 0
-        for idx in range(dealer_position + 1, dealer_position + total_number_of_players + 1):
-            player = current_gameboard['players'][idx % total_number_of_players]
-            if player.status != 'lost':
-                # check if small blind have enough cash to afford, or it is lose
-                if count_blind == 0:
-                    # logger.debug(f'{player.player_name} does not have chips to pay small blind, assign to lost')
-                    current_gameboard['board'].small_blind_postiion_idx = idx % total_number_of_players
-                    player.force_bet_small_blind(current_gameboard)
-                    logger.debug(f'{player.player_name} currently has ${player.current_cash}.')
-                    count_blind += 1
-                    continue
 
-                # check if big blind have enough cash to afford, or it is lose
-                elif count_blind == 1:
-                    # logger.debug(f'{player.player_name} does not have chips to pay big blind, assign to lost')
-                    current_gameboard['board'].big_blind_postiion_idx = idx % total_number_of_players
-                    player.force_bet_big_blind(current_gameboard)
-                    logger.debug(f'{player.player_name} currently has ${player.current_cash}.')
-                    current_gameboard['board'].current_bet_count = 1
-                    break
+        # calculate active_players_on_table:
+        active_players_on_table = 0
+        for player in current_gameboard['players']:
+            if player.status != 'lost':
+                active_players_on_table += 1
+
+
+
+        #
+        if active_players_on_table > 2:
+            count_blind = 0
+            for idx in range(dealer_position + 1, dealer_position + total_number_of_players + 1):
+                player = current_gameboard['players'][idx % total_number_of_players]
+                if player.status != 'lost':
+                    # check if small blind have enough cash to afford, or it is lose
+                    if count_blind == 0:
+                        current_gameboard['board'].small_blind_postiion_idx = idx % total_number_of_players
+                        player.force_bet_small_blind(current_gameboard)
+                        logger.debug(f'{player.player_name} currently has ${player.current_cash}.')
+                        count_blind += 1
+                        continue
+
+                    # check if big blind have enough cash to afford, or it is lose
+                    elif count_blind == 1:
+                        current_gameboard['board'].big_blind_postiion_idx = idx % total_number_of_players
+                        player.force_bet_big_blind(current_gameboard)
+                        logger.debug(f'{player.player_name} currently has ${player.current_cash}.')
+                        current_gameboard['board'].current_bet_count = 1
+                        break
+        elif active_players_on_table == 2:
+            # heads on game: Under practically all rules, the dealer posts the small blind and is first to act preflop. After the flop, the other player acts first.
+            count_blind = 0
+            for idx in range(dealer_position, dealer_position + total_number_of_players):
+                player = current_gameboard['players'][idx % total_number_of_players]
+                if player.status != 'lost':
+                    # check if small blind have enough cash to afford, or it is lose
+                    if count_blind == 0:
+                        current_gameboard['board'].small_blind_postiion_idx = idx % total_number_of_players
+                        player.force_bet_small_blind(current_gameboard)
+                        logger.debug(f'{player.player_name} currently has ${player.current_cash}.')
+                        count_blind += 1
+                        continue
+                        
+
+                    # check if big blind have enough cash to afford, or it is lose
+                    elif count_blind == 1:
+                        current_gameboard['board'].big_blind_postiion_idx = idx % total_number_of_players
+                        player.force_bet_big_blind(current_gameboard)
+                        logger.debug(f'{player.player_name} currently has ${player.current_cash}.')
+                        current_gameboard['board'].current_bet_count = 1
+                        break
+        else:
+            raise
         
 
     else:
@@ -280,18 +315,19 @@ def check_betting_over(current_gameboard):
 
     total_number_of_players = current_gameboard['total_number_of_players']
 
-    count_lose = 0
+    count_lost = 0
     count_call = 0
     count_check = 0
     count_bet = 0
     count_raise_bet = 0
     count_fold = 0
     count_none = 0
+    count_all_in = 0
     for move in current_gameboard['board'].players_last_move_list:
         if move in [Action.NONE, Action.SMALL_BLIND, Action.BIG_BLIND]:
             count_none += 1
         elif move == Action.LOST:
-            count_lose += 1
+            count_lost += 1
         elif move == Action.CALL:
             count_call += 1
         elif move == Action.CHECK:
@@ -302,14 +338,24 @@ def check_betting_over(current_gameboard):
             count_raise_bet += 1
         elif move == Action.FOLD:
             count_fold += 1
+        elif move == Action.ALL_IN:
+            count_all_in += 1
         else:
             print('The move is invalid, current move = ' + str(move))
             raise 
 
-    player_stayed_count = total_number_of_players - count_lose - count_fold
+    player_stayed_count = total_number_of_players - count_lost - count_fold
     if count_none > 0:
         logger.debug('At least one player has not moved yet. The betting continues.')
         return(False)
+
+
+    logger.debug('All players made the decision, the betting is over.')
+    return(True)
+    """
+    elif player_stayed_count == 1:
+        logger.debug('Only one player left')
+        return(True)
 
     elif count_check == player_stayed_count:
         # 1(b)
@@ -326,6 +372,7 @@ def check_betting_over(current_gameboard):
     else:
         logger.debug('Not meet any ending criteria, the betting continues.')
         return(False)
+    """
 
 
 
@@ -346,34 +393,78 @@ def initialize_round(current_gameboard):
 
     phase = current_gameboard['board'].cur_phase
 
+    # calculate active_players_on_table:
+    active_players_on_table = 0
+    for player in current_gameboard['players']:
+        if player.status != 'lost':
+            active_players_on_table += 1
+
+
     # put into local variables for better readability
     dealer_position = current_gameboard['board'].dealer_position
     total_number_of_players = current_gameboard['total_number_of_players']
-    if phase == Phase.PRE_FLOP:
-        # the current_betting_idx should be the player after big blind
-        position_after_dealer = 3
-    elif phase in [Phase.FLOP, Phase.TURN, Phase.RIVER]:
-        # the current_betting_idx should be the player after dealer
-        position_after_dealer = 1
+
+
+    if active_players_on_table > 2:
+        if phase == Phase.PRE_FLOP:
+            # the current_betting_idx should be the player after big blind
+            position_after_dealer = 3
+        elif phase in [Phase.FLOP, Phase.TURN, Phase.RIVER]:
+            # the current_betting_idx should be the player after dealer
+            position_after_dealer = 1
+        else:
+            print('This phase is not valid, current phase = ' + str(phase))
+            raise 
+        
+
+
+        counter = 0
+        found = False
+        for idx in range(dealer_position + 1, dealer_position + total_number_of_players + 1):
+            player = current_gameboard['players'][idx % total_number_of_players]
+            if player.status != 'lost':
+                counter += 1
+                if counter == position_after_dealer:
+                    found = True
+                    current_gameboard['board'].current_betting_idx = idx % total_number_of_players
+                    current_betting_idx_player = player.player_name
+                
+        if not found:
+            # just to make sure current_betting_idx is updated
+            raise ('current_betting_idx is not initializing, please check!')
+    elif active_players_on_table == 2:
+        # heads up game:
+        if phase == Phase.PRE_FLOP:
+            # the current_betting_idx should be the player after big blind
+            position_after_dealer = 2
+        elif phase in [Phase.FLOP, Phase.TURN, Phase.RIVER]:
+            # the current_betting_idx should be the player after dealer
+            position_after_dealer = 1
+        else:
+            print('This phase is not valid, current phase = ' + str(phase))
+            raise 
+        
+
+        counter = 0
+        found = False
+        for idx in range(dealer_position + 1, dealer_position + 2 * total_number_of_players + 1):
+            player = current_gameboard['players'][idx % total_number_of_players]
+            if player.status != 'lost':
+                counter += 1
+                if counter == position_after_dealer:
+                    found = True
+                    current_gameboard['board'].current_betting_idx = idx % total_number_of_players
+                    current_betting_idx_player = player.player_name
+                    break
+                
+        if not found:
+            # just to make sure current_betting_idx is updated
+            raise ('current_betting_idx is not initializing, please check!')
+
+
+
     else:
-        raise ('This phase is not valid, current phase = ' + str(phase))
-    
-
-
-    counter = 0
-    found = False
-    for idx in range(dealer_position + 1, dealer_position + total_number_of_players + 1):
-        player = current_gameboard['players'][idx % total_number_of_players]
-        if player.status != 'lost':
-            counter += 1
-            if counter == position_after_dealer:
-                found = True
-                current_gameboard['board'].current_betting_idx = idx % total_number_of_players
-                current_betting_idx_player = player.player_name
-            
-    if not found:
-        # just to make sure current_betting_idx is updated
-        raise ('current_betting_idx is not initializing, please check!')
+        raise
     logger.debug('The current current_betting_idx is: ' +  str(current_gameboard['board'].current_betting_idx) + '(0-indexed), ' + current_betting_idx_player + ' start betting')
 
     # initialize player.current_money_in_pot
@@ -402,6 +493,9 @@ def initialize_game(current_gameboard):
     for player in current_gameboard['players']:
         player.reset_player_each_game(current_gameboard)
 
+    # phase
+    current_gameboard['board'].cur_phase = Phase.PRE_FLOP
+
 
 def conclude_round(current_gameboard):
     """ 
@@ -423,6 +517,15 @@ def conclude_round(current_gameboard):
         
 
     """
+    if time.time() - current_gameboard.start_time:
+        logger.debug('Reach time termination condition = ' + str(current_gameboard['max_time_limitation']) + '. End!')
+        return(True)
+    if current_gameboard['round_count'] == current_gameboard['max_round_limitation']:
+        logger.debug('Reach round termination condition = ' + str(current_gameboard['max_round_limitation']) + '. End!')
+        return(True)
+
+    current_gameboard['round_count'] += 1
+
     # check if there are all-in players
     player_pot = current_gameboard['board'].player_pot # this is a dictionary with key being player name and value being amount
 
@@ -440,12 +543,12 @@ def conclude_round(current_gameboard):
     cur_side_pot_attendee_list = []
     if all_in_players_list:
         while(all_in_players_list):
-            all_in_player, all_in_amount = all_in_players.pop()
+            all_in_player, all_in_amount = all_in_players_list.pop()
             side_attendee = set()
             for p_idx, p in enumerate(current_gameboard['players']):
-                if player_pot[player_name] > all_in_amount: 
-                    player_pot[player_name] -= all_in_amount
-                    side_attendee.add(player_name)
+                if player_pot[p.player_name] > all_in_amount: 
+                    player_pot[p.player_name] -= all_in_amount
+                    side_attendee.add(p.player_name)
 
             cur_side_pot_amount_list.append(all_in_amount*len(side_attendee))
             cur_side_pot_attendee_list.append(side_attendee)
@@ -541,7 +644,13 @@ def conclude_game(current_gameboard):
         is_end(bool): True if only 1 person live
 
     """
-    
+    if current_gameboard['game_count'] == current_gameboard['max_game_limitation']:
+        logger.debug('Reach game termination condition = ' + str(current_gameboard['max_game_limitation']) + '. End!')
+        return(True)
+
+    current_gameboard['game_count'] += 1
+
+
     main_pot_attendee = current_gameboard['board'].pots_attendee_list[0]
 
     # assign money
@@ -562,6 +671,8 @@ def conclude_game(current_gameboard):
             live_player_list.append(player.player_name)
             if player.current_cash == 0:
                 player.assign_status(current_gameboard, 'lost')
+                if player.player_name == 'player_1':
+                    return(True)
             elif player.current_cash < 0:
                 raise
 
@@ -607,7 +718,7 @@ def assign_money_to_winners(current_gameboard, winners, money_amount):
         return
 
     # multiple winners
-    amount_per_winner = money_amount / len(winners)
+    amount_per_winner = round(money_amount / len(winners), 2)
     logger.debug(f'Board: amount each winner could get is {amount_per_winner}')
 
 
@@ -876,6 +987,6 @@ def update_players_last_move_list_when_raise(current_gameboard, raise_player_nam
     logger.debug(f'{raise_player_name} bet/raise, updating players_last_move_list')
     for player_idx in range(len(current_gameboard['players'])):
         cur_player = current_gameboard['players'][player_idx]
-        if cur_player.player_name != raise_player_name and cur_player.status != 'lost':
+        if cur_player.player_name != raise_player_name and cur_player.status != 'lost' and current_gameboard['board'].players_last_move_list[player_idx] != Action.FOLD:
             current_gameboard['board'].players_last_move_list[player_idx] = Action.NONE
 

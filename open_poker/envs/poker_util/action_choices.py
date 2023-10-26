@@ -46,7 +46,7 @@ def null_action():
 
 
 
-def call(player, current_gameboard):
+def call(current_gameboard, player):
     """ 
     determine if player can call. 
 
@@ -96,6 +96,8 @@ def call(player, current_gameboard):
 
     Args:
         current_gameboard
+        player
+        
 
     Returns:
         flag(flag_config_dict):
@@ -149,7 +151,7 @@ def call(player, current_gameboard):
 
 
 
-def raise_bet(player, current_gameboard, amount_to_raise):
+def raise_bet(current_gameboard, player):
     """ 
     determine if player can raise_bet. 
     criterias:
@@ -190,6 +192,8 @@ def raise_bet(player, current_gameboard, amount_to_raise):
 
     Args:
         current_gameboard
+        player
+        
 
     Returns:
         flag(flag_config_dict):
@@ -245,7 +249,7 @@ def raise_bet(player, current_gameboard, amount_to_raise):
 
 
 
-def fold(player, current_gameboard):
+def fold(current_gameboard, player):
     """ 
     1. assign current_gameboard['board'].players_last_move_list[player_name] to FOLD
     2. put amount in player_pot(current spent) into pots_amount_list[-1]
@@ -259,6 +263,8 @@ def fold(player, current_gameboard):
 
     Args:
         current_gameboard
+        player
+        
 
     Returns:
         flag(flag_config_dict):
@@ -288,7 +294,7 @@ def fold(player, current_gameboard):
 
 
 
-def check(player, current_gameboard):
+def check(current_gameboard, player):
     """ 
     determine if player can check. 
     criterias:
@@ -297,6 +303,8 @@ def check(player, current_gameboard):
 
     Args:
         current_gameboard
+        player
+        
 
     Returns:
         flag(flag_config_dict):
@@ -322,7 +330,7 @@ def check(player, current_gameboard):
 
 
 
-def bet(player, current_gameboard, first_bet):
+def bet(current_gameboard, player):
     """ 
     determine if player can bet. 
     criterias:
@@ -331,6 +339,7 @@ def bet(player, current_gameboard, first_bet):
 
     Args:
         current_gameboard
+        player
 
     Returns:
         flag(flag_config_dict):
@@ -382,18 +391,24 @@ def bet(player, current_gameboard, first_bet):
     return flag_config_dict['successful_action']
 
 
-def all_in(player, current_gameboard):
+def all_in(current_gameboard, player):
     """
-    player wants to put all his/her money to bet
-    :param player:
-    :param current_gameboard:
-    :return:
+    Args:
+        current_gameboard
+        player
+
+    Returns:
+        flag(flag_config_dict):
+
+    
     """
     logger.debug(f'{player.player_name} decides to --- All-in --- with amount ${player.current_cash}!')
 
     if player.current_cash <= 0:
         logger.debug(f'{player.player_name} does not have more money for betting')
         return flag_config_dict['failure_code']
+
+
 
 
     if current_gameboard['board'].cur_phase in [Phase.PRE_FLOP, Phase.FLOP]:
@@ -428,7 +443,18 @@ def all_in(player, current_gameboard):
     #
     current_gameboard['board'].player_pot[player.player_name] += bet_to_follow
 
-    
+    # update 
+    if current_gameboard['board'].current_bet_count == 0:
+        current_gameboard['board'].current_bet_count = 1
+    elif current_gameboard['board'].current_raise_count < current_gameboard['max_raise_count']:
+        current_gameboard['board'].current_raise_count += 1
+    elif current_gameboard['board'].current_raise_count == current_gameboard['max_raise_count']:
+        pass
+    else:
+        raise
+
+
+
     #
     dealer.update_player_last_move(current_gameboard, player.player_name, action.Action.ALL_IN)
 
