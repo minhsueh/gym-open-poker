@@ -31,7 +31,6 @@ class CardDistHigh(gym.Wrapper):
 
 
 
-
 def _alter_reset_board_each_game(self, current_gameboard):
     """
     original: board.reset_board_each_game

@@ -23,7 +23,7 @@ logger = logging.getLogger('open_poker.envs.poker_util.logging_info.init_game_el
 
 
 
-def initialize_game_element(player_decision_agents, random_seed):
+def initialize_game_element(player_decision_agents, customized_arg_dict, random_seed):
     """Initialization function for cards, player, board, history, and rules
 
     Args:
@@ -41,27 +41,28 @@ def initialize_game_element(player_decision_agents, random_seed):
     game_elements = dict()
 
 
-    game_elements['small_blind_amount'] = 5  # this could increase as number of games increase
-    game_elements['big_blind_pay_from_baseline'] = 2  # if small_blind_amount is 1, big blind pay 1 * 2
-    game_elements['big_blind_amount'] = game_elements['small_blind_amount'] * game_elements['big_blind_pay_from_baseline']
+    game_elements['small_blind_amount'] = customized_arg_dict.get('small_blind', 5)  # this could increase as number of games increase
+    game_elements['big_small_blind_ratio'] = customized_arg_dict.get('big_small_blind_ratio', 2)  # if small_blind_amount is 1, big blind pay 1 * 2
+    game_elements['big_blind_amount'] = game_elements['small_blind_amount'] * game_elements['big_small_blind_ratio']
     game_elements['small_bet'] = game_elements['big_blind_amount'] # in pre-flop and flop
-    game_elements['big_bet_factor_from_small_bet'] = 2
-    game_elements['big_bet'] = game_elements['big_blind_amount'] * game_elements['big_bet_factor_from_small_bet'] # in turn and river
-    game_elements['max_raise_count'] = 3
+    game_elements['big_small_bet_ratio'] = 2
+    game_elements['big_bet'] = game_elements['big_blind_amount'] * game_elements['big_small_bet_ratio'] # in turn and river
+    game_elements['max_raise_count'] = customized_arg_dict.get('max_raise_count', 3)
 
-    game_elements['buy_in_amount'] = 100
+    game_elements['buy_in_amount'] = customized_arg_dict.get("buy_in", 100)
 
     game_elements['early_stop'] = False
     
 
 
     # ------termination conditions------
-    game_elements['round_count'] = 0
-    game_elements['game_count'] = 0
+    game_elements['round_count'] = 1
+    game_elements['game_count'] = 1
     game_elements['start_time'] = time.time()
-    game_elements['max_round_limitation'] = max_round_limitation
-    game_elements['max_game_limitation'] = max_game_limitation
-    game_elements['max_time_limitation'] = max_time_limitation
+    game_elements['max_round_limitation'] = customized_arg_dict.get("max_round_limitation", np.inf)
+    game_elements['max_game_limitation'] = customized_arg_dict.get("max_game_limitation", np.inf)
+    game_elements['max_time_limitation'] = customized_arg_dict.get("max_time_limitation", np.inf)
+
 
 
     _initialize_cards(game_elements)

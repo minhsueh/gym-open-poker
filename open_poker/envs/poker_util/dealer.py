@@ -74,7 +74,7 @@ def check_and_deal_hole_cards(current_gameboard):
                 continue
 
             # check if big blind have enough cash to afford, or it is lose
-            if count_blind == 1 and player.current_cash < current_gameboard['small_blind_amount'] * current_gameboard['big_blind_pay_from_baseline']:
+            if count_blind == 1 and player.current_cash < current_gameboard['small_blind_amount'] * current_gameboard['big_small_blind_ratio']:
                 logger.debug(f'{player.player_name} does not have cash to pay big blind, assign to lost')
                 # player.assign_to_fold(game_elements)
                 player.assign_status(current_gameboard, 'lost')
@@ -517,7 +517,7 @@ def conclude_round(current_gameboard):
         
 
     """
-    if time.time() - current_gameboard.start_time:
+    if time.time() - current_gameboard['start_time'] > current_gameboard['max_time_limitation']:
         logger.debug('Reach time termination condition = ' + str(current_gameboard['max_time_limitation']) + '. End!')
         return(True)
     if current_gameboard['round_count'] == current_gameboard['max_round_limitation']:
@@ -644,6 +644,9 @@ def conclude_game(current_gameboard):
         is_end(bool): True if only 1 person live
 
     """
+    if time.time() - current_gameboard['start_time'] > current_gameboard['max_time_limitation']:
+        logger.debug('Reach time termination condition = ' + str(current_gameboard['max_time_limitation']) + '. End!')
+        return(True)
     if current_gameboard['game_count'] == current_gameboard['max_game_limitation']:
         logger.debug('Reach game termination condition = ' + str(current_gameboard['max_game_limitation']) + '. End!')
         return(True)

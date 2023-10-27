@@ -119,36 +119,44 @@ class OpenPokerEnv(gym.Env):
     """
 
     def __init__(self, 
-            background_agents_raw_list: list, 
-            log_file_path = './test.log',
-            max_raise_count=3,
-            small_bet=2,
-            big_bet=4,
-            render_mode=None,
-            show_all_move_mode=True,
-            seed=None,
-            visualize_debug_mode=True,
-            max_round_limitation = 999,
-            max_game_limitation = 999,
-            max_time_limitation = 999):
+            **customized_arg_dict):
         """
         PARAMS:
             number_of_players(int): The number of player join the game.
             background_agent(list): a list of the background agent.
 
+        background_agents_raw_list: list, 
+        log_file_path = './test.log',
+        max_raise_count=3,
+        small_bet=2,
+        big_bet=4,
+        render_mode=None,
+        show_all_move_mode=True,
+        seed=None,
+        visualize_debug_mode=True,
+        max_round_limitation = 999,
+        max_game_limitation = 999,
+        max_time_limitation = 999
+
         """
         global logger
+        log_file_path = customized_arg_dict.get("log_file_path", 'test.log')
         logger = log_file_create(log_file_path)
         logger.debug("Let's get started!!!!")
 
-        
+        self.customized_arg_dict = customized_arg_dict
+
         ### ------agent's related objects------
         self.background_agents_list = []
+        default_background_agents_raw_list = [
+            {"agent_type": "agent_p", "number_of_agent": 2},
+            {"agent_type": "dump_agent", "number_of_agent": 2}
+        ]
+        background_agents_raw_list = customized_arg_dict.get("background_agents_raw_list", default_background_agents_raw_list)
         for agent_dict in background_agents_raw_list:
             for _ in range(agent_dict['number_of_agent']):
-                self.background_agents_list.append(getattr(sys.modules[__name__], agent_dict['agent_type']))  
-                
-        self.number_of_players = len(background_agents_raw_list) + 1  
+                self.background_agents_list.append(getattr(sys.modules[__name__], agent_dict['agent_type']))   
+        self.number_of_players = len(self.background_agents_list) + 1  
         self.player_decision_agents = dict()
         self.player_decision_agents['player_1'] = 'player_1'
         for player_idx, player in enumerate(self.background_agents_list):
@@ -156,26 +164,17 @@ class OpenPokerEnv(gym.Env):
         logger.debug('Player_1 is assign as code user.')
 
         # ------general poker rules------
-        # self.small_bet = small_bet
-        # self.big_bet = big_bet
-        # self.small_blind = small_bet//2
-        # self.big_blind = small_bet
-        self.buy_in = 100
-        self.bankroll_limit = 1500
-
-        # ------termination conditions------
-        self.max_round_limitation = max_round_limitation
-        self.max_game_limitation = max_game_limitation
-        self.max_time_limitation = max_time_limitation
+        self.buy_in = customized_arg_dict.get("buy_in", 100)
+        self.bankroll_limit = customized_arg_dict.get("bankroll_limit", 1500)
 
 
         # ------visulaization------
-        self.render_mode = render_mode      
+        self.render_mode = customized_arg_dict.get("render_mode", 'human')      
         self.window = None
-        self.window_width = 1000  # The width of the PyGame window
-        self.window_height = 600  # The height of the PyGame window
-        self.visualize_debug_mode = visualize_debug_mode
-        self.show_all_move_mode = show_all_move_mode
+        self.window_width = customized_arg_dict.get("window_width", 1000)  # The width of the PyGame window
+        self.window_height = customized_arg_dict.get("window_height", 600)  # The height of the PyGame window
+        self.visualize_debug_mode = customized_arg_dict.get("visualize_debug_mode", False)
+        self.show_all_move_mode = customized_arg_dict.get("show_all_move_mode", False)
 
 
 
@@ -187,7 +186,7 @@ class OpenPokerEnv(gym.Env):
                 "hole_cards": spaces.Box(1, 52, shape=(2,), dtype=np.int64), 
                 "community_card": spaces.Box(-1, 52, shape=(5,), dtype=np.int64), 
                 "action": spaces.Box(-1, 5, shape=(self.number_of_players,), dtype=np.int64),
-                "pot_amount": spaces.Box(0, self.buy_in*self.number_of_players, shape=(1,), dtype=np.int64)
+                "pot_amount": spaces.Box(0, self.bankroll_limit, shape=(1,), dtype=np.int64)
             }
         )
 
@@ -401,8 +400,8 @@ class OpenPokerEnv(gym.Env):
             "pot_amount": self._get_pot_amount()
         }
 
-    def set_up_board(self, player_decision_agents, random_seed):
-        return initialize_game_element(player_decision_agents, random_seed)
+    def set_up_board(self, random_seed):
+        return initialize_game_element(self.player_decision_agents, self.customized_arg_dict, random_seed)
 
     def _get_info(self):
         output_info_dict = dict()
@@ -456,7 +455,9 @@ class OpenPokerEnv(gym.Env):
         return(output_info_dict)
 
 
-
+    def reward(self, rew):
+        # modify rew
+        return rew
 
 
         
@@ -465,8 +466,8 @@ class OpenPokerEnv(gym.Env):
         # We need the following line to seed self.np_random
         super().reset(seed=seed)
         np.random.seed(seed)
-        self.game_elements = self.set_up_board(self.player_decision_agents, random_seed=seed)
-        
+        self.game_elements = self.set_up_board(random_seed=seed)
+
 
         if self.render_mode == "human":
             self.render()
