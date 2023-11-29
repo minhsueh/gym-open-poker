@@ -34,6 +34,7 @@ class Board:
         # parameters to keep track on the total betting
         self.player_pot = collections.defaultdict(int) # how much did each player spend in the current round
         self.players_last_move_list = [Action.NONE] * num_active_player_on_table # keep track on last move of each player
+        self.players_last_move_list_hist = [Action.NONE] * num_active_player_on_table # keep track on last move of each player
         self.pots_amount_list = [0] # the total amount on the table, it will be update in function conclude round. The size might differ if there are side pot.
         self.pots_attendee_list = [set(['player_'+str(i) for i in range(1, num_active_player_on_table+1)])] # who is attend in corresponding pot in pots_amount_list. The size should be same as pots_amount_list.
         
@@ -45,6 +46,9 @@ class Board:
         self.big_blind_postiion_idx = 2
 
         self.previous_showdown = None
+        self.history = dict()
+        self.history['cash'] = dict()
+        self.history['rank'] = dict()
 
     def assign_dealer(self, player_name):
         """

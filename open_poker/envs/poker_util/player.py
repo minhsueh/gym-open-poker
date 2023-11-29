@@ -8,31 +8,23 @@ import logging
 logger = logging.getLogger('open_poker.envs.poker_util.logging_info.player')
 
 class Player:
-    def __init__(self, player_name, status, current_cash, small_blind, big_blind, is_dealer, hole_cards,
+    def __init__(self, player_name, status, current_cash, hole_cards,
                  current_bet, agent, current_decision):
         """
         Each object is unique player in the game
         :param player_name: name of player
         :param status: lost, active
         :param current_cash: int total cash in hand
-        :param small_blind: if current is small blind True, otherwise False
-        :param big_blind: if current is big blind True, otherwise False
-        :param is_dealer: if current is dealer of board True, otherwise False
         :param hole_cards: 2 card in hand for playing game
         :param current_bet: current bet in the round
         :param agent: agent object of this player
-        :param chips: dict of chips with amount as key, and chips as value in a set
         """
         self.player_name = player_name
         self.status = status #   lost, active
         self.current_cash = current_cash
-        self.small_blind = small_blind
-        self.big_blind = big_blind
-        self.is_dealer = is_dealer
         self.hole_cards = hole_cards
         self.current_bet = current_bet   # save chips the player has called, bet, raise bet, all-in
         self.agent = agent
-        # self.chips = chips
         self.current_decision = current_decision  # call/fold/check/all_in/bet/raise_bet in the current round
 
         self.is_fold = False  # which might skip their turn if is fold
@@ -41,6 +33,10 @@ class Player:
         self.bet_amount_each_game = 0  # total money the player bet in each game
 
         self.current_money_in_pot = 0
+
+        # place to store reward
+        self.last_game_cash = current_cash
+        self.last_reward = 0
 
 
 

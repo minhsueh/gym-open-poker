@@ -235,8 +235,6 @@ def raise_bet(current_gameboard, player):
     #
     current_gameboard['board'].player_pot[player.player_name] += bet_to_follow
 
-    #
-    current_gameboard['board'].current_raise_count += 1
 
     #
     dealer.update_player_last_move(current_gameboard, player.player_name, action.Action.RAISE_BET)
@@ -420,18 +418,29 @@ def all_in(current_gameboard, player):
 
     already_bet = current_gameboard['board'].player_pot[player.player_name]
     
-    if current_gameboard['board'].current_bet_count == 0:
-        bet_to_follow = raise_amount - already_bet
-    else:
-        bet_to_follow = raise_amount * (current_gameboard['board'].current_bet_count + current_gameboard['board'].current_raise_count) - already_bet
+    current_bet_count = current_gameboard['board'].current_bet_count
+    current_raise_count = current_gameboard['board'].current_raise_count
 
-    
-    if bet_to_follow == 0:
-        raise
-    elif player.current_cash > bet_to_follow:
+    # case1: want to call
+    bet_to_follow_case1 = raise_amount * (current_gameboard['board'].current_bet_count + current_gameboard['board'].current_raise_count) - already_bet
+    # case2; want to bet/raise_bet
+    bet_to_follow_case2 = raise_amount * (current_gameboard['board'].current_bet_count + current_gameboard['board'].current_raise_count + 1) - already_bet
+
+    # 
+    if player.current_cash > bet_to_follow_case1 and player.current_cash > bet_to_follow_case2:
         # only player.current_cash < bet_to_follow can do the all_in
-        logger.debug(f'{player.player_name} have ${player.current_cash}, but raise/bet only cost {bet_to_follow}, should not all in')
+        logger.debug(f'{player.player_name} have ${player.current_cash}, but raise/bet only cost {bet_to_follow_case2}, should not all in')
         return flag_config_dict['failure_code']
+
+    # 
+    if player.current_cash > bet_to_follow_case1:
+        # case 2
+        case = 'case2'
+    else:
+        # case 1
+        case = 'case1'
+        
+
 
 
     #
@@ -443,15 +452,21 @@ def all_in(current_gameboard, player):
     #
     current_gameboard['board'].player_pot[player.player_name] += bet_to_follow
 
-    # update 
-    if current_gameboard['board'].current_bet_count == 0:
-        current_gameboard['board'].current_bet_count = 1
-    elif current_gameboard['board'].current_raise_count < current_gameboard['max_raise_count']:
-        current_gameboard['board'].current_raise_count += 1
-    elif current_gameboard['board'].current_raise_count == current_gameboard['max_raise_count']:
-        pass
-    else:
-        raise
+
+    if case == 'case2':
+        # update 
+        if current_gameboard['board'].current_bet_count == 0:
+            current_gameboard['board'].current_bet_count = 1
+        elif current_gameboard['board'].current_raise_count < current_gameboard['max_raise_count']:
+            current_gameboard['board'].current_raise_count += 1
+        elif current_gameboard['board'].current_raise_count == current_gameboard['max_raise_count']:
+            pass
+        else:
+            raise
+        # the other players have to make decision again
+        dealer.update_players_last_move_list_when_raise(current_gameboard, player.player_name)
+
+
 
 
 

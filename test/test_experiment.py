@@ -18,7 +18,7 @@ with open(config_path, "r") as stream:
     except yaml.YAMLError as exc:
         print(exc)
 
-env = CardDistHigh(gym.make("open_poker/OpenPoker-v0", **config_dict))
+env = gym.make("open_poker/OpenPoker-v0", **config_dict)
 # env = CardDistLow(gym.make("open_poker/OpenPoker-v0", **config_dict))
 observation, info = env.reset(seed=42)
 print('============================')

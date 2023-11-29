@@ -56,10 +56,8 @@ def initialize_game_element(player_decision_agents, customized_arg_dict, random_
 
 
     # ------termination conditions------
-    game_elements['round_count'] = 1
     game_elements['game_count'] = 1
     game_elements['start_time'] = time.time()
-    game_elements['max_round_limitation'] = customized_arg_dict.get("max_round_limitation", np.inf)
     game_elements['max_game_limitation'] = customized_arg_dict.get("max_game_limitation", np.inf)
     game_elements['max_time_limitation'] = customized_arg_dict.get("max_time_limitation", np.inf)
 
@@ -201,9 +199,6 @@ def _initialize_players(game_elements, player_decision_agents):
         player_args = dict()
         player_args['player_name'] = player_name
         player_args['status'] = 'active'  # lost, active
-        player_args['small_blind'] = False
-        player_args['big_blind'] = False
-        player_args['is_dealer'] = False
         player_args['hole_cards'] = list()
         player_args['current_bet'] = dict()
         player_args['agent'] = agent
