@@ -1,5 +1,6 @@
 import gym
 import open_poker
+import numpy as np
 
 
 #from open_poker.envs.poker_util.agents import agent_p, dump_agent
@@ -30,7 +31,11 @@ print(info)
 while(True):
     print('============================')
     print('Enter your action:')
-    user_action = input()
+    # user_action = input()
+    action_mask = info['action_masks'].astype(bool)
+    all_action_list = np.array(list(range(6)))
+    user_action = np.random.choice(all_action_list[action_mask], size=1).item()
+
     if int(user_action) not in range(6):
         print('It is not a valid action, current value = ' + user_action)
         continue

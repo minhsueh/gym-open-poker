@@ -139,6 +139,7 @@ class OpenPokerEnv(gym.Env):
         max_time_limitation = 999
 
         """
+
         global logger
         log_file_path = customized_arg_dict.get("log_file_path", 'test.log')
         logger = log_file_create(log_file_path)
@@ -418,7 +419,11 @@ class OpenPokerEnv(gym.Env):
     def set_up_board(self, random_seed):
         return initialize_game_element(self.player_decision_agents, self.customized_arg_dict, random_seed)
 
-    def _get_info(self):
+    def _get_info(self, stopped=False):
+        """
+        PARAMS:
+            stopped(bool): True if terminated or truncated, there is no need to show action_masks
+        """
         output_info_dict = dict()
 
         # player_name_list
@@ -426,30 +431,30 @@ class OpenPokerEnv(gym.Env):
         for player in self.game_elements['players']:
             player_name_list.append(player.player_name)
 
+        if not stopped:
+            # action_masks
+            player_1 = self.game_elements['players_dict']['player_1']
+            if player_1.status == 'lost':
+                raise
 
-        # action_masks
-        player_1 = self.game_elements['players_dict']['player_1']
-        if player_1.status == 'lost':
-            raise
-
-        if self.game_elements['board'].cur_phase == Phase.PRE_FLOP:
-            allowable_actions = player_1.compute_allowable_pre_flop_actions(self.game_elements)
-        elif self.game_elements['board'].cur_phase == Phase.FLOP:
-            allowable_actions = player_1.compute_allowable_flop_actions(self.game_elements)
-        elif self.game_elements['board'].cur_phase == Phase.TURN:
-            allowable_actions = player_1.compute_allowable_turn_actions(self.game_elements)
-        elif self.game_elements['board'].cur_phase == Phase.RIVER:
-            allowable_actions = player_1.compute_allowable_river_actions(self.game_elements)
-        else:
-            raise
-
-        allowable_string = [action.__name__ for action in allowable_actions]
-        action_masks = []
-        for action in ['call', 'bet', 'raise_bet', 'check', 'fold', 'all_in']:
-            if action in allowable_string:
-                action_masks.append(1)
+            if self.game_elements['board'].cur_phase == Phase.PRE_FLOP:
+                allowable_actions = player_1.compute_allowable_pre_flop_actions(self.game_elements)
+            elif self.game_elements['board'].cur_phase == Phase.FLOP:
+                allowable_actions = player_1.compute_allowable_flop_actions(self.game_elements)
+            elif self.game_elements['board'].cur_phase == Phase.TURN:
+                allowable_actions = player_1.compute_allowable_turn_actions(self.game_elements)
+            elif self.game_elements['board'].cur_phase == Phase.RIVER:
+                allowable_actions = player_1.compute_allowable_river_actions(self.game_elements)
             else:
-                action_masks.append(0)
+                raise
+
+            allowable_string = [action.__name__ for action in allowable_actions]
+            action_masks = []
+            for action in ['call', 'bet', 'raise_bet', 'check', 'fold', 'all_in']:
+                if action in allowable_string:
+                    action_masks.append(1)
+                else:
+                    action_masks.append(0)
 
         # showdown
         showdown = []
@@ -470,7 +475,8 @@ class OpenPokerEnv(gym.Env):
 
         # return
         output_info_dict['player_name_list'] = player_name_list
-        output_info_dict['action_masks'] = np.array(action_masks)
+        if not stopped:
+            output_info_dict['action_masks'] = np.array(action_masks)
         output_info_dict['previous_showdown'] = showdown
 
         return(output_info_dict)
@@ -584,9 +590,9 @@ class OpenPokerEnv(gym.Env):
 
                     if terminated or truncated:
                         if self.render_mode == "human":
-                            self.render()
+                            self.render(stopped=True)
 
-                        return self._get_obs(), self._get_reward(), terminated, truncated, {}
+                        return self._get_obs(), self._get_reward(), terminated, truncated, self._get_info(stopped=True)
 
                     # srart the new game
 
@@ -654,7 +660,7 @@ class OpenPokerEnv(gym.Env):
 
             if self.render_mode == "human":
                 self.render()
-            return [self._get_obs(), -999, True, False, self._get_info()]
+            return [self._get_obs(), -999, True, False, self._get_info(stopped=True)]
 
         
 
@@ -814,15 +820,15 @@ class OpenPokerEnv(gym.Env):
 
 
 
-    def render(self):
+    def render(self, stopped=False):
         if self.render_mode == "human":
             if self.show_all_move_mode:
                 time.sleep(1)
-            return self._render_frame()
+            return self._render_frame(stopped=stopped)
 
 
 
-    def _render_frame(self):
+    def _render_frame(self, stopped=False):
         """
         ellipse shape
         pot
@@ -834,7 +840,10 @@ class OpenPokerEnv(gym.Env):
             card
             money
 
-
+        
+        PARAMS:
+            stopped(bool): True if terminated or truncated, there is no need to show action_masks
+        
         """
         suit_map = {
             'spade': 'S',
@@ -1048,26 +1057,27 @@ class OpenPokerEnv(gym.Env):
         self.window.blit(text_surface, text_surface.get_rect(center = (game_index_box_x, game_index_box_y)))
 
 
-        # action mask
-        current_betting_idx = self.game_elements['board'].current_betting_idx
-        if self.game_elements['players'][current_betting_idx].player_name == 'player_1' and self.game_elements['board'].players_last_move_list[current_betting_idx] != Action.FOLD:
-            action_masks = self._get_info()['action_masks'].tolist()
-            action_list = ['Call(0)', 'Bet(1)', 'Raise_bet(2)', 'Check(3)', 'Fold(4)', 'ALL IN(5)']
-            action_box_x_y = [(action_box_x, action_box_y + i*(action_box_height)) for i in range(len(action_list))]
+        if not stopped:
+            # action mask
+            current_betting_idx = self.game_elements['board'].current_betting_idx
+            if self.game_elements['players'][current_betting_idx].player_name == 'player_1' and self.game_elements['board'].players_last_move_list[current_betting_idx] != Action.FOLD:
+                action_masks = self._get_info()['action_masks'].tolist()
+                action_list = ['Call(0)', 'Bet(1)', 'Raise_bet(2)', 'Check(3)', 'Fold(4)', 'ALL IN(5)']
+                action_box_x_y = [(action_box_x, action_box_y + i*(action_box_height)) for i in range(len(action_list))]
 
-            for action_idx, action in enumerate(['Call(0)', 'Bet(1)', 'Raise_bet(2)', 'Check(3)', 'Fold(4)', 'ALL IN(5)']):
-                if action_masks[action_idx] == 1:
-                    # allow action
-                    text_backgound_color = (7, 250, 2)
-                    text_color = (0, 0, 0)
-                else:
-                    # not allow action
-                    text_backgound_color = (250, 2, 2)
-                    text_color = (181, 184, 178)
+                for action_idx, action in enumerate(['Call(0)', 'Bet(1)', 'Raise_bet(2)', 'Check(3)', 'Fold(4)', 'ALL IN(5)']):
+                    if action_masks[action_idx] == 1:
+                        # allow action
+                        text_backgound_color = (7, 250, 2)
+                        text_color = (0, 0, 0)
+                    else:
+                        # not allow action
+                        text_backgound_color = (250, 2, 2)
+                        text_color = (181, 184, 178)
 
-                text = font.render(action, True, text_color, text_backgound_color)
-                text_rect = text.get_rect(topleft=action_box_x_y[action_idx])
-                self.window.blit(text, text_rect)
+                    text = font.render(action, True, text_color, text_backgound_color)
+                    text_rect = text.get_rect(topleft=action_box_x_y[action_idx])
+                    self.window.blit(text, text_rect)
 
 
 

@@ -49,6 +49,7 @@ class Board:
         self.history = dict()
         self.history['cash'] = dict()
         self.history['rank'] = dict()
+        self.history['player_status'] = dict()
 
     def assign_dealer(self, player_name):
         """

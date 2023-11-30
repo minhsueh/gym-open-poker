@@ -710,10 +710,21 @@ def conclude_game(current_gameboard):
         truncated(bool): True if meet termination condition
 
     """
-    # add player rank and cash into board.history
+    # add into board.history
+    ##  player's rank
     cur_game_idx = current_gameboard['board'].game_idx
     rank_list = get_player_rank_list(current_gameboard)
-    current_gameboard['board'].history[cur_game_idx] = rank_list
+    current_gameboard['board'].history['rank'][cur_game_idx] = rank_list
+    ##  player's cash and status
+    player_cash_list = []
+    player_status_list = []
+    for player in current_gameboard['players']:
+        player_cash_list.append(player.current_cash)
+        player_status_list.append(player.status)
+    current_gameboard['board'].history['cash'][cur_game_idx] = player_cash_list
+    current_gameboard['board'].history['player_status'][cur_game_idx] = player_status_list
+
+
     print(current_gameboard['board'].history)
 
     #
