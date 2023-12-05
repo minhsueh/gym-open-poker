@@ -69,6 +69,8 @@ class Player:
         :return:
         """
         self.status = assign_to
+        if assign_to == 'lost':
+            self.current_cash = 0
 
         
 

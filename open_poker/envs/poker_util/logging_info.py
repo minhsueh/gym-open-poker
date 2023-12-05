@@ -24,3 +24,9 @@ def log_file_create(filename):
     return logger
 
 
+
+def remove_previous_logger():
+    logger = logging.getLogger(__name__)
+    logger.handlers.clear()
+
+    return logger

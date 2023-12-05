@@ -21,7 +21,7 @@ import sys, os
 sys.path.append(os.path.dirname(poker_util .__file__)) 
 
 from open_poker.envs.poker_util.action_choices import (check, bet, raise_bet, fold, call)
-from open_poker.envs.poker_util.logging_info import log_file_create
+from open_poker.envs.poker_util.logging_info import log_file_create, remove_previous_logger
 
 from agent import Agent
 from flag_config import flag_config_dict
@@ -141,6 +141,10 @@ class OpenPokerEnv(gym.Env):
         """
 
         global logger
+        # remove existed logger
+        remove_previous_logger()
+
+        # add new logger
         log_file_path = customized_arg_dict.get("log_file_path", 'test.log')
         logger = log_file_create(log_file_path)
         logger.debug("Let's get started!!!!")
@@ -505,7 +509,10 @@ class OpenPokerEnv(gym.Env):
         dealer.check_and_deal_hole_cards(self.game_elements)
 
         # force_small_big_blind_bet
-        dealer.force_small_big_blind_bet(self.game_elements)
+        blind_stop = dealer.force_small_big_blind_bet(self.game_elements)
+        if blind_stop:
+            dealer.conclude_tournament(self.game_elements)
+            return [self._get_obs(stopped=True), self._get_reward(), True, False, self._get_info(stopped=True)]
 
         # check player_1 lost or not
         if dealer.check_player1_lost(self.game_elements):
@@ -612,7 +619,11 @@ class OpenPokerEnv(gym.Env):
                     dealer.check_and_deal_hole_cards(self.game_elements)
 
                     # force_small_big_blind_bet
-                    dealer.force_small_big_blind_bet(self.game_elements)
+                    blind_stop = dealer.force_small_big_blind_bet(self.game_elements)
+                    if blind_stop:
+                        dealer.conclude_tournament(self.game_elements)
+                        return [self._get_obs(stopped=True), self._get_reward(), True, False, self._get_info(stopped=True)]
+
 
                     # check player_1 lost or not
                     if dealer.check_player1_lost(self.game_elements):
@@ -669,6 +680,8 @@ class OpenPokerEnv(gym.Env):
             self.game_elements['board'].current_betting_idx = current_betting_idx
             logger.debug('The current players_last_move_list is: ' + str(_get_players_last_move_list_string(self.game_elements)))
             logger.debug('The current players_last_move_list_hist is: ' + str(_get_players_last_move_list_hist_string(self.game_elements)))
+
+            dealer.conclude_tournament(self.game_elements)
 
             if self.render_mode == "human":
                 self.render()

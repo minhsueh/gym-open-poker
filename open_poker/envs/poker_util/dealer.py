@@ -125,7 +125,7 @@ def force_small_big_blind_bet(current_gameboard):
         current_gameboard
 
     Returns:
-        None
+        (Boolean): if this function failed, meaning active players have no cash to pay blind 
 
     """
     if current_gameboard['board'].cur_phase == Phase.PRE_FLOP:
@@ -189,12 +189,13 @@ def force_small_big_blind_bet(current_gameboard):
                         current_gameboard['board'].current_bet_count = 1
                         break
         else:
-            raise
+            return(True)
         
 
     else:
         raise ('The cur_phase at the funciton reset should only be Phase.PRE_FLOP, current value = ' + str(current_gameboard['board'].cur_phase))
 
+    return(False)
 
 def check_player1_lost(current_gameboard):
     if current_gameboard['players_dict']['player_1'].status == 'lost':
@@ -203,7 +204,22 @@ def check_player1_lost(current_gameboard):
         return(False)
 
 def conclude_tournament(current_gameboard):
-    pass
+    logger.debug('Concluding tournament:')
+
+    cash_dict = collections.defaultdict(list)
+    for player in current_gameboard['players']:
+        cash = round(player.current_cash, 2)
+        cash_dict[cash].append(player.player_name)
+
+
+    for rank_idx, cash in enumerate(sorted(cash_dict.keys(), reverse=True)):
+        for player_name in cash_dict[cash]:
+            logger.debug(f'{player_name} ended up having ${cash} with rank {rank_idx+1}.')
+
+
+
+
+
 
 def betting(current_gameboard, phase):
     """ 
