@@ -1,7 +1,7 @@
 # --------log file path--------
 log_file_path: './test1243.log'
 # --------visualization parameters--------
-render_mode: 'human'
+render_mode: 'None'
 show_all_move_mode: False
 visualize_debug_mode: True
 # window_width: 1200

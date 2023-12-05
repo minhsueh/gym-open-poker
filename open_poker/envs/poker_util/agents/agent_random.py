@@ -14,7 +14,7 @@ This agent randomly select one action from allowable_actions.
 
 
 """
-
+np.random.seed(15)
 
 def make_pre_flop_moves(player, current_gameboard, allowable_actions):
     """Strategies for agent in pre-flop round

@@ -13,6 +13,7 @@ class Action(Enum):
     SMALL_BLIND = 6
     BIG_BLIND = 7
     LOST = 8
+    ALL_IN_ALREADY = 9
 
 
 

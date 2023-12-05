@@ -337,14 +337,14 @@ class OpenPokerEnv(gym.Env):
         return(np.array([self.game_elements['board'].dealer_position, player_position_idx], dtype=np.int64))
 
 
-    def _get_hole_cards_info(self):
+    def _get_hole_cards_info(self, stopped=False):
         # [card1, card2]
         hole_cards = []
         for idx, player in enumerate(self.game_elements['players']):
             if player.player_name == 'player_1':
                 hole_cards = player.hole_cards
                 break
-        if not hole_cards:
+        if not stopped and not hole_cards:
             raise ("player's hole_cards should not be empty, please check _get_hole_cards_info")
 
         card_list = []
@@ -403,13 +403,13 @@ class OpenPokerEnv(gym.Env):
             return(last_reward)
 
 
-    def _get_obs(self):
+    def _get_obs(self, stopped=False):
         player_status, bankroll = self._get_status_and_bankroll_info()
         return {
             "player_status": player_status,
             "bankroll": bankroll,
             "position": self._get_position_info(),
-            "hole_cards": self._get_hole_cards_info(),
+            "hole_cards": self._get_hole_cards_info(stopped=stopped),
             "community_card": self._get_community_card_info(),
             "action": self._get_action_info(),
             "pot_amount": self._get_pot_amount(),
@@ -507,6 +507,11 @@ class OpenPokerEnv(gym.Env):
         # force_small_big_blind_bet
         dealer.force_small_big_blind_bet(self.game_elements)
 
+        # check player_1 lost or not
+        if dealer.check_player1_lost(self.game_elements):
+            dealer.conclude_tournament(self.game_elements)
+            return [self._get_obs(stopped=True), self._get_reward(), True, False, self._get_info(stopped=True)]
+
         # initialize_betting
         dealer.initialize_betting(self.game_elements)
 
@@ -548,7 +553,7 @@ class OpenPokerEnv(gym.Env):
 
         # invalid move -> lost immediately
         if execute_res:
-            return(execute_res[0])
+            return execute_res
 
         if self.render_mode == "human":
             self.render()
@@ -589,10 +594,11 @@ class OpenPokerEnv(gym.Env):
                     terminated, truncated = dealer.conclude_game(self.game_elements)
 
                     if terminated or truncated:
+                        dealer.conclude_tournament(self.game_elements)
                         if self.render_mode == "human":
                             self.render(stopped=True)
 
-                        return self._get_obs(), self._get_reward(), terminated, truncated, self._get_info(stopped=True)
+                        return self._get_obs(stopped=True), self._get_reward(), terminated, truncated, self._get_info(stopped=True)
 
                     # srart the new game
 
@@ -607,6 +613,11 @@ class OpenPokerEnv(gym.Env):
 
                     # force_small_big_blind_bet
                     dealer.force_small_big_blind_bet(self.game_elements)
+
+                    # check player_1 lost or not
+                    if dealer.check_player1_lost(self.game_elements):
+                        dealer.conclude_tournament(self.game_elements)
+                        return [self._get_obs(stopped=True), self._get_reward(), True, False, self._get_info(stopped=True)]
 
                     # initialize_betting
                     dealer.initialize_betting(self.game_elements)
@@ -635,7 +646,8 @@ class OpenPokerEnv(gym.Env):
                         return self._get_obs(), self._get_reward(), False, False, self._get_info()
   
 
-
+    def get_tournament_summary(self):
+        return(self.game_elements['board'].history)
 
 
        
@@ -660,7 +672,7 @@ class OpenPokerEnv(gym.Env):
 
             if self.render_mode == "human":
                 self.render()
-            return [self._get_obs(), -999, True, False, self._get_info(stopped=True)]
+            return [self._get_obs(stopped=True), -999, True, False, self._get_info(stopped=True)]
 
         
 
@@ -673,7 +685,7 @@ class OpenPokerEnv(gym.Env):
         self.game_elements['board'].current_betting_idx = current_betting_idx
         logger.debug('The current players_last_move_list is: ' + str(_get_players_last_move_list_string(self.game_elements)))
         logger.debug('The current players_last_move_list_hist is: ' + str(_get_players_last_move_list_hist_string(self.game_elements)))
-        return([])
+        
 
     def _log_board_before_decision(self, player):
         if self.game_elements['board'].cur_phase in [Phase.PRE_FLOP, Phase.FLOP]:

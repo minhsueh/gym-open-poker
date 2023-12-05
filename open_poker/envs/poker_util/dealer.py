@@ -196,6 +196,15 @@ def force_small_big_blind_bet(current_gameboard):
         raise ('The cur_phase at the funciton reset should only be Phase.PRE_FLOP, current value = ' + str(current_gameboard['board'].cur_phase))
 
 
+def check_player1_lost(current_gameboard):
+    if current_gameboard['players_dict']['player_1'].status == 'lost':
+        return(True)
+    else:
+        return(False)
+
+def conclude_tournament(current_gameboard):
+    pass
+
 def betting(current_gameboard, phase):
     """ 
 
@@ -252,7 +261,7 @@ def initialize_betting(current_gameboard):
         elif current_gameboard['board'].players_last_move_list[idx] == Action.FOLD:
             continue
         elif current_gameboard['board'].players_last_move_list[idx] == Action.ALL_IN:
-            continue
+            current_gameboard['board'].players_last_move_list[idx] == Action.ALL_IN_ALREADY
         else:
             current_gameboard['board'].players_last_move_list[idx] = Action.NONE
             current_gameboard['board'].players_last_move_list_hist[idx] = Action.NONE
@@ -356,6 +365,7 @@ def check_betting_over(current_gameboard):
     count_fold = 0
     count_none = 0
     count_all_in = 0
+    count_all_in_already = 0
     for move in current_gameboard['board'].players_last_move_list:
         if move in [Action.NONE, Action.SMALL_BLIND, Action.BIG_BLIND]:
             count_none += 1
@@ -373,11 +383,13 @@ def check_betting_over(current_gameboard):
             count_fold += 1
         elif move == Action.ALL_IN:
             count_all_in += 1
+        elif move == Action.ALL_IN_ALREADY:
+            count_all_in_already += 1
         else:
             print('The move is invalid, current move = ' + str(move))
             raise 
 
-    player_stayed_count = total_number_of_players - count_lost - count_fold
+    player_stayed_count = total_number_of_players - count_lost - count_fold - count_all_in_already
     if player_stayed_count == 1:
         logger.debug('Only one player is active, the betting is over.')
         return(True)
@@ -725,7 +737,7 @@ def conclude_game(current_gameboard):
     current_gameboard['board'].history['player_status'][cur_game_idx] = player_status_list
 
 
-    print(current_gameboard['board'].history)
+    # print(current_gameboard['board'].history)
 
     #
     if time.time() - current_gameboard['start_time'] > current_gameboard['max_time_limitation']:
