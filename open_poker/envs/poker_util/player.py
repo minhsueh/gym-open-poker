@@ -183,6 +183,11 @@ class Player:
 
         self.add_bet_amount_each_round(current_gameboard, small_blind_amount)
 
+        if self.current_cash == 0:
+            # modify players_last_move_list_hist to ALL_IN
+            for player_idx, player in enumerate(current_gameboard['players']):
+                if player.player_name == self.player_name:
+                    current_gameboard['board'].players_last_move_list[player_idx] = Action.ALL_IN
 
         return 
 
@@ -208,6 +213,11 @@ class Player:
 
         self.add_bet_amount_each_round(current_gameboard, big_blind_amount)
 
+        if self.current_cash == 0:
+            # modify players_last_move_list_hist to ALL_IN
+            for player_idx, player in enumerate(current_gameboard['players']):
+                if player.player_name == self.player_name:
+                    current_gameboard['board'].players_last_move_list[player_idx] = Action.ALL_IN
 
         return 
 

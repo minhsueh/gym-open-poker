@@ -12,7 +12,7 @@ logger = logging.getLogger('open_poker.envs.poker_util.logging_info.board')
 
 
 class Board:
-    def __init__(self, dealer_name, total_cash, pot, side_pot, deck, deck_idx, num_active_player_on_table):
+    def __init__(self, dealer_name, buy_in_amount, total_cash, pot, side_pot, deck, deck_idx, num_active_player_on_table):
         # self.dealer = dealer_name
         # self.total_cash_on_table = total_cash
         # self.pot = pot
@@ -22,7 +22,6 @@ class Board:
         self.community_cards = list()
         # self.players_made_decisions = list()  # players who have made decision on the table
         # self.current_highest_bet = 0  # previous bet in the current round
-        # self.buy_in_amount = 40  # 20 times to 100 times of force bet of big blind
         # self.num_active_player_on_table = num_active_player_on_table  # number of player could act in a hand
         self.game_idx = 0
         self.dealer_position = -1
@@ -39,6 +38,8 @@ class Board:
         self.pots_attendee_list = [set(['player_'+str(i) for i in range(1, num_active_player_on_table+1)])] # who is attend in corresponding pot in pots_amount_list. The size should be same as pots_amount_list.
         
 
+        self.buy_in_amount = buy_in_amount
+
         self.current_betting_idx = 0
         self.current_bet_count = 0
         self.current_raise_count = 0
@@ -48,8 +49,11 @@ class Board:
         self.previous_showdown = None
         self.history = dict()
         self.history['cash'] = dict()
+        self.history['cash'][0] = [buy_in_amount] * num_active_player_on_table
         self.history['rank'] = dict()
+        self.history['rank'][0] = [1] * num_active_player_on_table
         self.history['player_status'] = dict()
+        self.history['player_status'][0] = ['active'] * num_active_player_on_table
 
     def assign_dealer(self, player_name):
         """

@@ -181,6 +181,7 @@ def _initialize_board(game_elements):
     board_args['side_pot'] = dict()
     board_args['deck'] = game_elements['deck']
     board_args['deck_idx'] = 0
+    board_args['buy_in_amount'] = game_elements['buy_in_amount']
     board_args['num_active_player_on_table'] = len(game_elements['players'])
     board = Board(**board_args)
     game_elements['board'] = board
