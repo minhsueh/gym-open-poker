@@ -208,7 +208,8 @@ class OpenPokerEnv(gym.Env):
             Action.RAISE_BET: 2,
             Action.CHECK: 3,
             Action.FOLD: 4,
-            Action.ALL_IN: 5
+            Action.ALL_IN: 5,
+            Action.ALL_IN_ALREADY: 5
         }
         
 
@@ -526,7 +527,8 @@ class OpenPokerEnv(gym.Env):
 
         # start perform pre-flop betting
         if self.game_elements['players'][self.game_elements['board'].current_betting_idx].player_name != 'player_1':
-            self._betting()
+            self._betting() 
+
 
 
         observation = self._get_obs()
@@ -574,7 +576,6 @@ class OpenPokerEnv(gym.Env):
                 if not is_over and self.game_elements['board'].players_last_move_list[player_idx] not in [Action.FOLD, Action.ALL_IN]:
                     if self.render_mode == "human":
                         self.render()
-
                     logger.debug(player.player_name + ' start to move with cash ' + str(player.current_cash))
                     # log bet info
                     self._log_board_before_decision(player)
@@ -643,12 +644,12 @@ class OpenPokerEnv(gym.Env):
                     dealer.initialize_betting(self.game_elements)
 
                     # betting
-                    self._betting()
+                    is_over = self._betting()
                     # if self.render_mode == "human":
                     #    self.render()
 
 
-                    if self.game_elements['board'].players_last_move_list[player_idx] not in [Action.FOLD, Action.ALL_IN]:
+                    if not is_over and self.game_elements['board'].players_last_move_list[player_idx] not in [Action.FOLD, Action.ALL_IN]:
                         if self.render_mode == "human":
                             self.render()
                         logger.debug(player.player_name + ' start to move with cash ' + str(player.current_cash))

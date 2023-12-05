@@ -65,16 +65,15 @@ def check_and_deal_hole_cards(current_gameboard):
         count_blind = 0
         for idx in range(dealer_position + 1, dealer_position + total_number_of_players + 1):
             player = current_gameboard['players'][idx % total_number_of_players]
-
             # check if small blind have enough cash to afford, or it is lose
-            if count_blind == 0 and player.current_cash < current_gameboard['small_blind_amount']:
+            if player.status != 'lost' and count_blind == 0 and player.current_cash < current_gameboard['small_blind_amount']:
                 logger.debug(f'{player.player_name} does not have cash to pay small blind, assign to lost')
                 # player.assign_to_fold(game_elements)
                 player.assign_status(current_gameboard, 'lost')
                 continue
 
             # check if big blind have enough cash to afford, or it is lose
-            if count_blind == 1 and player.current_cash < current_gameboard['small_blind_amount'] * current_gameboard['big_small_blind_ratio']:
+            if player.status != 'lost' and count_blind == 1 and player.current_cash < current_gameboard['small_blind_amount'] * current_gameboard['big_small_blind_ratio']:
                 logger.debug(f'{player.player_name} does not have cash to pay big blind, assign to lost')
                 # player.assign_to_fold(game_elements)
                 player.assign_status(current_gameboard, 'lost')
@@ -277,7 +276,10 @@ def initialize_betting(current_gameboard):
         elif current_gameboard['board'].players_last_move_list[idx] == Action.FOLD:
             continue
         elif current_gameboard['board'].players_last_move_list[idx] == Action.ALL_IN:
-            current_gameboard['board'].players_last_move_list[idx] == Action.ALL_IN_ALREADY
+            current_gameboard['board'].players_last_move_list[idx] = Action.ALL_IN_ALREADY
+            current_gameboard['board'].players_last_move_list_hist[idx] = Action.ALL_IN_ALREADY
+        elif current_gameboard['board'].players_last_move_list[idx] == Action.ALL_IN_ALREADY:
+            continue
         else:
             current_gameboard['board'].players_last_move_list[idx] = Action.NONE
             current_gameboard['board'].players_last_move_list_hist[idx] = Action.NONE
@@ -591,7 +593,7 @@ def conclude_round(current_gameboard):
 
     all_in_players_list = [] # each element: (player_name, all_in_amount)
     for p_idx, p in enumerate(current_gameboard['players']):
-        if current_gameboard['board'].players_last_move_list[p_idx] == Action.ALL_IN:
+        if current_gameboard['board'].players_last_move_list[p_idx] == Action.ALL_IN or current_gameboard['board'].players_last_move_list[p_idx] == Action.ALL_IN_ALREADY:
             all_in_players_list.append((p.player_name, player_pot[p.player_name]))
     all_in_players_list.sort(key = lambda x: x[1], reverse = True) # sort all_in_amount in decending order
     # All-in -> side pot
@@ -767,6 +769,7 @@ def conclude_game(current_gameboard):
 
 
     main_pot_attendee = current_gameboard['board'].pots_attendee_list[0]
+
     # assign money
     for pot_idx in range(len(current_gameboard['board'].pots_amount_list)):
         money_amount = current_gameboard['board'].pots_amount_list[pot_idx]
@@ -879,7 +882,6 @@ def find_winner(current_gameboard, player_list):
     # 
     rank_dict = get_rank_dict(current_gameboard)
     hand_type_list = current_gameboard['hand_type_list']
-
     winners = []
     for hand_type in hand_type_list:
         if len(rank_dict[hand_type]) != 0:
@@ -887,9 +889,10 @@ def find_winner(current_gameboard, player_list):
                 for player_name, _ in player_hand_list:
                     if player_name in player_list:
                         winners.append(player_name)
-                if winners:
+                if len(winners) > 0: 
                     logger.debug('The winner is : ' + ', '.join(winners))
                     return(winners)
+
 
 
 def log_ranking(current_gameboard):
@@ -1114,7 +1117,8 @@ def update_players_last_move_list_when_raise(current_gameboard, raise_player_nam
         cur_player = current_gameboard['players'][player_idx]
         if cur_player.player_name != raise_player_name and cur_player.status != 'lost' \
         and current_gameboard['board'].players_last_move_list[player_idx] != Action.FOLD \
-        and current_gameboard['board'].players_last_move_list[player_idx] != Action.ALL_IN:
+        and current_gameboard['board'].players_last_move_list[player_idx] != Action.ALL_IN \
+        and current_gameboard['board'].players_last_move_list[player_idx] != Action.ALL_IN_ALREADY:
             current_gameboard['board'].players_last_move_list[player_idx] = Action.NONE
 
 

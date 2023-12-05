@@ -331,7 +331,8 @@ class Player:
 
         # 3. check
         # only big blind can chcek in pre-flop
-        if current_gameboard['board'].players_last_move_list[player_idx] == Action.BIG_BLIND:
+        if current_gameboard['board'].players_last_move_list[player_idx] == Action.BIG_BLIND and \
+        Action.ALL_IN not in current_gameboard['board'].players_last_move_list:
             allowable_actions.add(check)
 
 
@@ -433,7 +434,9 @@ class Player:
 
         # 2. check
         # if no bet/raise_bet in players_last_move_list
-        if Action.RAISE_BET not in current_gameboard['board'].players_last_move_list and Action.BET not in current_gameboard['board'].players_last_move_list:
+        if Action.RAISE_BET not in current_gameboard['board'].players_last_move_list and \
+        Action.BET not in current_gameboard['board'].players_last_move_list and \
+        Action.ALL_IN not in current_gameboard['board'].players_last_move_list:
             allowable_actions.add(check)
 
 
@@ -525,7 +528,9 @@ class Player:
 
         # 2. check
         # if no bet/raise_bet in players_last_move_list
-        if Action.RAISE_BET not in current_gameboard['board'].players_last_move_list and Action.BET not in current_gameboard['board'].players_last_move_list:
+        if Action.RAISE_BET not in current_gameboard['board'].players_last_move_list and \
+        Action.BET not in current_gameboard['board'].players_last_move_list and \
+        Action.ALL_IN not in current_gameboard['board'].players_last_move_list:
             allowable_actions.add(check)
 
 
@@ -617,7 +622,9 @@ class Player:
 
         # 2. check
         # if no bet/raise_bet in players_last_move_list
-        if Action.RAISE_BET not in current_gameboard['board'].players_last_move_list and Action.BET not in current_gameboard['board'].players_last_move_list:
+        if Action.RAISE_BET not in current_gameboard['board'].players_last_move_list and \
+        Action.BET not in current_gameboard['board'].players_last_move_list and \
+        Action.ALL_IN not in current_gameboard['board'].players_last_move_list:
             allowable_actions.add(check)
 
 
