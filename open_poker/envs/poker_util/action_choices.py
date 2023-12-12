@@ -456,15 +456,22 @@ def all_in(current_gameboard, player):
     if case == 'case2':
         # update 
         if current_gameboard['board'].current_bet_count == 0:
-            current_gameboard['board'].current_bet_count = 1
+            if bet_to_follow >= raise_amount/2:
+                # "half bet" rule
+                current_gameboard['board'].current_bet_count = 1
+                # the other players have to make decision again
+                dealer.update_players_last_move_list_when_raise(current_gameboard, player.player_name)
         elif current_gameboard['board'].current_raise_count < current_gameboard['max_raise_count']:
-            current_gameboard['board'].current_raise_count += 1
+            if bet_to_follow >= raise_amount/2:
+                # "half bet" rule
+                current_gameboard['board'].current_raise_count += 1
+                # the other players have to make decision again
+                dealer.update_players_last_move_list_when_raise(current_gameboard, player.player_name)
         elif current_gameboard['board'].current_raise_count == current_gameboard['max_raise_count']:
-            pass
+            raise
         else:
             raise
-        # the other players have to make decision again
-        dealer.update_players_last_move_list_when_raise(current_gameboard, player.player_name)
+        
 
 
 
