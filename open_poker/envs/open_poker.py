@@ -526,8 +526,9 @@ class OpenPokerEnv(gym.Env):
         
 
         # start perform pre-flop betting
-        if self.game_elements['players'][self.game_elements['board'].current_betting_idx].player_name != 'player_1':
-            self._betting() 
+        self.step(0, True)
+        # if self.game_elements['players'][self.game_elements['board'].current_betting_idx].player_name != 'player_1':
+        #     self._betting() 
 
 
 
@@ -541,7 +542,7 @@ class OpenPokerEnv(gym.Env):
 
         return observation, info
 
-    def step(self, action):
+    def step(self, action, game_start=False):
         """
         Args:
             
@@ -551,6 +552,7 @@ class OpenPokerEnv(gym.Env):
         
 
         """
+        
         # get the player object
         player = None
         for player_idx, player in enumerate(self.game_elements['players']):
@@ -558,18 +560,20 @@ class OpenPokerEnv(gym.Env):
                 break
         assert player is not None
 
-        execute_res = self.execute_player_1_action(player, action)
+        if not game_start:
+            execute_res = self.execute_player_1_action(player, action)
 
-        # invalid move -> lost immediately
-        if execute_res:
-            return execute_res
+            # invalid move -> lost immediately
+            if execute_res:
+                return execute_res
 
-        if self.render_mode == "human":
-            self.render()
+            if self.render_mode == "human":
+                self.render()
 
         while(True):
             # continue betting
             if not dealer.check_betting_over(self.game_elements):
+                
                 # continue betting
                 is_over = self._betting()
 
@@ -585,7 +589,7 @@ class OpenPokerEnv(gym.Env):
                     # player_1 fold
                     continue
             else:
-
+                
                 early_stop = dealer.conclude_round(self.game_elements)
                 if not early_stop:
                     # The betting is over, change the phase
@@ -748,8 +752,6 @@ class OpenPokerEnv(gym.Env):
         if self.render_mode == "human":
             self.render()
         while(not dealer.check_betting_over(self.game_elements)):
-            
-
             player = self.game_elements['players'][current_betting_idx]
             if player.status != 'lost':
 
@@ -849,7 +851,7 @@ class OpenPokerEnv(gym.Env):
     def render(self, stopped=False):
         if self.render_mode == "human":
             if self.show_all_move_mode:
-                time.sleep(1)
+                time.sleep(0.5)
             return self._render_frame(stopped=stopped)
 
 
