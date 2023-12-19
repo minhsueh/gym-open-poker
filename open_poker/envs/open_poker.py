@@ -41,6 +41,7 @@ from open_poker.envs.poker_util.agents import agent_p, dump_agent, agent_random
 
 class OpenPokerEnv(gym.Env):
     metadata = {"render_modes": ["human", "rgb_array"]}
+    
     """
     ----------------------------------------
     Poker introduction: 
@@ -180,7 +181,7 @@ class OpenPokerEnv(gym.Env):
         self.window_height = customized_arg_dict.get("window_height", 600)  # The height of the PyGame window
         self.visualize_debug_mode = customized_arg_dict.get("visualize_debug_mode", False)
         self.show_all_move_mode = customized_arg_dict.get("show_all_move_mode", False)
-
+        self.sleep_time = customized_arg_dict.get("sleep_time", 1)
 
 
         self.observation_space = spaces.Dict(
@@ -852,7 +853,7 @@ class OpenPokerEnv(gym.Env):
     def render(self, stopped=False):
         if self.render_mode == "human":
             if self.show_all_move_mode:
-                time.sleep(0.5)
+                time.sleep(self.sleep_time)
             return self._render_frame(stopped=stopped)
 
 

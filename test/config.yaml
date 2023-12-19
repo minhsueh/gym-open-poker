@@ -1,9 +1,9 @@
 # --------log file path--------
 log_file_path: './test1243.log'
 # --------visualization parameters--------
-render_mode: 'None'
+render_mode: 'human'  # None or human
 show_all_move_mode: False
-visualize_debug_mode: True
+visualize_debug_mode: False
 # window_width: 1200
 # window_height: 600
 # --------background agents--------
