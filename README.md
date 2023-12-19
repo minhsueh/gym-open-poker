@@ -3,8 +3,8 @@ Welcome to the open-world Poker Simulator, a tool that includes a novelty genera
 ![alt text](./poker.png)
 The poker simulator screenshot.
 
-![](./videos/normal_trim.mp4)
+<video src="videos/normal.mp4"></video>
 The visualization of normal game mode.
 
-![](./videos/debug_mode_trim.mp4)
+<video src="videos/debug_mode.mp4"></video>
 The visualization of debug game mode.
