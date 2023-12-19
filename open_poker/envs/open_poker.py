@@ -496,6 +496,7 @@ class OpenPokerEnv(gym.Env):
         np.random.seed(seed)
         self.game_elements = self.set_up_board(random_seed=seed)
 
+        logger.debug('This tournament uses random_seed = ' + str(seed))
 
         if self.render_mode == "human":
             self.render()
@@ -512,12 +513,12 @@ class OpenPokerEnv(gym.Env):
         # force_small_big_blind_bet
         blind_stop = dealer.force_small_big_blind_bet(self.game_elements)
         if blind_stop:
-            dealer.conclude_tournament(self.game_elements)
+            dealer.conclude_tournament(self.game_elements, early_stop=True)
             return [self._get_obs(stopped=True), self._get_reward(), True, False, self._get_info(stopped=True)]
 
         # check player_1 lost or not
         if dealer.check_player1_lost(self.game_elements):
-            dealer.conclude_tournament(self.game_elements)
+            dealer.conclude_tournament(self.game_elements, early_stop=True)
             return [self._get_obs(stopped=True), self._get_reward(), True, False, self._get_info(stopped=True)]
 
         # initialize_betting
@@ -577,7 +578,7 @@ class OpenPokerEnv(gym.Env):
                 # continue betting
                 is_over = self._betting()
 
-                if not is_over and self.game_elements['board'].players_last_move_list[player_idx] not in [Action.FOLD, Action.ALL_IN]:
+                if not is_over and self.game_elements['board'].players_last_move_list[player_idx] not in [Action.FOLD, Action.ALL_IN, Action.ALL_IN_ALREADY]:
                     if self.render_mode == "human":
                         self.render()
                     logger.debug(player.player_name + ' start to move with cash ' + str(player.current_cash))
@@ -626,13 +627,13 @@ class OpenPokerEnv(gym.Env):
                     # force_small_big_blind_bet
                     blind_stop = dealer.force_small_big_blind_bet(self.game_elements)
                     if blind_stop:
-                        dealer.conclude_tournament(self.game_elements)
+                        dealer.conclude_tournament(self.game_elements, early_stop=True)
                         return [self._get_obs(stopped=True), self._get_reward(), True, False, self._get_info(stopped=True)]
 
 
                     # check player_1 lost or not
                     if dealer.check_player1_lost(self.game_elements):
-                        dealer.conclude_tournament(self.game_elements)
+                        dealer.conclude_tournament(self.game_elements, early_stop=True)
                         return [self._get_obs(stopped=True), self._get_reward(), True, False, self._get_info(stopped=True)]
 
                     # initialize_betting
@@ -653,7 +654,7 @@ class OpenPokerEnv(gym.Env):
                     #    self.render()
 
 
-                    if not is_over and self.game_elements['board'].players_last_move_list[player_idx] not in [Action.FOLD, Action.ALL_IN]:
+                    if not is_over and self.game_elements['board'].players_last_move_list[player_idx] not in [Action.FOLD, Action.ALL_IN, Action.ALL_IN_ALREADY]:
                         if self.render_mode == "human":
                             self.render()
                         logger.debug(player.player_name + ' start to move with cash ' + str(player.current_cash))
@@ -686,7 +687,7 @@ class OpenPokerEnv(gym.Env):
             logger.debug('The current players_last_move_list is: ' + str(_get_players_last_move_list_string(self.game_elements)))
             logger.debug('The current players_last_move_list_hist is: ' + str(_get_players_last_move_list_hist_string(self.game_elements)))
 
-            dealer.conclude_tournament(self.game_elements)
+            dealer.conclude_tournament(self.game_elements, early_stop=True)
 
             if self.render_mode == "human":
                 self.render()
@@ -755,10 +756,10 @@ class OpenPokerEnv(gym.Env):
             player = self.game_elements['players'][current_betting_idx]
             if player.status != 'lost':
 
-                if player.player_name == 'player_1' and self.game_elements['board'].players_last_move_list[current_betting_idx] not in [Action.FOLD, Action.ALL_IN]:
+                if player.player_name == 'player_1' and self.game_elements['board'].players_last_move_list[current_betting_idx] not in [Action.FOLD, Action.ALL_IN, Action.ALL_IN_ALREADY]:
                     # this is gym user, return and wait for the next step
                     return(False) # meaning the betting is still continue
-                elif self.game_elements['board'].players_last_move_list[current_betting_idx] in [Action.FOLD, Action.ALL_IN]:
+                elif self.game_elements['board'].players_last_move_list[current_betting_idx] in [Action.FOLD, Action.ALL_IN, Action.ALL_IN_ALREADY]:
                     
                     # fold or all_in
                     current_betting_idx = (current_betting_idx + 1) % total_number_of_players

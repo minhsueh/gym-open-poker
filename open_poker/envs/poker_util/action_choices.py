@@ -310,13 +310,16 @@ def check(current_gameboard, player):
     """
     logger.debug(f'{player.player_name} decides to --- Check ---')
 
+
+
     for player_idx in range(len(current_gameboard['board'].players_last_move_list)):
         p = current_gameboard['players'][player_idx]
-        p_last_move = current_gameboard['board'].players_last_move_list[player_idx] 
+        if player.player_name != p.player_name:
+            p_last_move = current_gameboard['board'].players_last_move_list[player_idx] 
 
-        if action.Action.BET == p_last_move or action.Action.RAISE_BET == p_last_move:
-            logger.debug(f'{p.player_name} bet/raise_bet, you cannot chcek')
-            return flag_config_dict['failure_code']
+            if action.Action.BET == p_last_move or action.Action.RAISE_BET == p_last_move or action.Action.BIG_BLIND == p_last_move:
+                logger.debug(f'{p.player_name} bet/raise_bet/big_blind, you cannot chcek')
+                return flag_config_dict['failure_code']
 
 
 

@@ -206,8 +206,36 @@ def check_player1_lost(current_gameboard):
     else:
         return(False)
 
-def conclude_tournament(current_gameboard):
+def conclude_tournament(current_gameboard, early_stop=False):
+
+    """
+    Args:
+        current_gameboard
+        early_stop(Bool): True if the tournament ends without calling conclude_game. 
+                          This is an indicator to record history. 
+                        
+
+    Returns:
+        None
+
+    """
     logger.debug('Concluding tournament:')
+
+    # add into board.history
+    if early_stop:
+        ##  player's rank
+        cur_game_idx = current_gameboard['board'].game_idx
+        rank_list = get_player_rank_list(current_gameboard)
+        current_gameboard['board'].history['rank'][cur_game_idx] = rank_list
+        ##  player's cash and status
+        player_cash_list = []
+        player_status_list = []
+        for player_idx in range(1, current_gameboard['total_number_of_players']+1):
+            player = current_gameboard['players_dict']['player_' + str(player_idx)]
+            player_cash_list.append(player.current_cash)
+            player_status_list.append(player.status)
+        current_gameboard['board'].history['cash'][cur_game_idx] = player_cash_list
+        current_gameboard['board'].history['player_status'][cur_game_idx] = player_status_list
 
     cash_dict = collections.defaultdict(list)
     for player in current_gameboard['players']:

@@ -104,9 +104,8 @@ def make_pre_flop_moves(player, current_gameboard, allowable_actions):
         elif check in allowable_actions:
             return check, params
         else:
-            print(allowable_actions)
-            return fold, params
-            # raise 
+            # return fold, params
+            raise 
 
     # Case 3
     return fold, params
