@@ -2,7 +2,6 @@ from flag_config import flag_config_dict
 import card_utility_actions
 import copy
 import dealer
-from chip import Chip
 import action
 
 
