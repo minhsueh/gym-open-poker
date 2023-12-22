@@ -2,7 +2,6 @@ import sys
 from card import Card
 from player import Player
 from board import Board
-# from helper_functions import *
 from card_utility_actions import calculate_best_hand
 from card_utility_actions import (is_royal_flush, is_straight, is_one_pair, is_two_pair, is_flush, is_full_house,
                                   is_straight_flush, is_three_of_a_kind, is_four_of_a_kind, is_high_card)
@@ -11,7 +10,6 @@ from card_utility_actions import (get_royal_flush, get_straight, get_flush, get_
 from collections import deque
 
 from phase import Phase
-# from tournament_status import TournamentStatus
 import dealer
 import numpy as np
 import time
@@ -91,31 +89,6 @@ def initialize_game_element(player_decision_agents, customized_arg_dict, random_
 
     dealer.print_player_info(game_elements)
 
-    # game_elements['type'] = "game_elements"
-    # game_elements['hands_of_players'] = [dict()]  # each game result in dict, -1 should be least game
-
-    # gnome poker variables
-    #game_elements['cur_phase'] = Phase.PRE_FLOP
-    #game_elements['cur_phase_idx'] = 0
-    #game_elements['tournament_status'] = TournamentStatus.TRUNCATED
-    
-
-    # round parameter
-    # not use
-    # game_elements['highest_raise_position'] = None
-    # game_elements['num_active_player_on_table'] = game_elements['total_number_of_players']
-    # game_elements['player_last_move'] = None
-
-    # put into board
-    # game_elements['current_betting_idx'] = 0
-    # game_elements['current_bet_count'] = 0
-    # game_elements['current_raise_count'] = 0
-    # game_elements['players_last_move_list'] = ['NONE'] * len(game_elements['players']) 
-    # game_elements['small_blind_postiion_idx'] = None
-    # game_elements['big_blind_postiion_idx'] = None
-
-    
-
 
     # define hand rank order
     game_elements['hand_rank_type'] = {
@@ -150,11 +123,6 @@ def initialize_game_element(player_decision_agents, customized_arg_dict, random_
     game_elements['numbers_rank_type'] = {i: i for i in range(2, 14)}
     game_elements['numbers_rank_type'][1] = 14
 
-
-    #game_elements['find_winner'] = getattr(sys.modules[__name__], 'find_winner')
-    #game_elements['calculate_best_hand'] = getattr(sys.modules[__name__], 'calculate_best_hand')
-    #game_elements['assign_pot_to_only_winner'] = getattr(sys.modules[__name__], 'assign_pot_to_only_winner')
-
     # extra actions
     game_elements['extra_action'] = {}
 
@@ -172,9 +140,8 @@ def _initialize_board(game_elements):
     :param game_elements:
     :return:
     """
-    dealer = game_elements['players'][0]
+    # dealer = game_elements['players'][0]
     board_args = dict()
-    board_args['dealer_name'] = dealer.player_name
     board_args['total_cash'] = 0
     board_args['pot'] = dict()
     board_args['side_pot'] = dict()

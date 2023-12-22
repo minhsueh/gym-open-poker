@@ -563,7 +563,7 @@ class OpenPokerEnv(gym.Env):
         assert player is not None
 
         if not game_start:
-            execute_res = self.execute_player_1_action(player, action)
+            execute_res = self._execute_player_1_action(player, action)
 
             # invalid move -> lost immediately
             if execute_res:
@@ -669,7 +669,7 @@ class OpenPokerEnv(gym.Env):
 
 
        
-    def execute_player_1_action(self, player, action):
+    def _execute_player_1_action(self, player, action):
         # action_decode:
         action_to_execute, parameters = self._action_decoder(player, action)
 

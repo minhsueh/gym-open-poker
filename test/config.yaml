@@ -9,11 +9,11 @@ visualize_debug_mode: False
 # --------background agents--------
 background_agents_raw_list:
   - agent_type: "agent_p"
-    number_of_agent: 0
+    number_of_agent: 1
   - agent_type: "dump_agent"
     number_of_agent: 4
   - agent_type: "agent_random"
-    number_of_agent: 0
+    number_of_agent: 1
 # --------general pokers rules--------
 # max_raise_count: 3
 # small_blind: 5

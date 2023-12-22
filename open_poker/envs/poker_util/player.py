@@ -54,13 +54,7 @@ class Player:
 
         self.hole_cards = cards
 
-    def assign_current_decision(self, decision):
-        """
-        update player current decision in this round, includes call/bet/raise_bet/check/fold/all_in
-        :param decision:
-        :return:
-        """
-        self.current_decision = decision
+
 
     def assign_status(self, current_gameboard, assign_to='waiting_for_move'):
         """
@@ -74,20 +68,6 @@ class Player:
 
         
 
-
-    def assign_to_fold(self, current_gameboard):
-        """
-        if player decide to fold this game, directly call this function
-        :return:
-        """
-        if current_gameboard['board'].num_active_player_on_table < 1:
-            logger.debug('Error: something go wrong')
-            raise Exception
-
-        logger.debug(f'{self.player_name} is assigned to fold')
-        self.is_fold = True
-        current_gameboard['board'].num_active_player_on_table -= 1
-
     def assign_to_all_in(self, current_gameboard):
         """
         assign this player to all-in status
@@ -97,22 +77,6 @@ class Player:
         logger.debug(f'{self.player_name} is assigned to all-in')
         self.is_all_in = True
 
-    def add_current_bet(self, amount, chips):
-        """
-        current_bet is where player put chips in with corresponding amount, which would be take away later by board
-        the function add those chips here
-        :param amount:
-        :param chips:
-        :return:
-        """
-        if amount < 0:
-            logger.debug('Error: cannot add negative chips to current bet')
-            raise Exception
-
-        if amount not in self.current_bet:
-            self.current_bet[amount] = set()
-        for c in copy.copy(chips):
-            self.current_bet[amount].add(c)
 
     def add_bet_amount_each_round(self, current_gameboard, amount):
         """
@@ -220,63 +184,6 @@ class Player:
                     current_gameboard['board'].players_last_move_list[player_idx] = Action.ALL_IN
 
         return 
-
-    def assign_small_blind(self, current_gameboard, assign_to=False):
-        """
-        assigns the player left of the dealer to small blind after river
-        :param current_gameboard:
-        :param player_name:
-        :return:
-        """
-        if not assign_to and not self.small_blind:
-            logger.debug(f'{self.player_name} is already not small blind, something go wrong...')
-            raise Exception
-        elif assign_to and self.small_blind:
-            logger.debug(f'{self.player_name} is already small blind, something go wrong...')
-            raise Exception
-
-        self.small_blind = assign_to
-        logger.debug(f'{self.player_name} successfully set to small blind')
-
-    def assign_big_blind(self, current_gameboard, assign_to=False):
-        """
-        assigns the player left of the small blind to small blind after river
-        :param current_gameboard:
-        :param player_name:
-        :return:
-        """
-        if not assign_to and not self.big_blind:
-            logger.debug(f'{self.player_name} is already not big blind, something go wrong...')
-            raise Exception
-        elif assign_to and self.big_blind:
-            logger.debug(f'{self.player_name} is already big blind, something go wrong...')
-            raise Exception
-
-        self.big_blind = assign_to
-        logger.debug(f'{self.player_name} successfully set to big blind')
-
-    def compute_allowable_pre_flop_actions_old(self, current_gameboard):
-        """
-        Players in this phase could call, raise, or fold (no all-in in this turn?)
-        The phase could finish only if all player who would like to continue put the same amount of money
-        :param current_gameboard:
-        :return: allowable actions
-        :rtype: set
-        """
-        logger.debug(f'{self.player_name} computes allowable pre-flop round actions...')
-        allowable_actions = set()
-
-        # big blind are able to check if no other raise bet in pre-flop
-        big_blind_force_bet = current_gameboard['small_blind_amount'] * current_gameboard['big_blind_pay_from_baseline']
-        if self.big_blind and big_blind_force_bet == current_gameboard['board'].current_highest_bet:
-            allowable_actions.add(check)
-
-        allowable_actions.add(fold)  # can fold in any case
-
-        allowable_actions.add(call)
-        allowable_actions.add(raise_bet)
-
-        return allowable_actions
 
 
     def compute_allowable_pre_flop_actions(self, current_gameboard):
@@ -820,8 +727,6 @@ class Player:
         current_gameboard['history']['param'].append(params)
         current_gameboard['history']['return'].append((action_to_execute, parameters))
 
-        if action_to_execute == null_action:
-            return self._execute_action(action_to_execute, parameters, current_gameboard)
 
         return self._execute_action(action_to_execute, parameters, current_gameboard)
 
@@ -846,9 +751,6 @@ class Player:
         params['allowable_moves'] = allowable_actions
         current_gameboard['history']['param'].append(params)
         current_gameboard['history']['return'].append((action_to_execute, parameters))
-
-        if action_to_execute == null_action:
-            return self._execute_action(action_to_execute, parameters, current_gameboard)
 
         return self._execute_action(action_to_execute, parameters, current_gameboard)
 
@@ -876,8 +778,6 @@ class Player:
         current_gameboard['history']['param'].append(params)
         current_gameboard['history']['return'].append((action_to_execute, parameters))
 
-        if action_to_execute == null_action:
-            return self._execute_action(action_to_execute, parameters, current_gameboard)
 
         return self._execute_action(action_to_execute, parameters, current_gameboard)
 

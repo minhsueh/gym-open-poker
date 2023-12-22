@@ -12,7 +12,7 @@ logger = logging.getLogger('open_poker.envs.poker_util.logging_info.board')
 
 
 class Board:
-    def __init__(self, dealer_name, buy_in_amount, total_cash, pot, side_pot, deck, deck_idx, num_active_player_on_table):
+    def __init__(self, buy_in_amount, total_cash, pot, side_pot, deck, deck_idx, num_active_player_on_table):
         # self.dealer = dealer_name
         # self.total_cash_on_table = total_cash
         # self.pot = pot
@@ -55,13 +55,6 @@ class Board:
         self.history['player_status'] = dict()
         self.history['player_status'][0] = ['active'] * num_active_player_on_table
 
-    def assign_dealer(self, player_name):
-        """
-        assigns which player is the dealer in the next round after river.
-        :param player_name: next player who should be dealer after river turn
-        :return:
-        """
-        self.dealer = player_name
 
     def assign_deck_idx(self, num):
         """
@@ -75,13 +68,6 @@ class Board:
 
         self.deck_idx += num
 
-    def compare_for_highest_bet(self, new_bet):
-        """
-        keep a record of current highest bet on the table each round
-        :param new_bet:
-        :return:
-        """
-        self.current_highest_bet = max(self.current_highest_bet, new_bet)
 
 
 
@@ -138,21 +124,6 @@ class Board:
                 elif counter == 2:
                     current_gameboard['board'].big_blind_postiion_idx = idx % total_number_of_players
 
-    def reset_board_each_round(self, current_gameboard):
-        self.players_made_decisions = list()
-        self.current_highest_bet = 0
-
-    def add_total_cash_on_table(self, amount):
-        """
-        once a player bets, we should add that amount in the middle table
-        :param amount:
-        :return:
-        """
-        if amount < 0:
-            logger.debug('Error: try to add 0 or negative value into the board')
-            raise Exception
-
-        self.pots_amount_list[-1] += amount
 
 
     def deal_hole_cards(self, player, phase, current_gameboard):
@@ -232,13 +203,6 @@ class Board:
         self.assign_deck_idx(num)
         logger.debug(f'Board: burn {num} cards before dealing community cards')
 
-
-
-
-
-
-
-    # =========
 
     def remain_deck_number(self):
         """ calculate the remain card number in deck

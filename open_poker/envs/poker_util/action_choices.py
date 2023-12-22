@@ -10,89 +10,8 @@ import logging
 
 logger = logging.getLogger('open_poker.envs.poker_util.logging_info.action_choices')
 
-# Note: like how skip turn gets removed and conclude actions get added to allowable_actions after a player decides not to skip turn,
-# here (check, bet) for all players will be replaced by (call, raise_bet) after bet is made by a player in a round
-
-
-def null_action():
-    """
-    :return: successful_action code
-    """
-    logger.debug('executing null action...')
-    return flag_config_dict['successful_action']  # does nothing; code is always a success
-
-
-# def directly_go_to_concluding_phase(player, current_gameboard, condition):
-#     """
-#     if one player is going out of chips, we should compute and compare their best hand in order to find
-#     winner of this game
-#     :param player:
-#     :param current_gameboard:
-#     :return:
-#     """
-#     logger.debug(f'{player.player_name} are {condition}, deal all of community cards and find winner')
-#     cur_phase = current_gameboard['board'].cur_phase
-#     if cur_phase == 'pre_flop_phase':
-#         current_gameboard['board'].deal_community_card_by_number(5)
-#     elif cur_phase == 'flop_phase':
-#         current_gameboard['board'].deal_community_card_by_number(2)
-#     elif cur_phase == 'turn_phase':
-#         current_gameboard['board'].deal_community_card_by_number(1)
-#
-#     current_gameboard['board'].cur_phase = 'concluding_phase'
-#     current_gameboard[condition] = True
-
-
-
-
 def call(current_gameboard, player):
     """ 
-    determine if player can call. 
-
-    Procedures: to determine whether it is a successful action. If it does not go through the whole criteria, then it fails.
-    criterias:
-        if current_bet_count == 1
-
-    Method1: 
-        check on current_bet_count and current_raise_count
-        bet_to_follow = 0
-        1. PRE_FLOP:
-            (1) BIG_BLIND
-                if current_bet_count == 1 and current_raise_count == 0:
-                    bet_to_follow = current_gameboard['big_blind_amount'] = current_gameboard['small_bet']
-
-            (2) RAISE_BET
-                if current_bet_count == 1 and current_raise_count > 0:
-                    bet_to_follow = current_gameboard['small_bet'] * (current_bet_count + current_raise_count)
-           The above two are equivalent to the following formula:
-                raise_amount = current_gameboard['small_bet']
-                bet_to_follow = raise_amount * (current_bet_count + current_raise_count)
-        
-
-
-        2. FLOP: 
-            (1) BET
-            (2) RAISE_BET
-            raise_amount = current_gameboard['small_bet']
-            bet_to_follow = raise_amount * (current_bet_count + current_raise_count)
-
-        3. TURN and RIVER
-            (1) BET
-            (2) RAISE_BET
-
-            The calculation is similar to the procedures in pre-flop, except the raise_amount = current_gameboard['big_bet']
-            raise_amount = current_gameboard['big_bet']
-            bet_to_follow = raise_amount * (current_bet_count + current_raise_count)
-    
-
-    Method2 (not used):    
-        iterate players_last_move_list reversely, until 
-        1. pre-flrop
-            RAISE_BET or BIG_BLIND
-        2. other rounds
-            RAISE_BET or BET
-
-
     Args:
         current_gameboard
         player
@@ -152,42 +71,6 @@ def call(current_gameboard, player):
 
 def raise_bet(current_gameboard, player):
     """ 
-    determine if player can raise_bet. 
-    criterias:
-        if current_bet_count == 1 and current_raise_count > 0
-
-
-    Procedures: to determine whether it is a successful action. If it does not go through the whole criteria, then it fails.
-    Method1: 
-        check on current_bet_count and current_raise_count
-        bet_to_follow = 0
-        1. PRE_FLOP:
-            (1) BIG_BLIND
-                if current_bet_count == 1 and current_raise_count == 0:
-                    bet_to_follow = current_gameboard['big_blind_amount'] = current_gameboard['small_bet']
-
-            (2) RAISE_BET
-                if current_bet_count == 1 and current_raise_count > 0:
-                    bet_to_follow = current_gameboard['small_bet'] * (current_bet_count + current_raise_count)
-           The above two are equivalent to the following formula:
-                raise_amount = current_gameboard['small_bet']
-                bet_to_follow = raise_amount * (current_bet_count + current_raise_count)
-        
-
-
-        2. FLOP: 
-            (1) BET
-            (2) RAISE_BET
-            raise_amount = current_gameboard['small_bet']
-            bet_to_follow = raise_amount * (current_bet_count + current_raise_count)
-
-        3. TURN and RIVER
-            (1) BET
-            (2) RAISE_BET
-
-            The calculation is similar to the procedures in pre-flop, except the raise_amount = current_gameboard['big_bet']
-            raise_amount = current_gameboard['big_bet']
-            bet_to_follow = raise_amount * (current_bet_count + current_raise_count)
 
     Args:
         current_gameboard
@@ -293,11 +176,6 @@ def fold(current_gameboard, player):
 
 def check(current_gameboard, player):
     """ 
-    determine if player can check. 
-    criterias:
-        Not fold and lose
-        if current_bet_count == 0 and current_raise_count == 0 
-
     Args:
         current_gameboard
         player
@@ -332,11 +210,6 @@ def check(current_gameboard, player):
 
 def bet(current_gameboard, player):
     """ 
-    determine if player can bet. 
-    criterias:
-        Not fold and lose
-        if current_bet_count == 0 
-
     Args:
         current_gameboard
         player
