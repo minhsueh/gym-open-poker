@@ -26,11 +26,11 @@ We will publish this package to PyPI soon.
 
 ### Development Installation
 ```
-git clone https://github.com/minhsueh/OpenAI_gym_poker.git
+https://github.com/minhsueh/gym-open-poker.git
 ```
 
 ```
-cd open_poker
+cd gym-open-poker
 ```
 
 ```
