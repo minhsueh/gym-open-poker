@@ -56,6 +56,7 @@ pip3 install -r requirements.txt
 
 ## Authors
 - Min-Hsueh Chiu - [GitHub](https://github.com/minhsueh)
+- Mayank Kejriwal - [GitHub](https://github.com/mayankkejriwal)
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
