@@ -54,6 +54,28 @@ pip3 install -e .
 pip3 install -r requirements.txt
 ```
 
+### Execution
+1. Navigate to the testing directory:
+```
+cd test
+```
+2. execute the simulator
+original poker:
+```
+python3 test_experiment.py
+```
+novel poker: (Can you detect the difference from the original one?)
+```
+python3 test_novel_experiment.py
+```
+3. post-analysis:
+```
+cat test.log
+```
+
+Note:
+1. You can modify the game parameters in config.yaml
+
 ## Authors
 - Min-Hsueh Chiu - [GitHub](https://github.com/minhsueh)
 - Mayank Kejriwal - [GitHub](https://github.com/mayankkejriwal)
