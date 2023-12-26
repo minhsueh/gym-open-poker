@@ -36,26 +36,8 @@ Within this software package, the implementation of Limit Texas Hold'em is provi
 ### User Installation
 We will publish this package to PyPI soon...
 
-### Development Installation
-1. Clone the repository:
-```
-git clone https://github.com/minhsueh/gym-open-poker.git
-```
-2. Navigate to the project directory:
-```
-cd gym-open-poker
-```
-3. Install the package in editable mode:
-```
-pip3 install -e .
-```
-4. Install additional dependencies:
-```
-pip3 install -r requirements.txt
-```
-
 ### User Execution
-1. Sample script for running the simulator
+Sample script for running the simulator
 ```
 import gym
 import open_poker
@@ -107,6 +89,24 @@ while(True):
         else:
             print('LOST!')
         break
+```
+
+### Development Installation
+1. Clone the repository:
+```
+git clone https://github.com/minhsueh/gym-open-poker.git
+```
+2. Navigate to the project directory:
+```
+cd gym-open-poker
+```
+3. Install the package in editable mode:
+```
+pip3 install -e .
+```
+4. Install additional dependencies:
+```
+pip3 install -r requirements.txt
 ```
 
 ### Development Execution
