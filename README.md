@@ -74,7 +74,7 @@ cat test.log
 ```
 
 Note:
-1. You can modify the game parameters in config.yaml
+- You can modify the game parameters in config.yaml
 
 ## Authors
 - Min-Hsueh Chiu - [GitHub](https://github.com/minhsueh)
