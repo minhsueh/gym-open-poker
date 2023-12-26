@@ -59,7 +59,7 @@ pip3 install -r requirements.txt
 ```
 cd test
 ```
-2. execute the simulator
+2. Execute the simulator
 original poker:
 ```
 python3 test_experiment.py
@@ -68,7 +68,7 @@ novel poker: (Can you detect the difference from the original one?)
 ```
 python3 test_novel_experiment.py
 ```
-3. post-analysis:
+3. Post-analysis:
 ```
 cat test.log
 ```
