@@ -1,22 +1,20 @@
 import gym
 import open_poker
-
-
-#from open_poker.envs.poker_util.agents import agent_p, dump_agent
-
-#from open_poker.wrappers import CardDistHigh, CardDistLow
-
+import os
 import yaml
 
 
 
 # load config parameters
 config_path = './config.yaml'
-with open(config_path, "r") as stream:
-    try:
-        config_dict = yaml.safe_load(stream)
-    except yaml.YAMLError as exc:
-        print(exc)
+if os.path.exists(config_path):
+    with open(config_path, "r") as stream:
+        try:
+            config_dict = yaml.safe_load(stream)
+        except yaml.YAMLError as exc:
+            print(exc)
+else:
+    config_dict = dict()
 
 env = gym.make("open_poker/OpenPoker-v0", **config_dict)
 # env = CardDistLow(gym.make("open_poker/OpenPoker-v0", **config_dict))
