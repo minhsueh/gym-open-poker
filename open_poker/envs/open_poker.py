@@ -180,7 +180,7 @@ class OpenPokerEnv(gym.Env):
         self.window_width = customized_arg_dict.get("window_width", 1200)  # The width of the PyGame window
         self.window_height = customized_arg_dict.get("window_height", 600)  # The height of the PyGame window
         self.visualize_debug_mode = customized_arg_dict.get("visualize_debug_mode", False)
-        self.show_all_move_mode = customized_arg_dict.get("show_all_move_mode", False)
+        self.show_all_move_mode = customized_arg_dict.get("show_all_move_mode", True)
         self.sleep_time = customized_arg_dict.get("sleep_time", 1)
 
 
@@ -614,8 +614,11 @@ class OpenPokerEnv(gym.Env):
 
                         return self._get_obs(stopped=True), self._get_reward(), terminated, truncated, self._get_info(stopped=True)
 
-                    # srart the new game
+                    # showdown:
+                    if self.render_mode == "human":
+                        self.render(stopped=True, showdown=True)
 
+                    # srart the new game
                     #
                     dealer.initialize_game(self.game_elements)
 
@@ -850,15 +853,15 @@ class OpenPokerEnv(gym.Env):
 
 
 
-    def render(self, stopped=False):
+    def render(self, stopped=False, showdown=False):
         if self.render_mode == "human":
             if self.show_all_move_mode:
                 time.sleep(self.sleep_time)
-            return self._render_frame(stopped=stopped)
+            return self._render_frame(stopped=stopped, showdown=showdown)
 
 
 
-    def _render_frame(self, stopped=False):
+    def _render_frame(self, stopped=False, showdown=False):
         """
         ellipse shape
         pot
@@ -873,6 +876,7 @@ class OpenPokerEnv(gym.Env):
         
         PARAMS:
             stopped(bool): True if terminated or truncated, there is no need to show action_masks
+            showdown(bool): True if the game is ended and want to show all players card
         
         """
         suit_map = {
@@ -1041,7 +1045,7 @@ class OpenPokerEnv(gym.Env):
                 self.window.blit(text, text_rect)
 
             # card info
-            if self.visualize_debug_mode:
+            if self.visualize_debug_mode or showdown:
                 # showing all players' hand
                 hole_card = self.game_elements['players'][pidx].hole_cards
                 for card_idx, card in enumerate(hole_card):
