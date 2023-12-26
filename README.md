@@ -34,7 +34,7 @@ Within this software package, the implementation of Limit Texas Hold'em is provi
 - Python 3.9 or above
 
 ### User Installation
-We will publish this package to PyPI soon..
+We will publish this package to PyPI soon...
 
 ### Development Installation
 1. Clone the repository:
