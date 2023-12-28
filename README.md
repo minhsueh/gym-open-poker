@@ -34,15 +34,16 @@ Within this software package, the implementation of Limit Texas Hold'em is provi
 - Python 3.9 or above
 
 ### User Installation
-We will publish this package to PyPI soon...
+```
+pip3 install gym-open-poker
+```
 
 ### User Execution
 Sample script for running the simulator
 ```
 import gym
-import open_poker
+import gym_open_poker
 import os
-from open_poker.wrappers import CardDistHigh, CardDistLow
 import yaml
 
 # load config parameters
@@ -56,8 +57,8 @@ if os.path.exists(config_path):
 else:
     config_dict = dict()
 
-env = gym.make("open_poker/OpenPoker-v0", **config_dict) # original
-# env = CardDistLow(gym.make("open_poker/OpenPoker-v0", **config_dict)) # novelty
+env = gym.make("gym_open_poker/OpenPoker-v0", **config_dict)
+# env = CardDistLow(gym.make("gym_open_poker/OpenPoker-v0", **config_dict))
 observation, info = env.reset(seed=42)
 print('============================')
 print('---observation---')

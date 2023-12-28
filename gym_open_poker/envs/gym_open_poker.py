@@ -16,12 +16,12 @@ import math
 import time
 
 
-import open_poker.envs.poker_util as poker_util
+import gym_open_poker.envs.poker_util as poker_util
 import sys, os
 sys.path.append(os.path.dirname(poker_util .__file__)) 
 
-from open_poker.envs.poker_util.action_choices import (check, bet, raise_bet, fold, call)
-from open_poker.envs.poker_util.logging_info import log_file_create, remove_previous_logger
+from gym_open_poker.envs.poker_util.action_choices import (check, bet, raise_bet, fold, call)
+from gym_open_poker.envs.poker_util.logging_info import log_file_create, remove_previous_logger
 
 from agent import Agent
 from flag_config import flag_config_dict
@@ -34,8 +34,8 @@ from card import Card
 import dealer
 from initialize_game_elements import initialize_game_element
 
-from open_poker.envs.poker_util.agents import agent_p, dump_agent, agent_random
-# from open_poker.envs.poker_util.agents import *
+from gym_open_poker.envs.poker_util.agents import agent_p, dump_agent, agent_random
+# from gym_open_poker.envs.poker_util.agents import *
 
 
 

@@ -1,5 +1,5 @@
 import gym
-import open_poker
+import gym_open_poker
 import os
 import yaml
 
@@ -16,8 +16,8 @@ if os.path.exists(config_path):
 else:
     config_dict = dict()
 
-env = gym.make("open_poker/OpenPoker-v0", **config_dict)
-# env = CardDistLow(gym.make("open_poker/OpenPoker-v0", **config_dict))
+env = gym.make("gym_open_poker/OpenPoker-v0", **config_dict)
+# env = CardDistLow(gym.make("gym_open_poker/OpenPoker-v0", **config_dict))
 observation, info = env.reset(seed=42)
 print('============================')
 print('---observation---')

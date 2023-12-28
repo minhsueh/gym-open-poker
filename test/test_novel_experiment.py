@@ -1,6 +1,6 @@
 import gym
-import open_poker
-from open_poker.wrappers import CardDistHigh, CardDistLow
+import gym_open_poker
+from gym_open_poker.wrappers import CardDistHigh, CardDistLow
 import yaml
 
 
@@ -16,8 +16,8 @@ if os.path.exists(config_path):
 else:
     config_dict = dict()
 
-env = CardDistHigh(gym.make("open_poker/OpenPoker-v0", **config_dict))
-# env = CardDistLow(gym.make("open_poker/OpenPoker-v0", **config_dict))
+env = CardDistHigh(gym.make("gym_open_poker/OpenPoker-v0", **config_dict))
+# env = CardDistLow(gym.make("gym_open_poker/OpenPoker-v0", **config_dict))
 observation, info = env.reset(seed=42)
 print('============================')
 print('---observation---')
