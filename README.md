@@ -45,6 +45,7 @@ import gym
 import gym_open_poker
 import os
 import yaml
+from gym_open_poker.wrappers import CardDistHigh, CardDistLow # novelty modules
 
 # load config parameters
 config_path = './config.yaml'
@@ -58,7 +59,7 @@ else:
     config_dict = dict()
 
 env = gym.make("gym_open_poker/OpenPoker-v0", **config_dict)
-# env = CardDistLow(gym.make("gym_open_poker/OpenPoker-v0", **config_dict))
+# env = CardDistLow(gym.make("gym_open_poker/OpenPoker-v0", **config_dict)) # novelty inject
 observation, info = env.reset(seed=42)
 print('============================')
 print('---observation---')
