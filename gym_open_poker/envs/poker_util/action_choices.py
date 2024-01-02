@@ -1,6 +1,4 @@
 from flag_config import flag_config_dict
-import card_utility_actions
-import copy
 import dealer
 import action
 
@@ -9,6 +7,7 @@ from phase import Phase
 import logging
 
 logger = logging.getLogger('open_poker.envs.poker_util.logging_info.action_choices')
+
 
 def call(current_gameboard, player):
     """ 
