@@ -1,5 +1,7 @@
 # Open Poker
 
+[![PyPI Downloads](https://img.shields.io/pypi/v/gym-open-poker?label=pypi%20package)](https://pypi.org/project/gym-open-poker/)
+
 Welcome to the open-world Poker Simulator, a tool that includes novelty generators for open-world artificial intelligence (Open-world AI). This package relies on the following frameworks:
 
 - [OpenAI Gym](https://github.com/openai/gym): Serving as the infrastructure for simulation environments.
