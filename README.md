@@ -94,6 +94,37 @@ while(True):
             print('LOST!')
         break
 ```
+It is also possible to customize the parameters within the configuration file. You can make modifications to the following settings, save the file as config.yaml, and place it alongside the executable file.
+```
+# --------log file path--------
+log_file_path: './test.log'
+# --------visualization parameters--------
+render_mode: 'human'  # None or human
+show_all_move_mode: False
+visualize_debug_mode: True
+# window_width: 1200
+# window_height: 600
+sleep_time: 0.5
+# --------background agents--------
+background_agents_raw_list:
+  - agent_type: "agent_p"
+    number_of_agent: 1
+  - agent_type: "dump_agent"
+    number_of_agent: 4
+  - agent_type: "agent_random"
+    number_of_agent: 1
+# --------general pokers rules--------
+# max_raise_count: 3
+# small_blind: 5
+# big_small_blind_ratio: 2 # big_blind = small_blind * big_small_blind_ratio
+# seed: 15
+# buy_in_amount: 100
+# bankroll_limit: 1500
+# --------termination conditions--------
+# max_game_limitation: 999
+# max_time_limitation: 999
+```
+
 
 ### Development Installation
 1. Clone the repository:

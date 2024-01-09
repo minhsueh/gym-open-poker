@@ -2,7 +2,6 @@ import sys
 from card import Card
 from player import Player
 from board import Board
-from card_utility_actions import calculate_best_hand
 from card_utility_actions import (is_royal_flush, is_straight, is_one_pair, is_two_pair, is_flush, is_full_house,
                                   is_straight_flush, is_three_of_a_kind, is_four_of_a_kind, is_high_card)
 from card_utility_actions import (get_royal_flush, get_straight, get_flush, get_two_pair, get_one_pair, get_full_house,
@@ -167,9 +166,9 @@ def _initialize_players(game_elements, player_decision_agents):
         player_args['player_name'] = player_name
         player_args['status'] = 'active'  # lost, active
         player_args['hole_cards'] = list()
-        player_args['current_bet'] = dict()
+        #player_args['current_bet'] = dict()
         player_args['agent'] = agent
-        player_args['current_decision'] = None
+        #player_args['current_decision'] = None
 
         player_args['current_cash'] = game_elements['buy_in_amount']
         players.append(Player(**player_args))

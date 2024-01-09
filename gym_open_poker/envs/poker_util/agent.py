@@ -8,7 +8,7 @@ class Agent:
         self.make_turn_moves = make_turn_moves
         self.make_river_moves = make_river_moves
         self.is_running = False
-        self._agent_memory = dict()
+        #self._agent_memory = dict()
 
     def startup(self):
         """

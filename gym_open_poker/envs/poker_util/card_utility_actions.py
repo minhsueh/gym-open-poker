@@ -26,30 +26,6 @@ def get_number_rank():
     number_rank[1] = 14
     return(number_rank)
 
-# def identify_dealer(current_gameboard):
-#     pass
-#
-#
-# def identify_start_player(current_gameboard):
-#     # if preflop, then player to the left of big blind
-#     # else starts with single blind
-#     pass
-#
-#
-# def should_this_phase_go_on_for_another_round(current_gameboard):
-#     # return true or false, based on:
-#     # - false if all players checked
-#     # - false if amount put in the pot by all players are equal in that round
-#     # - false if all players but one folded , ie, that player WINS the pot  --> number_of_folded_player()
-#     # - else true
-#     pass
-#
-#
-# def number_of_folded_players(current_gameboard):
-#     # calculate number of players that folded at the end of a round from among the active players
-#     # return int
-#     pass
-
 
 def number_cards_to_draw(phase):
     """
@@ -66,37 +42,6 @@ def number_cards_to_draw(phase):
         return 1
 
 
-# functions below is used for calculating best hand for each player
-def calculate_best_hand(current_gameboard, player):
-    """
-    computing the best hand of this player
-    :param current_gameboard:
-    :param player:
-    :return:
-    """
-    if current_gameboard['cur_phase'] != 'concluding_phase':
-        raise Exception
-
-    logger.debug(f'{player.player_name} is now calculating its best hand with community cards')
-    board = current_gameboard['board']
-    community_cards = copy.copy(board.community_cards)
-    hole_cards = copy.copy(player.hole_cards)
-
-    total_hand = community_cards + hole_cards
-    if len(total_hand) != 7:
-        raise Exception
-
-    suits = [card.get_suit() for card in total_hand]
-    values = [card.get_number() for card in total_hand]
-    for c in total_hand:
-        logger.debug(c)
-
-    rank_type, hand = check_hands(current_gameboard, total_hand, player)
-
-    # recording best hand with corresponding player name
-    current_gameboard['hands_of_players'][-1][player.player_name] = (rank_type, hand)
-
-    return flag_config_dict['successful_action']
 
 
 def get_best_hand(current_gameboard, total_hand):
@@ -129,22 +74,6 @@ def get_best_hand(current_gameboard, total_hand):
     
     return rank_type, hand
 
-def check_hands(current_gameboard, total_hand, player):
-    
-
-    hand_rank_functions = current_gameboard['hand_rank_funcs']
-    hand = rank_type = None
-
-    # loop start from the highest rank to the lowest, so always the highest would be return
-    for cur_check_func, cur_get_func, rank_name in hand_rank_functions:
-        if cur_check_func(total_hand):  # detect a hand rank
-            hand = cur_get_func(total_hand)
-            rank_type = current_gameboard['hand_rank_type'][rank_name]
-            logger.debug(f'{player.player_name} has {rank_name} in hand: {hand}!')
-            break  # break if find one rank
-
-
-    return (rank_type, hand)
 
 
 def is_high_card(total_hand):

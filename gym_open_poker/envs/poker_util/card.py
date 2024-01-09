@@ -16,11 +16,7 @@ class Card:
         assert suit in ['club', 'diamond', 'heart', 'spade']
         self.suit = suit                # clubs, diamonds, hearts, spades
         self.number = number            # 1,2,3,4,5,6,7,8,9,10,11,12,13
-        self.active_card = active       # 1: in the deck     0: in the muck
-        self.is_num_card = is_num_card
-        self.is_face_card = is_face_card
-        self.is_ace_card = is_ace_card
-        self.color = color
+
 
     def __str__(self):
         """
@@ -28,15 +24,15 @@ class Card:
         :return: card info
         """
         if self.number == 1:
-            return f'card info: A; {self.suit}; {self.color}'
+            return f'card info: A; {self.suit}'
         elif self.number == 11:
-            return f'card info: J; {self.suit}; {self.color}'
+            return f'card info: J; {self.suit}'
         elif self.number == 12:
-            return f'card info: Q; {self.suit}; {self.color}'
+            return f'card info: Q; {self.suit}'
         elif self.number == 13:
-            return f'card info: K; {self.suit}; {self.color}'
+            return f'card info: K; {self.suit}'
         else:
-            return f'card info: {self.number}; {self.suit}; {self.color}'
+            return f'card info: {self.number}; {self.suit}'
 
     def get_suit(self):
         return self.suit

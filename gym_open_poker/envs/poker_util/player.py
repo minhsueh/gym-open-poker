@@ -9,7 +9,7 @@ logger = logging.getLogger('open_poker.envs.poker_util.logging_info.player')
 
 class Player:
     def __init__(self, player_name, status, current_cash, hole_cards,
-                 current_bet, agent, current_decision):
+                 agent):
         """
         Each object is unique player in the game
         :param player_name: name of player
@@ -23,16 +23,16 @@ class Player:
         self.status = status #   lost, active
         self.current_cash = current_cash
         self.hole_cards = hole_cards
-        self.current_bet = current_bet   # save chips the player has called, bet, raise bet, all-in
+        #self.current_bet = current_bet   # save chips the player has called, bet, raise bet, all-in
         self.agent = agent
-        self.current_decision = current_decision  # call/fold/check/all_in/bet/raise_bet in the current round
+        #self.current_decision = current_decision  # call/fold/check/all_in/bet/raise_bet in the current round
 
-        self.is_fold = False  # which might skip their turn if is fold
-        self.is_all_in = False  # which might skip their turn if is all-in
-        self.bet_amount_each_round = 0  # total money the player bet in each round
-        self.bet_amount_each_game = 0  # total money the player bet in each game
+        #self.is_fold = False  # which might skip their turn if is fold
+        #self.is_all_in = False  # which might skip their turn if is all-in
+        #self.bet_amount_each_round = 0  # total money the player bet in each round
+        #self.bet_amount_each_game = 0  # total money the player bet in each game
 
-        self.current_money_in_pot = 0
+        #self.current_money_in_pot = 0
 
         # place to store reward
         self.last_game_cash = current_cash
@@ -40,7 +40,7 @@ class Player:
 
 
 
-        self.position = -1
+        #self.position = -1
 
     def assign_hole_cards(self, cards):
         """
@@ -67,15 +67,6 @@ class Player:
             self.current_cash = 0
 
         
-
-    def assign_to_all_in(self, current_gameboard):
-        """
-        assign this player to all-in status
-        :param current_gamebaord:
-        :return:
-        """
-        logger.debug(f'{self.player_name} is assigned to all-in')
-        self.is_all_in = True
 
 
     def add_bet_amount_each_round(self, current_gameboard, amount):
