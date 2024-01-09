@@ -2,6 +2,7 @@ import gym
 import gym_open_poker
 from gym_open_poker.wrappers import CardDistHigh, CardDistLow
 import yaml
+import os
 
 
 
