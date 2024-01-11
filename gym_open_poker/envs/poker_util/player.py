@@ -5,7 +5,7 @@ from action import Action
 
 import logging
 
-logger = logging.getLogger('open_poker.envs.poker_util.logging_info.player')
+logger = logging.getLogger('gym_open_poker.envs.poker_util.logging_info.player')
 
 class Player:
     def __init__(self, player_name, status, current_cash, hole_cards,

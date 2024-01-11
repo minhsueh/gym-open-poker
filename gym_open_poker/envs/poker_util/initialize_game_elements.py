@@ -15,7 +15,8 @@ import time
 
 import logging
 
-logger = logging.getLogger('open_poker.envs.poker_util.logging_info.init_game_elements')
+
+logger = logging.getLogger('gym_open_poker.envs.poker_util.logging_info.init_game_elements')
 
 
 

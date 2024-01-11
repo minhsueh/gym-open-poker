@@ -857,7 +857,7 @@ class OpenPokerEnv(gym.Env):
         if self.render_mode == "human":
             if self.show_all_move_mode:
                 time.sleep(self.sleep_time)
-            return self._render_frame(stopped=stopped, showdown=showdown)
+            self._render_frame(stopped=stopped, showdown=showdown)
 
 
 
@@ -899,13 +899,13 @@ class OpenPokerEnv(gym.Env):
         pygame.display.init()
         self.window = pygame.display.set_mode((self.window_width, self.window_height))
 
+
+
         background_color = (0, 0, 0)
         text_color = (255, 255, 255)
 
         self.window.fill(background_color)
-        pygame.display.flip()
-
-
+        # pygame.display.flip()
 
         # board
         board_color = (39, 99, 55)
@@ -1034,8 +1034,10 @@ class OpenPokerEnv(gym.Env):
                 player_string_list.append(f"${round(self.game_elements['players'][pidx].current_cash, 2)}")
             if pidx == dealer_idx:
                 player_string_list.append('(dealer)')
-            last_move = self.game_elements['board'].players_last_move_list[pidx]
-            if last_move not in [Action.LOST, Action.NONE]:
+            last_move = self.game_elements['board'].players_last_move_list_hist[pidx]
+            if last_move == Action.ALL_IN_ALREADY:
+                player_string_list.append('ALL_IN')
+            elif last_move not in [Action.LOST, Action.NONE]:
                 player_string_list.append(last_move.name)
             
 
@@ -1117,6 +1119,7 @@ class OpenPokerEnv(gym.Env):
 
 
         # 
+        # pygame.display.flip()
         pygame.display.update()
         
     def close(self):

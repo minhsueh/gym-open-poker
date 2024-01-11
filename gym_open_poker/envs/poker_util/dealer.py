@@ -8,7 +8,7 @@ import logging
 import collections
 import time
 
-logger = logging.getLogger('open_poker.envs.poker_util.logging_info.dealer')
+logger = logging.getLogger('gym_open_poker.envs.poker_util.logging_info.dealer')
 
 
 
@@ -779,14 +779,6 @@ def conclude_game(current_gameboard):
     
 
     #
-    if time.time() - current_gameboard['start_time'] > current_gameboard['max_time_limitation']:
-        logger.debug('Reach time termination condition = ' + str(current_gameboard['max_time_limitation']) + '. End!')
-        return(False, True)
-    if current_gameboard['game_count'] > current_gameboard['max_game_limitation']:
-        logger.debug('Reach game termination condition = ' + str(current_gameboard['max_game_limitation']) + '. End!')
-        return(False, True)
-
-    current_gameboard['game_count'] += 1
 
 
     main_pot_attendee = current_gameboard['board'].pots_attendee_list[0]
@@ -853,6 +845,18 @@ def conclude_game(current_gameboard):
             hands = [None, None]
         showdown_list.append(hands)
     current_gameboard['board'].previous_showdown = showdown_list
+
+
+    # if meet termination condition
+    current_gameboard['game_count'] += 1
+    if time.time() - current_gameboard['start_time'] > current_gameboard['max_time_limitation']:
+        logger.debug('Reach time termination condition = ' + str(current_gameboard['max_time_limitation']) + '. End!')
+        return(False, True)
+    if current_gameboard['game_count'] > current_gameboard['max_game_limitation']:
+        logger.debug('Reach game termination condition = ' + str(current_gameboard['max_game_limitation']) + '. End!')
+        return(False, True)
+
+
 
     # check how many player left
     if len(live_player_list) == 1:

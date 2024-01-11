@@ -7,7 +7,7 @@ from phase import Phase
 
 import logging
 
-logger = logging.getLogger('open_poker.envs.poker_util.logging_info.card_utility_actions')
+logger = logging.getLogger('gym_open_poker.envs.poker_util.logging_info.card_utility_actions')
 
 
 def get_number_rank():

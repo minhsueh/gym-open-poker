@@ -3,10 +3,10 @@ log_file_path: './test.log'
 # --------visualization parameters--------
 render_mode: 'human'  # None or human
 show_all_move_mode: False
-visualize_debug_mode: True
+visualize_debug_mode: False
 # window_width: 1200
 # window_height: 600
-sleep_time: 0.5
+sleep_time: 1
 # --------background agents--------
 background_agents_raw_list:
   - agent_type: "agent_p"
@@ -23,7 +23,7 @@ background_agents_raw_list:
 # buy_in_amount: 100
 # bankroll_limit: 1500
 # --------termination conditions--------
-# max_game_limitation: 999
+max_game_limitation: 1
 # max_time_limitation: 999
 
 
