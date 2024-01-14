@@ -47,7 +47,7 @@ import gym
 import gym_open_poker
 import os
 import yaml
-from gym_open_poker.wrappers import CardDistHigh, CardDistLow # novelty modules
+from gym_open_poker.envs.poker_util.novelty import CardDistHigh, CardDistLow # novelty modules
 
 # load config parameters
 config_path = './config.yaml'
