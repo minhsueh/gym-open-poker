@@ -1,9 +1,9 @@
 import gym
 import gym_open_poker
-from gym_open_poker.wrappers import CardDistHigh, CardDistLow
+# from gym_open_poker.wrappers import CardDistHigh, CardDistLow, Action1
+from gym_open_poker.envs.poker_util.novelty import Action1, CardDistHigh, CardDistLow
 import yaml
 import os
-
 
 
 # load config parameters
@@ -18,6 +18,7 @@ else:
     config_dict = dict()
 
 env = CardDistHigh(gym.make("gym_open_poker/OpenPoker-v0", **config_dict))
+# env = Action1(gym.make("gym_open_poker/OpenPoker-v0", **config_dict))
 # env = CardDistLow(gym.make("gym_open_poker/OpenPoker-v0", **config_dict))
 observation, info = env.reset(seed=42)
 print('============================')

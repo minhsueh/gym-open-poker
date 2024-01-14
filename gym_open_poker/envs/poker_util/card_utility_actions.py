@@ -136,7 +136,6 @@ def is_straight(total_hand):
     """
     suits = [card.get_suit() for card in total_hand]
     values = [card.get_number() for card in total_hand]
-
     # special case: A 13 12 11 10
     ace_high_count = 0
     for num in [1, 13, 12, 11, 10]:

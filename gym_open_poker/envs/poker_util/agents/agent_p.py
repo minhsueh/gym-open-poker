@@ -94,7 +94,7 @@ def make_pre_flop_moves(player, current_gameboard, allowable_actions):
             return check, params
         else:
             raise
-
+            
     # Case 2
     if has_pair or has_suit:
         if all_in in allowable_actions:
