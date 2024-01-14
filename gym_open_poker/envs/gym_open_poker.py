@@ -1093,6 +1093,7 @@ class OpenPokerEnv(gym.Env):
         # game index
         game_index_string = "Game: " + str(self.game_elements['board'].game_idx)
         game_info_list.append(game_index_string)
+        game_info_list.append(str(self.game_elements['board'].cur_phase.name))
         # bet and raise number
         bet_count_string = "  Bet count: " + str(self.game_elements['board'].current_bet_count)
         raise_bet_count_string = "  Raise_bet count: " + str(self.game_elements['board'].current_raise_count)

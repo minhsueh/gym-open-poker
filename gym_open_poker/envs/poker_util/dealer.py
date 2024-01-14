@@ -574,6 +574,32 @@ def initialize_round(current_gameboard):
     # initialize player.current_money_in_pot
     current_gameboard['board'].player_pot = collections.defaultdict(int)
     
+    for idx, player in enumerate(current_gameboard['players']):
+        if player.status == 'lost':
+            current_gameboard['board'].players_last_move_list[idx] = Action.LOST
+            current_gameboard['board'].players_last_move_list_hist[idx] = Action.LOST
+        elif current_gameboard['board'].cur_phase == Phase.PRE_FLOP and \
+        current_gameboard['board'].small_blind_postiion_idx == idx and \
+        current_gameboard['board'].players_last_move_list[idx] != Action.ALL_IN:
+           current_gameboard['board'].players_last_move_list[idx] = Action.SMALL_BLIND
+           current_gameboard['board'].players_last_move_list_hist[idx] = Action.SMALL_BLIND
+        elif current_gameboard['board'].cur_phase == Phase.PRE_FLOP and \
+        current_gameboard['board'].big_blind_postiion_idx == idx and \
+        current_gameboard['board'].players_last_move_list[idx] != Action.ALL_IN:
+            current_gameboard['board'].players_last_move_list[idx] = Action.BIG_BLIND
+            current_gameboard['board'].players_last_move_list_hist[idx] = Action.BIG_BLIND
+        elif current_gameboard['board'].players_last_move_list[idx] == Action.LOST:
+            continue
+        elif current_gameboard['board'].players_last_move_list[idx] == Action.FOLD:
+            continue
+        elif current_gameboard['board'].players_last_move_list[idx] == Action.ALL_IN:
+            current_gameboard['board'].players_last_move_list[idx] = Action.ALL_IN_ALREADY
+            current_gameboard['board'].players_last_move_list_hist[idx] = Action.ALL_IN_ALREADY
+        elif current_gameboard['board'].players_last_move_list[idx] == Action.ALL_IN_ALREADY:
+            continue
+        else:
+            current_gameboard['board'].players_last_move_list[idx] = Action.NONE
+            current_gameboard['board'].players_last_move_list_hist[idx] = Action.NONE
 
 
 def initialize_game(current_gameboard):
