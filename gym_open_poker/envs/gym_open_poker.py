@@ -617,6 +617,7 @@ class OpenPokerEnv(gym.Env):
                     # showdown:
                     if self.render_mode == "human":
                         self.render(stopped=True, showdown=True)
+                        time.sleep(3)
 
                     # srart the new game
                     #
