@@ -170,7 +170,7 @@ class OpenPokerEnv(gym.Env):
         logger.debug('Player_1 is assign as code user.')
 
         # ------general poker rules------
-        self.buy_in = customized_arg_dict.get("buy_in", 100)
+        self.buy_in = customized_arg_dict.get("buy_in", 200)
         self.bankroll_limit = customized_arg_dict.get("bankroll_limit", 1500)
 
 
@@ -933,8 +933,8 @@ class OpenPokerEnv(gym.Env):
         action_box_spacing = line_spacing//2
         action_box_x = board_center_x + board_a//2 + self.window_width/10
         action_box_y = board_center_y + self.window_height*1//5
-        game_index_box_x = self.window_width/10
-        game_index_box_y = self.window_height/10
+        game_round_index_box_x = self.window_width/20
+        game_round_index_box_y = self.window_height/10
 
 
         def get_ellipse_position(a, b, degree, type = 'player_info'):
@@ -1037,7 +1037,7 @@ class OpenPokerEnv(gym.Env):
             last_move = self.game_elements['board'].players_last_move_list_hist[pidx]
             if last_move == Action.ALL_IN_ALREADY:
                 player_string_list.append('ALL_IN')
-            elif last_move not in [Action.LOST, Action.NONE]:
+            elif last_move not in [Action.LOST, Action.NONE] and self.game_elements['players'][pidx].player_name != 'player_1':
                 player_string_list.append(last_move.name)
             
 
@@ -1087,10 +1087,24 @@ class OpenPokerEnv(gym.Env):
         text_surface = font.render(pot_amount_string, True, text_color)
         self.window.blit(text_surface, text_surface.get_rect(center = (board_center_x, dealer_card_rect.bottom + card_img_height/2)))
 
+
+        # game and round information
+        game_info_list = []
         # game index
         game_index_string = "Game: " + str(self.game_elements['board'].game_idx)
-        text_surface = font.render(game_index_string, True, text_color)
-        self.window.blit(text_surface, text_surface.get_rect(center = (game_index_box_x, game_index_box_y)))
+        game_info_list.append(game_index_string)
+        # bet and raise number
+        bet_count_string = "  Bet count: " + str(self.game_elements['board'].current_bet_count)
+        raise_bet_count_string = "  Raise_bet count: " + str(self.game_elements['board'].current_raise_count)
+        game_info_list.append(bet_count_string)
+        game_info_list.append(raise_bet_count_string)
+
+        for game_info_idx in range(len(game_info_list)):
+            text = font.render(game_info_list[game_info_idx], True, text_color, text_backgound_color)
+            text_rect = text.get_rect(midleft=(game_round_index_box_x, game_round_index_box_y + line_spacing*game_info_idx))
+            self.window.blit(text, text_rect)
+        # text_surface = font.render(game_info_list, True, text_color)
+        # self.window.blit(text_surface, text_surface.get_rect(center = (game_round_index_box_x, game_round_index_box_y)))
 
 
         if not stopped:

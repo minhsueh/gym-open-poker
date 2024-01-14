@@ -46,7 +46,7 @@ def initialize_game_element(player_decision_agents, customized_arg_dict, random_
     game_elements['big_bet'] = game_elements['big_blind_amount'] * game_elements['big_small_bet_ratio'] # in turn and river
     game_elements['max_raise_count'] = customized_arg_dict.get('max_raise_count', 3)
 
-    game_elements['buy_in_amount'] = customized_arg_dict.get("buy_in", 100)
+    game_elements['buy_in_amount'] = customized_arg_dict.get("buy_in", 200)
 
     game_elements['early_stop'] = False
     
