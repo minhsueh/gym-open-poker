@@ -18,8 +18,6 @@ The poker simulator screenshot.
 ![alt text](./videos/trim_normal_mode.gif)
 The visualization of normal game mode.
 
-![alt text](./videos/trim_debug_mode.gif)
-The visualization of debug game mode.
 
 
 ## Getting Started
@@ -125,6 +123,10 @@ background_agents_raw_list:
 # max_game_limitation: 999
 # max_time_limitation: 999
 ```
+For example, setting ```visualize_debug_mode: True``` enables developers to directly see all players' cards, making it easier for development, as illustrated below:
+
+![alt text](./videos/trim_debug_mode.gif)
+The visualization of debug game mode.
 
 
 ### Development Installation
