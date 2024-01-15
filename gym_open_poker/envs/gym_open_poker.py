@@ -155,8 +155,8 @@ class OpenPokerEnv(gym.Env):
         ### ------agent's related objects------
         self.background_agents_list = []
         default_background_agents_raw_list = [
-            {"agent_type": "agent_p", "number_of_agent": 2},
-            {"agent_type": "dump_agent", "number_of_agent": 2}
+            {"agent_type": "agent_p", "number_of_agent": 3},
+            {"agent_type": "dump_agent", "number_of_agent": 1}
         ]
         background_agents_raw_list = customized_arg_dict.get("background_agents_raw_list", default_background_agents_raw_list)
         for agent_dict in background_agents_raw_list:
@@ -1101,6 +1101,9 @@ class OpenPokerEnv(gym.Env):
         game_info_list.append(bet_count_string)
         game_info_list.append(raise_bet_count_string)
 
+        text_backgound_color = (0, 0, 0)
+        text_color = (255, 255, 255)
+        
         for game_info_idx in range(len(game_info_list)):
             text = font.render(game_info_list[game_info_idx], True, text_color, text_backgound_color)
             text_rect = text.get_rect(midleft=(game_round_index_box_x, game_round_index_box_y + line_spacing*game_info_idx))
