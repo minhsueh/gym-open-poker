@@ -1091,9 +1091,15 @@ class OpenPokerEnv(gym.Env):
 
         # game and round information
         game_info_list = []
+        # game sb/bb
+        sb_string = str(self.game_elements['small_blind_amount'])
+        bb_string = str(self.game_elements['big_blind_amount'])
+        sb_bb_string = f"${sb_string}/${bb_string}"
+        game_info_list.append(sb_bb_string)
         # game index
         game_index_string = "Game: " + str(self.game_elements['board'].game_idx)
         game_info_list.append(game_index_string)
+        # phase
         game_info_list.append(str(self.game_elements['board'].cur_phase.name))
         # bet and raise number
         bet_count_string = "  Bet count: " + str(self.game_elements['board'].current_bet_count)
@@ -1103,7 +1109,7 @@ class OpenPokerEnv(gym.Env):
 
         text_backgound_color = (0, 0, 0)
         text_color = (255, 255, 255)
-        
+
         for game_info_idx in range(len(game_info_list)):
             text = font.render(game_info_list[game_info_idx], True, text_color, text_backgound_color)
             text_rect = text.get_rect(midleft=(game_round_index_box_x, game_round_index_box_y + line_spacing*game_info_idx))
