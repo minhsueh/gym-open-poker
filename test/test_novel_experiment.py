@@ -17,7 +17,7 @@ if os.path.exists(config_path):
 else:
     config_dict = dict()
 
-env = CardDistHigh(gym.make("gym_open_poker/OpenPoker-v0", **config_dict))
+env = CardDistLow(gym.make("gym_open_poker/OpenPoker-v0", **config_dict))
 # env = Action1(gym.make("gym_open_poker/OpenPoker-v0", **config_dict))
 # env = CardDistLow(gym.make("gym_open_poker/OpenPoker-v0", **config_dict))
 observation, info = env.reset(seed=65)

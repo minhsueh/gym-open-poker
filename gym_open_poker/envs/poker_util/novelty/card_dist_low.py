@@ -15,10 +15,10 @@ class CardDistLow(gym.Wrapper):
     
     1. in _initialize_cards, we will sort the deck with numbers in ascending order 
     2. in _reset_board_each_game, we will shuffle the first x cards only.
-        x = total_number_of_players * 2 + 5 + 4 
+        x = total_number_of_players * 2 + 5 + 3 
         each player has 2 hole cards
         5 community card
-        4 burn card
+        3 burn card
 
 
 
@@ -55,7 +55,7 @@ def _alter_reset_board_each_game(self, current_gameboard):
     self.community_cards = list()
 
     #### novelty
-    first_x_card = int(current_gameboard['total_number_of_players'] * 2 + 5 + 4)
+    first_x_card = int(current_gameboard['total_number_of_players'] * 2 + 5 + 3)
     first_portion = self.deck[:first_x_card]
     second_portion = self.deck[first_x_card:]
     np.random.shuffle(first_portion)
