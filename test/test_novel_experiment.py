@@ -1,9 +1,8 @@
 import gym
 import gym_open_poker
-# from gym_open_poker.wrappers import CardDistHigh, CardDistLow, Action1
-from gym_open_poker.envs.poker_util.novelty import Action1, CardDistHigh, CardDistLow, Card1
 import yaml
 import os
+from gym_open_poker.envs.poker_util.novelty_generator import NoveltyGenerator
 
 
 # load config parameters
@@ -17,9 +16,19 @@ if os.path.exists(config_path):
 else:
     config_dict = dict()
 
-env = CardDistLow(gym.make("gym_open_poker/OpenPoker-v0", **config_dict))
-# env = Action1(gym.make("gym_open_poker/OpenPoker-v0", **config_dict))
-# env = CardDistLow(gym.make("gym_open_poker/OpenPoker-v0", **config_dict))
+# original environment
+env = gym.make("gym_open_poker/OpenPoker-v0", **config_dict)
+
+# novelty injection
+ng = NoveltyGenerator()
+
+# print out supported novelies
+print(ng.get_support_novelties())
+# injecting
+if len(config_dict['novelty_list']) > 0:
+    env = ng.inject(env, config_dict['novelty_list'])
+
+# start gaming
 observation, info = env.reset(seed=65)
 print('============================')
 print('---observation---')

@@ -46,7 +46,7 @@ import gym
 import gym_open_poker
 import os
 import yaml
-from gym_open_poker.envs.poker_util.novelty import CardDistHigh, CardDistLow # novelty modules
+from gym_open_poker.envs.poker_util.novelty_generator import NoveltyGenerator
 
 # load config parameters
 config_path = './config.yaml'
@@ -59,8 +59,19 @@ if os.path.exists(config_path):
 else:
     config_dict = dict()
 
+# original environment
 env = gym.make("gym_open_poker/OpenPoker-v0", **config_dict)
-# env = CardDistLow(gym.make("gym_open_poker/OpenPoker-v0", **config_dict)) # novelty inject
+
+# novelty injection
+ng = NoveltyGenerator()
+
+## print out supported novelies
+print(ng.get_support_novelties())
+## injecting
+if len(config_dict['novelty_list']) > 0:
+    env = ng.inject(env, config_dict['novelty_list'])
+
+# start gaming
 observation, info = env.reset(seed=42)
 print('============================')
 print('---observation---')
@@ -122,6 +133,11 @@ background_agents_raw_list:
 # --------termination conditions--------
 # max_game_limitation: 999
 # max_time_limitation: 999
+# --------novelty list--------
+novelty_list:
+#  - CardDistLow
+  - CardDistHigh
+#  - RANDOM
 ```
 For example, setting ```visualize_debug_mode: True``` enables developers to directly see all players' cards, making it easier for development, as illustrated below:
 
