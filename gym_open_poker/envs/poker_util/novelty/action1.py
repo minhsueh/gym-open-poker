@@ -18,14 +18,14 @@ class Action1(gym.Wrapper):
     def __init__(self, env):
 
         super().__init__(env)
-        sys.modules['player'].Player.compute_allowable_pre_flop_actions = getattr(sys.modules[__name__], '_compute_allowable_pre_flop_actions')
-        sys.modules['player'].Player.compute_allowable_flop_actions = getattr(sys.modules[__name__], '_compute_allowable_flop_actions')
-        sys.modules['player'].Player.compute_allowable_turn_actions = getattr(sys.modules[__name__], '_compute_allowable_turn_actions')
-        sys.modules['player'].Player.compute_allowable_river_actions = getattr(sys.modules[__name__], '_compute_allowable_river_actions')
+        sys.modules['player'].Player.compute_allowable_pre_flop_actions = getattr(sys.modules[__name__], '_alter_compute_allowable_pre_flop_actions')
+        sys.modules['player'].Player.compute_allowable_flop_actions = getattr(sys.modules[__name__], '_alter_compute_allowable_flop_actions')
+        sys.modules['player'].Player.compute_allowable_turn_actions = getattr(sys.modules[__name__], '_alter_compute_allowable_turn_actions')
+        sys.modules['player'].Player.compute_allowable_river_actions = getattr(sys.modules[__name__], '_alter_compute_allowable_river_actions')
 
 
 
-def _compute_allowable_pre_flop_actions(self, current_gameboard):
+def _alter_compute_allowable_pre_flop_actions(self, current_gameboard):
         """
         novelty: remove fold from allowable_actions
 
@@ -145,7 +145,7 @@ def _compute_allowable_pre_flop_actions(self, current_gameboard):
 
     
 
-def _compute_allowable_flop_actions(self, current_gameboard):
+def _alter_compute_allowable_flop_actions(self, current_gameboard):
     """
     novelty: remove fold from allowable_actions
     Args:
@@ -254,7 +254,7 @@ def _compute_allowable_flop_actions(self, current_gameboard):
 
 
 
-def _compute_allowable_turn_actions(self, current_gameboard):
+def _alter_compute_allowable_turn_actions(self, current_gameboard):
     """
     novelty: remove fold from allowable_actions
     
@@ -360,7 +360,7 @@ def _compute_allowable_turn_actions(self, current_gameboard):
 
 
 
-def _compute_allowable_river_actions(self, current_gameboard):
+def _alter_compute_allowable_river_actions(self, current_gameboard):
     """
     novelty: remove fold from allowable_actions
     
