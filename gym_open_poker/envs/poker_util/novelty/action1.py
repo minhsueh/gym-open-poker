@@ -12,10 +12,8 @@ import collections
 
 class Action1(gym.Wrapper):
     """
-    Prohibit fold action
-
-
-
+    This novelty, named 'Action1', restricts the fold action for all players, 
+    meaning that the optimal action for a user with a suboptimal hand is limited to checking or passively calling.
     """
     def __init__(self, env):
 

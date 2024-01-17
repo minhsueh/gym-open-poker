@@ -66,9 +66,9 @@ env = gym.make("gym_open_poker/OpenPoker-v0", **config_dict)
 ng = NoveltyGenerator()
 
 ## print out supported novelies
-print(ng.get_support_novelties())
+# print(ng.get_support_novelties())
 ## injecting
-if len(config_dict['novelty_list']) > 0:
+if config_dict['novelty_list'] and len(config_dict['novelty_list']) > 0:
     env = ng.inject(env, config_dict['novelty_list'])
 
 # start gaming

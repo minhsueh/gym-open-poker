@@ -1,12 +1,10 @@
-"""
-This is the higher-level module to inject novelty into the original environment.
-So, the user can directly assign novelty in the config file without modifying the execution script.
-"""
 import sys
 from gym_open_poker.envs.poker_util.novelty import NOVELTY_LIST
 import gym_open_poker
 import random
+import logging
 
+logger = logging.getLogger('gym_open_poker.envs.poker_util.logging_info.novelty_generator')
 
 class NoveltyGenerator():
     def __init__(self):
@@ -30,7 +28,9 @@ class NoveltyGenerator():
             # we randomly inject one of the novelty in NOVELTY_LIST
             novelty_string = random.choice([novelty_string for novelty_string in self._novelties])
             novelty = getattr(novelty_module, novelty_string, None)
+            self._logging(novelty)
             novel_env = novelty(env)
+
 
         else:
             # check if all novelies in novelty_list in self._novelties
@@ -39,8 +39,25 @@ class NoveltyGenerator():
                     raise ValueError(f'{novelty_string} is not supported, please use NoveltyGenerator.get_support_novelties() to check supported novelties.')
 
             # inject novelties
+            novelty_index = 1
             for novelty_string in novelty_list:
                 novelty = getattr(novelty_module, novelty_string, None)
+                self._logging(novelty, novelty_index)
                 novel_env = novelty(env)
+                novelty_index += 1
 
         return(novel_env)
+
+    def _logging(self, novelty, novelty_index=None):
+        """
+        Args:
+            novelty(gym.Wrapper): An wrapper object with doc string
+            novelty_index(int): an novelty index to record in log
+        """
+        logger.debug("-------------------")
+        if novelty_index is not None:
+            logger.debug(f'{str(novelty_index)} NOVELTY INJECTING:')
+        else:
+            logger.debug("NOVELTY INJECTING:")
+        logger.debug(novelty.__doc__)
+        logger.debug("-------------------")

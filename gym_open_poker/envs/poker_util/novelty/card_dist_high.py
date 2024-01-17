@@ -8,18 +8,16 @@ import collections
 
 class CardDistHigh(gym.Wrapper):
     """
-    This novelty will change the card distribution. Deck only contain high number cards.
-    The rules will be as following:
-    
-    1. in _initialize_cards, we will sort the deck with numbers in descending order 
-    2. in _reset_board_each_game, we will shuffle the first x cards only.
-        x = total_number_of_players * 2 + 5 + 3 
-        each player has 2 hole cards
-        5 community card
-        3 burn card
+    This novelty, named 'CardDistHigh', alters the card distribution by restricting the deck to contain only high-number cards. 
+    The rules associated with this novelty are as follows:
 
+    1. In the '_initialize_cards' method, the deck will be sorted with numbers in descending order.
 
-
+    2. In the '_reset_board_each_game' method, only the first x cards of the sorting deck will be used and shuffled, where:
+       x = total_number_of_players * 2 + 5 + 3
+       - Each player is dealt 2 hole cards.
+       - There are 5 community cards.
+       - 3 cards are designated as burn cards.
     """
     def __init__(self, env):
 
@@ -27,7 +25,6 @@ class CardDistHigh(gym.Wrapper):
         super().__init__(env)
         sys.modules['initialize_game_elements']._initialize_cards = getattr(sys.modules[__name__], '_alter_initialize_cards')
         sys.modules['board'].Board.reset_board_each_game = getattr(sys.modules[__name__], '_alter_reset_board_each_game')
-
 
 
 
