@@ -20,6 +20,7 @@ class Board:
         self.deck = deck
         self.deck_idx = deck_idx  # record which card has been used in the deck. e.x deck[deck_idx: deck_idx+2] as hole card
         self.community_cards = list()
+        self.burn_cards = list()
         # self.players_made_decisions = list()  # players who have made decision on the table
         # self.current_highest_bet = 0  # previous bet in the current round
         # self.num_active_player_on_table = num_active_player_on_table  # number of player could act in a hand
@@ -199,6 +200,10 @@ class Board:
         if self.deck_idx + num > len(self.deck):
             logger.debug('Error: cannot burn more cards')
             raise Exception
+
+        for card in self.deck[self.deck_idx:self.deck_idx + num]:
+            self.burn_cards.append(card)
+            logger.debug(f'Burn a card with suit {card.suit} and number {card.number}')
 
         self.assign_deck_idx(num)
         logger.debug(f'Board: burn {num} cards before dealing community cards')

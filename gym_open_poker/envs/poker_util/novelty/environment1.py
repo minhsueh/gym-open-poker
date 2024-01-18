@@ -4,7 +4,10 @@ import sys
 
 
 import collections
-from gym_open_poker.envs.poker_util.dealer import *
+from dealer import *
+import logging
+
+logger = logging.getLogger('gym_open_poker.envs.poker_util.logging_info.novelty.environment1')
 
 class Environment1(gym.Wrapper):
     """

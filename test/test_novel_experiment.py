@@ -40,9 +40,9 @@ while(True):
     print('============================')
     print('Enter your action:')
     user_action = input()
-    if int(user_action) not in range(6):
-        print('It is not a valid action, current value = ' + user_action)
-        continue
+    while(int(user_action) not in range(6)):
+        print(f'It is not a valid action, current value = {user_action}, please enter 0~5')
+        user_action = input()
     #print('----------------')
     observation, reward, terminated, truncated, info = env.step(int(user_action))
     print('---observation---')

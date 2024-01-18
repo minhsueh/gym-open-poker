@@ -4,9 +4,12 @@ import sys
 
 
 
-from gym_open_poker.envs.poker_util.card import Card
-from gym_open_poker.envs.poker_util.action import Action
+from card import Card
+from action import Action
 import collections
+import logging
+
+logger = logging.getLogger('gym_open_poker.envs.poker_util.logging_info.novelty.card_dist_low')
 
 class CardDistLow(gym.Wrapper):
     """

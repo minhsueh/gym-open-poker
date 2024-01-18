@@ -11,7 +11,7 @@ setup(
     name="gym_open_poker",
     packages=find_packages(),
     description='gym_open_poker',
-    version="0.0.34",
+    version="0.0.35",
     author='Min-Hsueh Chiu',
     author_email='peter810601@gmail.com',
     url="https://github.com/minhsueh/gym-open-poker",

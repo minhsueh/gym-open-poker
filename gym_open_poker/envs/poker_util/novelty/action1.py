@@ -9,6 +9,9 @@ from action_choices import *
 from phase import Phase
 # import gym_open_poker.envs.poker_util.phase.Phase
 import collections
+import logging
+
+logger = logging.getLogger('gym_open_poker.envs.poker_util.logging_info.novelty.action1')
 
 class Action1(gym.Wrapper):
     """

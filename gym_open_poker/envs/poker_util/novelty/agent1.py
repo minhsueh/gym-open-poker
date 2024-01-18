@@ -6,7 +6,7 @@ import collections
 import logging
 
 from agent import Agent
-from gym_open_poker.envs.poker_util.agents import agent_p, agent_dump, agent_random
+from agents import agent_p, agent_dump, agent_random
 
 logger = logging.getLogger('gym_open_poker.envs.poker_util.logging_info.novelty.agent1')
 
