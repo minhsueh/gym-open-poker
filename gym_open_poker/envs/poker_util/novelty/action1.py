@@ -22,6 +22,8 @@ class Action1(gym.Wrapper):
         sys.modules['player'].Player.compute_allowable_flop_actions = getattr(sys.modules[__name__], '_alter_compute_allowable_flop_actions')
         sys.modules['player'].Player.compute_allowable_turn_actions = getattr(sys.modules[__name__], '_alter_compute_allowable_turn_actions')
         sys.modules['player'].Player.compute_allowable_river_actions = getattr(sys.modules[__name__], '_alter_compute_allowable_river_actions')
+        sys.modules['action_choices'].fold = getattr(sys.modules[__name__], '_alter_fold')
+        sys.modules['action_choices'].fold.__name__ = "fold"
 
 
 
@@ -466,3 +468,19 @@ def _alter_compute_allowable_river_actions(self, current_gameboard):
     logger.debug('allowable_actions = ' + ", ".join([action.__name__ for action in allowable_actions]))
 
     return allowable_actions
+
+
+def _alter_fold(current_gameboard, player):
+    """ 
+    In this novelty, fold is prohibited. So, we directly return flag_config_dict['failure_code'] in any circumstance.
+
+    Args:
+        current_gameboard
+        player
+        
+
+    Returns:
+        flag(flag_config_dict):
+
+    """
+    return flag_config_dict['failure_code']

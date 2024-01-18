@@ -173,6 +173,9 @@ def _initialize_players(game_elements, player_decision_agents):
 
         player_args['current_cash'] = game_elements['buy_in_amount']
         players.append(Player(**player_args))
+        # logging stradegy_type
+        if player_name != 'player_1':
+            logger.debug(f'{player_name} is initialized with stradegy_type {agent.strategy_type}')
     game_elements['players'] = players
 
 

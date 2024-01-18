@@ -2,8 +2,7 @@ import gym
 import numpy as np
 import sys
 
-from gym_open_poker.envs.poker_util.card import Card
-from gym_open_poker.envs.poker_util.action import Action
+
 import collections
 from gym_open_poker.envs.poker_util.dealer import *
 

@@ -34,8 +34,9 @@ from card import Card
 import dealer
 from initialize_game_elements import initialize_game_element
 
-from gym_open_poker.envs.poker_util.agents import agent_p, dump_agent, agent_random
+from gym_open_poker.envs.poker_util.agents import agent_p, agent_dump, agent_random
 # from gym_open_poker.envs.poker_util.agents import *
+
 
 
 
@@ -696,7 +697,7 @@ class OpenPokerEnv(gym.Env):
 
             if self.render_mode == "human":
                 self.render()
-            return [self._get_obs(stopped=True), -999, True, False, self._get_info(stopped=True)]
+            return self._get_obs(stopped=True), -999, True, False, self._get_info(stopped=True)
 
         
 

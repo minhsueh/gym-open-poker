@@ -85,6 +85,7 @@ def _build_decision_agent_methods_dict():
     ans['make_flop_moves'] = make_flop_moves
     ans['make_turn_moves'] = make_turn_moves
     ans['make_river_moves'] = make_river_moves
+    ans['strategy_type'] = "agent_dump"
 
     return ans
 

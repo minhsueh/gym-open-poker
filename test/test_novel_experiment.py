@@ -52,13 +52,16 @@ while(True):
     print('---info---')
     print(info)
     if truncated:
-        print('meet termination condition! Over!')
+        print('Meet termination condition! Over!')
         break
     if terminated:
         if observation['player_status'][observation['position'][1]] == 1:
             print('WINNNN!')
         else:
-            print('LOST!')
+            if reward == -999:
+                print('Use an invalid move! LOST!')
+            else:
+                print('LOST!')
         break
 
 

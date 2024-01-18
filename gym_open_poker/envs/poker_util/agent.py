@@ -2,12 +2,13 @@ from flag_config import flag_config_dict
 
 
 class Agent:
-    def __init__(self, make_pre_flop_moves, make_flop_moves, make_turn_moves, make_river_moves):
+    def __init__(self, make_pre_flop_moves, make_flop_moves, make_turn_moves, make_river_moves, strategy_type=None):
         self.make_pre_flop_moves = make_pre_flop_moves
         self.make_flop_moves = make_flop_moves
         self.make_turn_moves = make_turn_moves
         self.make_river_moves = make_river_moves
         self.is_running = False
+        self.strategy_type = strategy_type
         #self._agent_memory = dict()
 
     def startup(self):
