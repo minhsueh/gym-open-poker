@@ -136,7 +136,6 @@ class Board:
         """
         num_cards = number_cards_to_draw(phase)
         if self.deck_idx + num_cards > len(self.deck):
-            logger.debug()
             logger.debug('Error: cannot deal more hold cards, since no more card in the deck')
             raise Exception
         if phase != Phase.PRE_FLOP:

@@ -19,14 +19,15 @@ class Agent3(gym.Wrapper):
 
         super().__init__(env)
 
+        add_player_number = 15
 
         # add one new player
         last_player_index = env.number_of_players
 
-        for p_idx in range(1, 16):
+        for p_idx in range(1, add_player_number+1):
             new_player_methods = getattr(sys.modules[__name__], 'agent_p')
             env.player_decision_agents['player_' + str(last_player_index+p_idx)] = Agent(**new_player_methods.decision_agent_methods)
 
 
         # modify number_of_players
-        env.number_of_players += 15
+        env.number_of_players += add_player_number
