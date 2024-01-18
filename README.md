@@ -21,7 +21,7 @@ The poker simulator screenshot.
 ## Introduction
 In complex task environments in both nature and human society, **structural** violations of expectation (VoE) occur with non-trivial frequency. Agents that are designed to operate in such environments must be capable of **open-world learning** (OWL), defined as the ability to detect and accommodate out-of-distribution inputs, as well as more complex structural VoEs, without requiring extensive and offline re-training. Until recently, OWL research was relatively constrained and limited to areas such as anomaly detection and concept drift. More recently, agent-based OWL research has witnessed much interest from across the community. To support this research, not just for developing OWL algorithms, but also evaluating them, there is a need for multi-agent environments where structural VoEs can be generated, and controlled experiments can be run with relative ease. To address this need, we propose PokerOWL, a platform that is supported on the Gymnasium infrastructure (formerly supported by OpenAI), which is extensively used in the reinforcement learning and AI gameplaying communities. PokerOWL supports both a rich VoE generator and a graphical interface for facilitating development and evaluation of OWL methods. 
 
-## How novelty look like?
+## What does a novelty look like?
 ![alt text](./videos/novelty_agent3.png)
 Explore one of the novelties we've crafted! Picture a scenario where 25 players engage in a game – would your strategy change? While this novelty may not be the optimal choice for illustrating the impact of novelty on players, it is the most visualizable. Our repository includes several other novelties, so feel free to interact with them and discover their unique dynamics!
 
