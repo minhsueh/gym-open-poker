@@ -110,8 +110,8 @@ It is also possible to customize the parameters within the configuration file. Y
 log_file_path: './test.log'
 # --------visualization parameters--------
 render_mode: 'human'  # None or human
-show_all_move_mode: False
-visualize_debug_mode: True
+show_all_move_mode: True
+visualize_debug_mode: False
 # window_width: 1200
 # window_height: 600
 sleep_time: 0.5
