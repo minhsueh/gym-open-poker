@@ -15,11 +15,9 @@ The poker simulator screenshot.
 -->
 
 
+![alt text](./videos/trim_normal_mode.gif)
+<p style="text-align: center;">The visualization of normal game mode.</p>
 
-
-<div style="text-align: center;">
-![alt text](./videos/trim_normal_mode.gif "The visualization of normal game mode.")
-</div>
 
 
 ## Introduction
