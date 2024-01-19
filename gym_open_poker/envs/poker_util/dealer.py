@@ -225,8 +225,8 @@ def conclude_tournament(current_gameboard, early_stop=False):
     if early_stop:
         ##  player's rank
         cur_game_idx = current_gameboard['board'].game_idx
-        # rank_list = get_player_rank_list(current_gameboard)
-        rank_list = [-1] * len(current_gameboard['players'])
+        rank_list = get_player_rank_list(current_gameboard)
+        # rank_list = [-1] * len(current_gameboard['players'])
         current_gameboard['board'].history['rank'][cur_game_idx] = rank_list
         ##  player's cash and status
         player_cash_list = []
