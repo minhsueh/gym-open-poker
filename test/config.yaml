@@ -31,10 +31,14 @@ novelty_list:
 #  - CardDistHigh
 #  - Card1
 #  - Action1
-#  - RANDOM
+  - RANDOM
 #  - Environment1
 #  - Environment2
 #  - Agent1
 #  - Agent2
-  - Agent3
+#  - Agent3
 #  - Event1
+#  - Rule1
+#  - Rule2
+#  - Rule3
+#  - Event2

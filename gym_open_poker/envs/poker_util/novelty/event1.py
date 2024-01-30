@@ -14,7 +14,7 @@ logger = logging.getLogger('gym_open_poker.envs.poker_util.logging_info.novelty.
 
 class Event1(gym.Wrapper):
     """
-    If the game meet the following condition,
+    This novelty, Event1, is defined as the following. If the game meet the following condition,
         1. In the river
         2. Any player achieves three-of-a-kind with the number x,  but not four-of-a-kind already.
         3. The remaining card with the number x is still available in the deck.

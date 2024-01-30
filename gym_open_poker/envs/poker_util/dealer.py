@@ -816,8 +816,8 @@ def conclude_game(current_gameboard):
         player_list = current_gameboard['board'].pots_attendee_list[pot_idx]
         winners = find_winner(current_gameboard, player_list)
         assign_money_to_winners(current_gameboard, winners, money_amount)
-        # print cash info after assign pot to winners
-        print_player_info(current_gameboard)
+    # print cash info after assign pot to winners
+    print_player_info(current_gameboard)
 
 
 

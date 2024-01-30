@@ -172,7 +172,7 @@ class OpenPokerEnv(gym.Env):
 
         # ------general poker rules------
         self.buy_in = customized_arg_dict.get("buy_in", 200)
-        self.bankroll_limit = customized_arg_dict.get("bankroll_limit", 1500)
+        self.bankroll_limit = customized_arg_dict.get("bankroll_limit", self.buy_in*self.number_of_players)
 
 
         # ------visulaization------
@@ -199,7 +199,7 @@ class OpenPokerEnv(gym.Env):
         )
 
         # We have 5 actions, corresponding to "call", "bet", "raise", "check", "fold"
-        self.action_space = spaces.Discrete(5, start=0)
+        self.action_space = spaces.Discrete(6, start=0)
         
         
         self._action_encoder = {
@@ -542,7 +542,6 @@ class OpenPokerEnv(gym.Env):
         if self.render_mode == "human":
             self.render()
 
-
         return observation, info
 
     def step(self, action, game_start=False):
@@ -579,7 +578,9 @@ class OpenPokerEnv(gym.Env):
                 
                 # continue betting
                 is_over = self._betting()
-
+                for player_idx, player in enumerate(self.game_elements['players']):
+                    if player.player_name == 'player_1':
+                        break
                 if not is_over and self.game_elements['board'].players_last_move_list[player_idx] not in [Action.FOLD, Action.ALL_IN, Action.ALL_IN_ALREADY]:
                     if self.render_mode == "human":
                         self.render()
@@ -766,12 +767,13 @@ class OpenPokerEnv(gym.Env):
                     # this is gym user, return and wait for the next step
                     return(False) # meaning the betting is still continue
                 elif self.game_elements['board'].players_last_move_list[current_betting_idx] in [Action.FOLD, Action.ALL_IN, Action.ALL_IN_ALREADY]:
-                    
+
                     # fold or all_in
                     current_betting_idx = (current_betting_idx + 1) % total_number_of_players
                     self.game_elements['board'].current_betting_idx = current_betting_idx
                     continue
                 else:
+
                     logger.debug(player.player_name + ' start to move with cash ' + str(player.current_cash))
                     # log bet info
                     self._log_board_before_decision(player)
