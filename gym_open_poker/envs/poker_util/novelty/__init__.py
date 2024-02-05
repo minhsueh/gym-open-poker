@@ -12,6 +12,9 @@ from .event1 import Event1
 from .rule2 import Rule2
 from .rule3 import Rule3
 from .event2 import Event2
+from .rule4 import Rule4
+from .card2 import Card2
+from .card3 import Card3
 
 NOVELTY_LIST = [cls for cls in locals().values() if isinstance(cls, type)]
 NOVELTY_LIST.append('RANDOM')

@@ -56,6 +56,7 @@ def _alter_reset_board_each_game(self, current_gameboard):
     first_portion = self.deck[:first_x_card]
     second_portion = self.deck[first_x_card:]
     np.random.shuffle(first_portion)
+    np.random.shuffle(second_portion)
     self.deck = first_portion + second_portion
     ####
 

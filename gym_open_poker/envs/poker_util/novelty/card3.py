@@ -2,27 +2,16 @@ import gym
 import numpy as np
 import sys
 
-
-
 from card import Card
 from action import Action
 import collections
 import logging
 
-logger = logging.getLogger('gym_open_poker.envs.poker_util.logging_info.novelty.card_dist_low')
+logger = logging.getLogger('gym_open_poker.envs.poker_util.logging_info.novelty.card3')
 
-class CardDistLow(gym.Wrapper):
+class Card3(gym.Wrapper):
     """
-    This novelty, named 'CardDistHigh', alters the card distribution by restricting the deck to contain only low-number cards. 
-    The rules associated with this novelty are as follows:
-
-    1. In the '_initialize_cards' method, the deck will be sorted with numbers in ascending order.
-
-    2. In the '_reset_board_each_game' method, only the first x cards of the sorting deck will be used and shuffled, where:
-       x = total_number_of_players * 2 + 5 + 3
-       - Each player is dealt 2 hole cards.
-       - There are 5 community cards.
-       - 3 cards are designated as burn cards.
+    This novelty, named 'Card3', alters the card distribution by showing all red cards (heart and diamond) first.
     """
     def __init__(self, env):
 
@@ -30,7 +19,6 @@ class CardDistLow(gym.Wrapper):
         super().__init__(env)
         sys.modules['initialize_game_elements']._initialize_cards = getattr(sys.modules[__name__], '_alter_initialize_cards')
         sys.modules['board'].Board.reset_board_each_game = getattr(sys.modules[__name__], '_alter_reset_board_each_game')
-
 
 
 
@@ -56,11 +44,11 @@ def _alter_reset_board_each_game(self, current_gameboard):
     self.community_cards = list()
 
     #### novelty
-    first_x_card = int(current_gameboard['total_number_of_players'] * 2 + 5 + 3)
+    first_x_card = 26
     first_portion = self.deck[:first_x_card]
     second_portion = self.deck[first_x_card:]
     np.random.shuffle(first_portion)
-    p.random.shuffle(second_portion)
+    np.random.shuffle(second_portion)
     self.deck = first_portion + second_portion
     ####
 
@@ -120,12 +108,11 @@ def _alter_initialize_cards(game_elements):
     """
     #### novelty
     # nums = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']
-    nums = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
+    nums = ['A', 'K', 'J', '9', '7', '5', '3', 'Q', '10', '8', '6', '4', '2']
     ####
-    suits = ['club',  'diamond', 'heart', 'spade']
-    colors = ['black', 'red', 'red', 'black']
-    temp_deck = [(num, suit, color) for num in nums for suit, color in zip(suits, colors)]
-
+    suits = ['heart', 'diamond', 'club', 'spade']
+    colors = ['red', 'red', 'black', 'black']
+    temp_deck = [(num, suit, color) for suit, color in zip(suits, colors) for num in nums ]
     deck = list()
     for num, suit, color in temp_deck:
         if num == 'A':

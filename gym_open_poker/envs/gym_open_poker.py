@@ -32,7 +32,8 @@ from action import Action
 import action_choices
 from card import Card
 import dealer
-from initialize_game_elements import initialize_game_element
+# from initialize_game_elements import initialize_game_element
+import initialize_game_elements
 
 from gym_open_poker.envs.poker_util.agents import agent_p, agent_dump, agent_random
 # from gym_open_poker.envs.poker_util.agents import *
@@ -424,7 +425,7 @@ class OpenPokerEnv(gym.Env):
         }
 
     def set_up_board(self, random_seed):
-        return initialize_game_element(self.player_decision_agents, self.customized_arg_dict, random_seed)
+        return initialize_game_elements.initialize_game_element(self.player_decision_agents, self.customized_arg_dict, random_seed)
 
     def _get_info(self, stopped=False):
         """
