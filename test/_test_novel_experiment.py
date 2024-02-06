@@ -4,7 +4,6 @@ import yaml
 import os
 from gym_open_poker.envs.poker_util.novelty_generator import NoveltyGenerator
 
-print('test')
 # load config parameters
 config_path = './config.yaml'
 if os.path.exists(config_path):
