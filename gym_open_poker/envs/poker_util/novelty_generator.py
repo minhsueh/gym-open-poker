@@ -6,13 +6,13 @@ import logging
 
 logger = logging.getLogger('gym_open_poker.envs.poker_util.logging_info.novelty_generator')
 
+
 class NoveltyGenerator():
     def __init__(self):
         self._novelties = [novelty.__name__ for novelty in NOVELTY_LIST if novelty != 'RANDOM'] 
 
-
     def get_support_novelties(self):
-        return(self._novelties)
+        return (self._novelties)
 
     def inject(self, env, novelty_list: list[str]):
         """
@@ -31,7 +31,6 @@ class NoveltyGenerator():
             self._logging(novelty)
             novel_env = novelty(env)
 
-
         else:
             # check if all novelies in novelty_list in self._novelties
             for novelty_string in novelty_list:
@@ -46,7 +45,7 @@ class NoveltyGenerator():
                 novel_env = novelty(env)
                 novelty_index += 1
 
-        return(novel_env)
+        return (novel_env)
 
     def _logging(self, novelty, novelty_index=None):
         """

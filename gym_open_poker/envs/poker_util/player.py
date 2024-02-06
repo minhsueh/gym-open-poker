@@ -1,11 +1,13 @@
-from action_choices import *
+from action_choices import call, all_in, fold, raise_bet, bet, check
 from card_utility_actions import *
 from action import Action
+from phase import Phase
 
 
 import logging
 
 logger = logging.getLogger('gym_open_poker.envs.poker_util.logging_info.player')
+
 
 class Player:
     def __init__(self, player_name, status, current_cash, hole_cards,
@@ -20,27 +22,14 @@ class Player:
         :param agent: agent object of this player
         """
         self.player_name = player_name
-        self.status = status #   lost, active
+        self.status = status  # lost, active
         self.current_cash = current_cash
         self.hole_cards = hole_cards
-        #self.current_bet = current_bet   # save chips the player has called, bet, raise bet, all-in
         self.agent = agent
-        #self.current_decision = current_decision  # call/fold/check/all_in/bet/raise_bet in the current round
-
-        #self.is_fold = False  # which might skip their turn if is fold
-        #self.is_all_in = False  # which might skip their turn if is all-in
-        #self.bet_amount_each_round = 0  # total money the player bet in each round
-        #self.bet_amount_each_game = 0  # total money the player bet in each game
-
-        #self.current_money_in_pot = 0
 
         # place to store reward
         self.last_game_cash = current_cash
         self.last_reward = 0
-
-
-
-        #self.position = -1
 
     def assign_hole_cards(self, cards):
         """
@@ -54,8 +43,6 @@ class Player:
 
         self.hole_cards = cards
 
-
-
     def assign_status(self, current_gameboard, assign_to='waiting_for_move'):
         """
         assign player's status, which might skip its turn if lost/win
@@ -66,9 +53,6 @@ class Player:
         if assign_to == 'lost':
             self.current_cash = 0
 
-        
-
-
     def add_bet_amount_each_round(self, current_gameboard, amount):
         """
         add the total amount of money the player bet in this round
@@ -77,7 +61,6 @@ class Player:
         """
         current_gameboard['board'].player_pot[self.player_name] += amount
 
-
     def reduce_current_cash(self, amount):
         """
         if bet, current cash amount should be reduced
@@ -85,8 +68,6 @@ class Player:
         :return:
         """
         self.current_cash -= amount
-
-
 
     def reset_player_each_game(self, current_gameboard):
         """
@@ -98,8 +79,6 @@ class Player:
             None
 
         """
-
-
         self.small_blind = False
         self.big_blind = False
         self.hole_cards = list()
@@ -117,9 +96,6 @@ class Player:
         self.current_decision = None
         self.bet_amount_each_round = 0
 
-
-        return chips, total_bet
-
     def force_bet_small_blind(self, current_gameboard):  # what is number?
         """
         Already checked if player have enough money for small blind in dealer.check_and_deal_hole_cards
@@ -130,7 +106,6 @@ class Player:
             None
 
         """
-        
 
         small_blind_amount = current_gameboard["small_blind_amount"]
         logger.debug(f'{self.player_name} is forced to bet ${small_blind_amount} as small blind')
@@ -144,11 +119,6 @@ class Player:
                 if player.player_name == self.player_name:
                     current_gameboard['board'].players_last_move_list[player_idx] = Action.ALL_IN
 
-        return 
-
-        
-
-
     def force_bet_big_blind(self, current_gameboard, time_raise_from_small_blind=2):
         """
         Already checked if player have enough money for small blind in dealer.check_and_deal_hole_cards
@@ -159,8 +129,6 @@ class Player:
             None
 
         """
-
-      
         big_blind_amount = current_gameboard["big_blind_amount"]
         logger.debug(f'{self.player_name} is forced to bet ${big_blind_amount} as big blind')
 
@@ -172,10 +140,7 @@ class Player:
             # modify players_last_move_list_hist to ALL_IN
             for player_idx, player in enumerate(current_gameboard['players']):
                 if player.player_name == self.player_name:
-                    current_gameboard['board'].players_last_move_list[player_idx] = Action.ALL_IN
-
-        return 
-
+                    current_gameboard['board'].players_last_move_list[player_idx] = Action.ALL_IN 
 
     def compute_allowable_pre_flop_actions(self, current_gameboard):
         """
@@ -202,7 +167,7 @@ class Player:
             6. call
                 raise_bet in last_move
 
-        
+
         corner case:
             big blind
             small blind
@@ -212,7 +177,7 @@ class Player:
 
         Returns:
             allowable_actions(set)
-            
+
 
         Raises:
 
@@ -221,7 +186,6 @@ class Player:
             raise
 
         allowable_actions = set()
-
 
         # get player_idx
         for player_idx, player in enumerate(current_gameboard['players']):
@@ -234,7 +198,6 @@ class Player:
 
         # 1. fold
         allowable_actions.add(fold)  # can fold at any time
-
 
         # bet, raise_bet, call, chcek, all_in
 
@@ -259,20 +222,13 @@ class Player:
             # check
             allowable_actions.add(check)
 
-
-        elif current_bet_count == 1 and  \
-             current_raise_count < current_gameboard['max_raise_count']:
-
+        elif current_bet_count == 1 and current_raise_count < current_gameboard['max_raise_count']:
 
             is_big_blind = False
             # exception: BB in pre-flop 
             if current_gameboard['board'].players_last_move_list[player_idx] == Action.BIG_BLIND:
                 is_big_blind = True
 
-
-            
-
-            
             # call, all_in
             bet_to_follow = raise_amount * (current_bet_count + current_raise_count) - already_bet
             if current_gameboard['board'].cur_phase == Phase.PRE_FLOP and \
@@ -294,11 +250,7 @@ class Player:
             else:
                 allowable_actions.add(raise_bet)
 
-
-
-
-        elif current_bet_count == 1 and  \
-             current_raise_count == current_gameboard['max_raise_count']:
+        elif current_bet_count == 1 and current_raise_count == current_gameboard['max_raise_count']:
             # call, all_in
 
             bet_to_follow = raise_amount * (current_bet_count + current_raise_count) - already_bet
@@ -316,13 +268,6 @@ class Player:
         logger.debug('allowable_actions = ' + ", ".join([action.__name__ for action in allowable_actions]))
 
         return allowable_actions
-
-
-        logger.debug('allowable_actions = ' + ", ".join([action.__name__ for action in allowable_actions]))
-
-        return allowable_actions
-
-    
 
     def compute_allowable_flop_actions(self, current_gameboard):
         """
@@ -372,7 +317,6 @@ class Player:
         # 1. fold
         allowable_actions.add(fold)  # can fold at any time
 
-
         # bet, raise_bet, call, chcek, all_in
 
         if current_gameboard['board'].cur_phase in [Phase.PRE_FLOP, Phase.FLOP]:
@@ -386,7 +330,6 @@ class Player:
         current_bet_count = current_gameboard['board'].current_bet_count
         current_raise_count = current_gameboard['board'].current_raise_count
 
-
         if current_bet_count == 0:
             # bet(all_in)
             if self.current_cash <= raise_amount:
@@ -396,15 +339,12 @@ class Player:
             # check
             allowable_actions.add(check)
 
-
-        elif current_bet_count == 1 and  \
-             current_raise_count < current_gameboard['max_raise_count']:
-
+        elif current_bet_count == 1 and current_raise_count < current_gameboard['max_raise_count']:
             # exception: BB in pre-flop 
             if current_gameboard['board'].cur_phase == Phase.PRE_FLOP and \
                current_raise_count == 0 and \
                current_gameboard['board'].players_last_move_list[player_idx] == Action.BIG_BLIND:
-               allowable_actions.add(check)
+                allowable_actions.add(check)
 
             # call, all_in
             bet_to_follow = raise_amount * (current_bet_count + current_raise_count) - already_bet
@@ -423,11 +363,7 @@ class Player:
             else:
                 allowable_actions.add(raise_bet)
 
-
-
-
-        elif current_bet_count == 1 and  \
-             current_raise_count == current_gameboard['max_raise_count']:
+        elif current_bet_count == 1 and current_raise_count == current_gameboard['max_raise_count']:
             # call, all_in
 
             bet_to_follow = raise_amount * (current_bet_count + current_raise_count) - already_bet
@@ -450,13 +386,10 @@ class Player:
 
         return allowable_actions
 
-
-
-
     def compute_allowable_turn_actions(self, current_gameboard):
         """
         first player: bet or check
-        
+
         Args:
         current_gameboard
 
@@ -468,7 +401,6 @@ class Player:
             raise
 
         allowable_actions = set()
-
 
         # get player_idx
         for player_idx, player in enumerate(current_gameboard['players']):
@@ -482,7 +414,6 @@ class Player:
         # 1. fold
         allowable_actions.add(fold)  # can fold at any time
 
-
         # bet, raise_bet, call, chcek, all_in
 
         if current_gameboard['board'].cur_phase in [Phase.PRE_FLOP, Phase.FLOP]:
@@ -496,7 +427,6 @@ class Player:
         current_bet_count = current_gameboard['board'].current_bet_count
         current_raise_count = current_gameboard['board'].current_raise_count
 
-
         if current_bet_count == 0:
             # bet(all_in)
             if self.current_cash <= raise_amount:
@@ -506,15 +436,13 @@ class Player:
             # check
             allowable_actions.add(check)
 
-
-        elif current_bet_count == 1 and  \
-             current_raise_count < current_gameboard['max_raise_count']:
+        elif current_bet_count == 1 and current_raise_count < current_gameboard['max_raise_count']:
 
             # exception: BB in pre-flop 
             if current_gameboard['board'].cur_phase == Phase.PRE_FLOP and \
                current_raise_count == 0 and \
                current_gameboard['board'].players_last_move_list[player_idx] == Action.BIG_BLIND:
-               allowable_actions.add(check)
+                allowable_actions.add(check)
 
             # call, all_in
             bet_to_follow = raise_amount * (current_bet_count + current_raise_count) - already_bet
@@ -533,11 +461,7 @@ class Player:
             else:
                 allowable_actions.add(raise_bet)
 
-
-
-
-        elif current_bet_count == 1 and  \
-             current_raise_count == current_gameboard['max_raise_count']:
+        elif current_bet_count == 1 and current_raise_count == current_gameboard['max_raise_count']:
             # call, all_in
 
             bet_to_follow = raise_amount * (current_bet_count + current_raise_count) - already_bet
@@ -555,9 +479,6 @@ class Player:
         logger.debug('allowable_actions = ' + ", ".join([action.__name__ for action in allowable_actions]))
 
         return allowable_actions
-
-
-
 
     def compute_allowable_river_actions(self, current_gameboard):
         """
@@ -575,7 +496,6 @@ class Player:
 
         allowable_actions = set()
 
-
         # get player_idx
         for player_idx, player in enumerate(current_gameboard['players']):
             if player.player_name == self.player_name:
@@ -587,7 +507,6 @@ class Player:
 
         # 1. fold
         allowable_actions.add(fold)  # can fold at any time
-
 
         # bet, raise_bet, call, chcek, all_in
 
@@ -602,7 +521,6 @@ class Player:
         current_bet_count = current_gameboard['board'].current_bet_count
         current_raise_count = current_gameboard['board'].current_raise_count
 
-
         if current_bet_count == 0:
             # bet(all_in)
             if self.current_cash <= raise_amount:
@@ -612,15 +530,13 @@ class Player:
             # check
             allowable_actions.add(check)
 
-
-        elif current_bet_count == 1 and  \
-             current_raise_count < current_gameboard['max_raise_count']:
+        elif current_bet_count == 1 and current_raise_count < current_gameboard['max_raise_count']:
 
             # exception: BB in pre-flop 
             if current_gameboard['board'].cur_phase == Phase.PRE_FLOP and \
                current_raise_count == 0 and \
                current_gameboard['board'].players_last_move_list[player_idx] == Action.BIG_BLIND:
-               allowable_actions.add(check)
+                allowable_actions.add(check)
 
             # call, all_in
             bet_to_follow = raise_amount * (current_bet_count + current_raise_count) - already_bet
@@ -639,11 +555,7 @@ class Player:
             else:
                 allowable_actions.add(raise_bet)
 
-
-
-
-        elif current_bet_count == 1 and  \
-             current_raise_count == current_gameboard['max_raise_count']:
+        elif current_bet_count == 1 and current_raise_count == current_gameboard['max_raise_count']:
             # call, all_in
 
             bet_to_follow = raise_amount * (current_bet_count + current_raise_count) - already_bet
@@ -666,8 +578,6 @@ class Player:
 
         return allowable_actions
 
-
-
     def make_pre_flop_moves(self, current_gameboard):
         """
         player takes actions in pre-flop round
@@ -676,8 +586,6 @@ class Player:
         """
         logger.debug(f'{self.player_name} currently in pre-flop round')
         allowable_actions = self.compute_allowable_pre_flop_actions(current_gameboard=current_gameboard)
-
-
 
         action_to_execute, parameters = self.agent.make_pre_flop_moves(self, current_gameboard, allowable_actions)
         # current_gameboard['player_last_move'] = Action[action_to_execute.__name__]
@@ -691,8 +599,6 @@ class Player:
         current_gameboard['history']['param'].append(params)
         current_gameboard['history']['return'].append((action_to_execute, parameters))
 
-
-
         return self._execute_action(action_to_execute, parameters, current_gameboard)
 
     def make_flop_moves(self, current_gameboard):
@@ -704,10 +610,9 @@ class Player:
         logger.debug(f'{self.player_name} currently in flop round')
         allowable_actions = self.compute_allowable_flop_actions(current_gameboard=current_gameboard)
 
-
         action_to_execute, parameters = self.agent.make_flop_moves(self, current_gameboard, allowable_actions)
 
-        #current_gameboard['player_last_move'] = action_to_execute.__name__
+        # current_gameboard['player_last_move'] = action_to_execute.__name__
 
         # add to game history
         current_gameboard['history']['function'].append(self.agent.make_flop_moves)
@@ -717,7 +622,6 @@ class Player:
         params['allowable_moves'] = allowable_actions
         current_gameboard['history']['param'].append(params)
         current_gameboard['history']['return'].append((action_to_execute, parameters))
-
 
         return self._execute_action(action_to_execute, parameters, current_gameboard)
 
@@ -732,7 +636,7 @@ class Player:
 
         action_to_execute, parameters = self.agent.make_turn_moves(self, current_gameboard, allowable_actions)
 
-        #current_gameboard['player_last_move'] = action_to_execute.__name__
+        # current_gameboard['player_last_move'] = action_to_execute.__name__
 
         # add to game history
         current_gameboard['history']['function'].append(self.agent.make_turn_moves)
@@ -754,11 +658,9 @@ class Player:
         logger.debug(f'{self.player_name} currently in river round')
         allowable_actions = self.compute_allowable_river_actions(current_gameboard=current_gameboard)
 
-
         action_to_execute, parameters = self.agent.make_river_moves(self, current_gameboard, allowable_actions)
 
-
-        #current_gameboard['player_last_move'] = action_to_execute.__name__
+        # current_gameboard['player_last_move'] = action_to_execute.__name__
 
         # add to game history
         current_gameboard['history']['function'].append(self.agent.make_river_moves)
@@ -769,10 +671,7 @@ class Player:
         current_gameboard['history']['param'].append(params)
         current_gameboard['history']['return'].append((action_to_execute, parameters))
 
-
         return self._execute_action(action_to_execute, parameters, current_gameboard)
-
-    
 
     def _execute_action(self, action_to_execute, parameters, current_gameboard):
         """

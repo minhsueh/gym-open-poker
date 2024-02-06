@@ -1,14 +1,12 @@
 import numpy as np
-from action_choices import *
+from action_choices import call, all_in, fold, raise_bet, bet, check
 from card_utility_actions import *
 from itertools import combinations
 from agent_helper_function import *
 from collections import Counter
 
 
-
 def make_pre_flop_moves(player, current_gameboard, allowable_actions):
-
 
     params = dict()
     params['player'] = player
@@ -22,8 +20,6 @@ def make_pre_flop_moves(player, current_gameboard, allowable_actions):
         return call, params
     else:
         return fold, params
-
-    
 
 
 def make_flop_moves(player, current_gameboard, allowable_actions):
@@ -71,7 +67,6 @@ def make_river_moves(player, current_gameboard, allowable_actions):
         return call, params
     else:
         return fold, params
-
 
 
 def _build_decision_agent_methods_dict():

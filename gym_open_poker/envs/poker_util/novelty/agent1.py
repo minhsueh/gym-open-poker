@@ -10,6 +10,7 @@ from agents import agent_p, agent_dump, agent_random
 
 logger = logging.getLogger('gym_open_poker.envs.poker_util.logging_info.novelty.agent1')
 
+
 class Agent1(gym.Wrapper):
     """
     This novelty, named Agent1, introduces a modification to one of the player's strategies. 
@@ -23,7 +24,6 @@ class Agent1(gym.Wrapper):
         3. agent_dump -> agent_p
     """
     def __init__(self, env):
-
 
         super().__init__(env)
 

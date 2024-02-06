@@ -1,32 +1,25 @@
 import numpy as np
-from action_choices import *
+from action_choices import call, all_in, fold, raise_bet, bet, check
 from card_utility_actions import *
 from itertools import combinations
 from agent_helper_function import (format_float_precision, get_out_probability, is_out_in_hand)
 from collections import Counter
 
-
-
 """
-
 This agent randomly select one action from allowable_actions.
-
-
-
 """
 np.random.seed(15)
 
+
 def make_pre_flop_moves(player, current_gameboard, allowable_actions):
     """Strategies for agent in pre-flop round
-
- 
     Args:
         player
         current_gameboard
         allowable_actions
 
     Returns:
-        function 
+        function
     """
 
     # parameters the agent need to take actions with
@@ -35,10 +28,6 @@ def make_pre_flop_moves(player, current_gameboard, allowable_actions):
     params['player'] = player
 
     return np.random.choice(list(allowable_actions)), params
-
-
-
-
 
 
 def make_flop_moves(player, current_gameboard, allowable_actions):
@@ -57,28 +46,18 @@ def make_flop_moves(player, current_gameboard, allowable_actions):
     params['current_gameboard'] = current_gameboard
     params['player'] = player
 
-
     return np.random.choice(list(allowable_actions)), params
-
-
-
-
-
-
 
 
 def make_turn_moves(player, current_gameboard, allowable_actions):
     """Strategies for agent in flop round
-    
-
-
     Args:
         player
         current_gameboard
         allowable_actions
 
     Returns:
-        function 
+        function
     """
 
     # parameters the agent need to take actions with
@@ -86,8 +65,8 @@ def make_turn_moves(player, current_gameboard, allowable_actions):
     params['current_gameboard'] = current_gameboard
     params['player'] = player
 
-
     return np.random.choice(list(allowable_actions)), params
+
 
 def make_river_moves(player, current_gameboard, allowable_actions):
     """Strategies of agent in river round
@@ -106,11 +85,7 @@ def make_river_moves(player, current_gameboard, allowable_actions):
     params['current_gameboard'] = current_gameboard
     params['player'] = player
 
-
     return np.random.choice(list(allowable_actions)), params
-    
-
-
 
 
 def _build_decision_agent_methods_dict():
@@ -125,7 +100,6 @@ def _build_decision_agent_methods_dict():
     ans['make_turn_moves'] = make_turn_moves
     ans['make_river_moves'] = make_river_moves
     ans['strategy_type'] = "agent_random"
-    
 
     return ans
 

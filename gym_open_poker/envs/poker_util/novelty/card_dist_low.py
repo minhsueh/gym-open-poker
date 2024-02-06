@@ -11,9 +11,10 @@ import logging
 
 logger = logging.getLogger('gym_open_poker.envs.poker_util.logging_info.novelty.card_dist_low')
 
+
 class CardDistLow(gym.Wrapper):
     """
-    This novelty, named 'CardDistHigh', alters the card distribution by restricting the deck to contain only low-number cards. 
+    This novelty, named 'CardDistHigh', alters the card distribution by restricting the deck to contain only low-number cards.
     The rules associated with this novelty are as follows:
 
     1. In the '_initialize_cards' method, the deck will be sorted with numbers in ascending order.
@@ -30,9 +31,6 @@ class CardDistLow(gym.Wrapper):
         super().__init__(env)
         sys.modules['initialize_game_elements']._initialize_cards = getattr(sys.modules[__name__], '_alter_initialize_cards')
         sys.modules['board'].Board.reset_board_each_game = getattr(sys.modules[__name__], '_alter_reset_board_each_game')
-
-
-
 
 
 def _alter_reset_board_each_game(self, current_gameboard):

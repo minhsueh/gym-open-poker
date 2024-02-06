@@ -19,7 +19,6 @@ import logging
 logger = logging.getLogger('gym_open_poker.envs.poker_util.logging_info.init_game_elements')
 
 
-
 def initialize_game_element(player_decision_agents, customized_arg_dict, random_seed):
     """Initialization function for cards, player, board, history, and rules
 
@@ -36,8 +35,6 @@ def initialize_game_element(player_decision_agents, customized_arg_dict, random_
     np.random.seed(random_seed)
 
     game_elements = dict()
-
-
     game_elements['small_blind_amount'] = customized_arg_dict.get('small_blind', 5)  # this could increase as number of games increase
     game_elements['big_small_blind_ratio'] = customized_arg_dict.get('big_small_blind_ratio', 2)  # if small_blind_amount is 1, big blind pay 1 * 2
     game_elements['big_blind_amount'] = game_elements['small_blind_amount'] * game_elements['big_small_blind_ratio']
@@ -49,16 +46,12 @@ def initialize_game_element(player_decision_agents, customized_arg_dict, random_
     game_elements['buy_in_amount'] = customized_arg_dict.get("buy_in", 200)
 
     game_elements['early_stop'] = False
-    
-
 
     # ------termination conditions------
     game_elements['game_count'] = 1
     game_elements['start_time'] = time.time()
     game_elements['max_game_limitation'] = customized_arg_dict.get("max_game_limitation", np.inf)
     game_elements['max_time_limitation'] = customized_arg_dict.get("max_time_limitation", np.inf)
-
-
 
     _initialize_cards(game_elements)
     logger.debug('Successfully instantiated and initialized cards.')
@@ -76,19 +69,16 @@ def initialize_game_element(player_decision_agents, customized_arg_dict, random_
     game_elements['total_number_of_players'] = len(game_elements['players_dict'])
     game_elements['active_player'] = game_elements['total_number_of_players']
     
-
     _initialize_board(game_elements)
     logger.debug('Successfully instantiated and initialized board.')
 
     _initialize_game_history_structs(game_elements)
     logger.debug('Successfully instantiated game history data structures.')
 
-
     _initialize_rules(game_elements)
     logger.debug('Successfully instantiated and initialized rules.')
 
     dealer.print_player_info(game_elements)
-
 
     # define hand rank order
     game_elements['hand_rank_type'] = {
@@ -125,11 +115,6 @@ def initialize_game_element(player_decision_agents, customized_arg_dict, random_
 
     # extra actions
     game_elements['extra_action'] = {}
-
-
-
-
-
 
     return game_elements
 
@@ -181,16 +166,10 @@ def _initialize_players(game_elements, player_decision_agents):
 
 def _initialize_cards(game_elements):
     """Initialization card into game_elements object
-     
-
     Args:
         None
-
     Returns:
-        
-
     Raises:
-      
     """
     nums = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']
     suits = ['club',  'diamond', 'heart', 'spade']
