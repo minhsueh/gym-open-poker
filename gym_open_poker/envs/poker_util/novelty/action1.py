@@ -5,7 +5,7 @@ import sys
 # import gym_open_poker
 from player import Player
 from action import Action
-from action_choices import *
+from gym_open_poker.envs.poker_util.action_choices import *
 from phase import Phase
 # import gym_open_poker.envs.poker_util.phase.Phase
 import collections

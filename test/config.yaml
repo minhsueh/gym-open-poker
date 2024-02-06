@@ -30,7 +30,7 @@ novelty_list:
 #  - CardDistLow
 #  - CardDistHigh
 #  - Card1
-#  - Action1
+  - Action1
 #  - RANDOM
 #  - Environment1
 #  - Environment2
@@ -44,4 +44,4 @@ novelty_list:
 #  - Event2
 #  - Card2
 #  - Rule4
-  - Card3
+#  - Card3
