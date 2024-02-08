@@ -1,6 +1,7 @@
 import copy
 import collections
 from card_utility_actions import *
+from dealer import compare_two_hands
 
 
 def format_float_precision(val, significant_digit = 5):
@@ -71,10 +72,11 @@ def get_out_probability(current_gameboard, total_hand, desired_hand = None):
     hand_rank_type = current_gameboard['hand_rank_type']
 
     # calculate current best hand
-    current_rank_type, _ = get_best_hand(current_gameboard, total_hand)
+    current_rank_type, current_best_hand = get_best_hand(current_gameboard, total_hand)
+    want_type = current_rank_type
 
     if desired_hand and hand_rank_type[desired_hand] > hand_rank_type[current_rank_type]:
-        current_rank_type = desired_hand
+        want_type = desired_hand
 
 
     # get out_probability
@@ -90,8 +92,16 @@ def get_out_probability(current_gameboard, total_hand, desired_hand = None):
             next_total_hand = total_hand + [out_card]
             found_better = False
             for check_function, get_function, hand_name in hand_rank_funcs:
-                if hand_name == current_rank_type:
+                if hand_rank_type[hand_name] < hand_rank_type[want_type]:
                     break
+
+                if hand_name == current_rank_type:
+                    next_rank_type, next_best_hand = get_best_hand(current_gameboard, next_total_hand)
+                    
+                    if compare_two_hands(current_gameboard, current_best_hand, next_best_hand) == -1:
+                        found_better = True
+                    break
+                    
                 if check_function(next_total_hand):
                     found_better = True
                     break

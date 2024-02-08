@@ -87,8 +87,9 @@ def is_high_card(total_hand):
         True
 
     """
-    
-    return True
+    if len(total_hand) > 0:
+        return True
+    return False
 
 def is_one_pair(total_hand):
 

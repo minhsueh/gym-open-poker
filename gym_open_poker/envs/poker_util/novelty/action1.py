@@ -7,6 +7,7 @@ from player import Player
 from action import Action
 from gym_open_poker.envs.poker_util.action_choices import call, all_in, fold, raise_bet, bet, check
 from phase import Phase
+from flag_config import flag_config_dict
 # import gym_open_poker.envs.poker_util.phase.Phase
 import collections
 import logging

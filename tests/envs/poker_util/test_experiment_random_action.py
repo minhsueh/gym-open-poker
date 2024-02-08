@@ -1,15 +1,7 @@
 import gym
-import gym_open_poker
+# import gym_open_poker
 import numpy as np
-
-
-#from open_poker.envs.poker_util.agents import agent_p, dump_agent
-
-#from open_poker.wrappers import CardDistHigh, CardDistLow
-
 import yaml
-
-
 
 # load config parameters
 config_path = './config.yaml'
@@ -28,7 +20,9 @@ print(observation)
 print('---info---')
 print(info)
 
-while(True):
+count_step = 0
+
+while (True):
     print('============================')
     print('Enter your action:')
     # user_action = input()
@@ -39,7 +33,7 @@ while(True):
     if int(user_action) not in range(6):
         print('It is not a valid action, current value = ' + user_action)
         continue
-    #print('----------------')
+    # print('----------------')
     observation, reward, terminated, truncated, info = env.step(int(user_action))
     print('---observation---')
     print(observation)
@@ -56,7 +50,7 @@ while(True):
         else:
             print('LOST!')
         break
-
-
-
-# env.close()
+    count_step += 1
+    if count_step == 10:
+        break
+env.close()
