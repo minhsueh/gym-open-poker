@@ -2,6 +2,8 @@ import gym
 import gym_open_poker
 import numpy as np
 import yaml
+import os
+os.environ["SDL_VIDEODRIVER"] = "dummy"  # This is for github actions
 
 env = gym.make("gym_open_poker/OpenPoker-v0")
 # env = CardDistLow(gym.make("open_poker/OpenPoker-v0", **config_dict))
