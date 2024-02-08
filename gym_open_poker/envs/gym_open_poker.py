@@ -17,6 +17,7 @@ import time
 
 
 import gym_open_poker.envs.poker_util as poker_util
+from gym_open_poker.default import default_config_dict
 import sys, os
 sys.path.append(os.path.dirname(poker_util .__file__)) 
 
@@ -146,6 +147,11 @@ class OpenPokerEnv(gym.Env):
         global logger
         # remove existed logger
         remove_previous_logger()
+
+        # default config
+        if not customized_arg_dict:
+            customized_arg_dict = default_config_dict
+
 
         # add new logger
         log_file_path = customized_arg_dict.get("log_file_path", 'test.log')

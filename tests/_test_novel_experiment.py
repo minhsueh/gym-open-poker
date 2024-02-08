@@ -3,8 +3,10 @@ import gym_open_poker
 import yaml
 import os
 from gym_open_poker.envs.poker_util.novelty_generator import NoveltyGenerator
+from typing import Dict, List
 
 # load config parameters
+"""
 config_path = './config.yaml'
 if os.path.exists(config_path):
     with open(config_path, "r") as stream:
@@ -14,9 +16,12 @@ if os.path.exists(config_path):
             print(exc)
 else:
     config_dict = dict()
+"""
+config_dict: Dict[str, List] = dict()
 
 # original environment
-env = gym.make("gym_open_poker/OpenPoker-v0", **config_dict)
+# env = gym.make("gym_open_poker/OpenPoker-v0", **config_dict)
+env = gym.make("gym_open_poker/OpenPoker-v0")
 
 # novelty injection
 ng = NoveltyGenerator()
@@ -24,7 +29,7 @@ ng = NoveltyGenerator()
 # print out supported novelies
 # print(ng.get_support_novelties())
 # injecting
-if config_dict['novelty_list'] and len(config_dict['novelty_list']) > 0:
+if 'novelty_list' in config_dict and len(config_dict['novelty_list']) > 0:
     env = ng.inject(env, config_dict['novelty_list'])
 
 # start gaming

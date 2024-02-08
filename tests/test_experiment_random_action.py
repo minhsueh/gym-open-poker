@@ -2,18 +2,8 @@ import gym
 import gym_open_poker
 import numpy as np
 import yaml
-import sys
-sys.path.insert(0, '.')  # this is for the github action
 
-# load config parameters
-config_path = './config.yaml'
-with open(config_path, "r") as stream:
-    try:
-        config_dict = yaml.safe_load(stream)
-    except yaml.YAMLError as exc:
-        print(exc)
-
-env = gym.make("gym_open_poker/OpenPoker-v0", **config_dict)
+env = gym.make("gym_open_poker/OpenPoker-v0")
 # env = CardDistLow(gym.make("open_poker/OpenPoker-v0", **config_dict))
 observation, info = env.reset(seed=42)
 print('============================')
