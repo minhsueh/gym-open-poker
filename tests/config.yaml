@@ -1,7 +1,7 @@
 # --------log file path--------
-log_file_path: './test.log'
+log_file_path: "./test.log"
 # --------visualization parameters--------
-render_mode: 'human'  # None or human
+render_mode: "human" # None or human
 show_all_move_mode: False
 visualize_debug_mode: True
 # window_width: 1200
@@ -10,11 +10,11 @@ sleep_time: 1
 # --------background agents--------
 background_agents_raw_list:
   - agent_type: "agent_p"
-    number_of_agent: 1
+    number_of_agent: 2
   - agent_type: "agent_dump"
     number_of_agent: 2
   - agent_type: "agent_random"
-    number_of_agent: 1
+    number_of_agent: 2
 # --------general pokers rules--------
 # max_raise_count: 3
 # small_blind: 5
@@ -27,19 +27,19 @@ background_agents_raw_list:
 # max_time_limitation: 999
 # --------novvelty list--------
 novelty_list:
-#  - CardDistLow
-#  - CardDistHigh
-#  - Card1
-  - Action1
-#  - RANDOM
-#  - Environment1
-#  - Environment2
-#  - Agent1
-#  - Agent2
-#  - Agent3
-#  - Event1
-#  - Rule1
-#  - Rule2
+  #  - CardDistLow
+  #  - CardDistHigh
+  #  - Card1
+  #  - Action1
+  #  - RANDOM
+  #  - Environment1
+  #  - Environment2
+  #  - Agent1
+  #  - Agent2
+  #  - Agent3
+  #  - Event1
+  #  - Rule1
+  - Rule2
 #  - Rule3
 #  - Event2
 #  - Card2

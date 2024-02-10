@@ -1,15 +1,26 @@
 from flag_config import flag_config_dict
 
+import logging
+
+logger = logging.getLogger("gym_open_poker.envs.poker_util.logging_info.agent")
+
 
 class Agent:
-    def __init__(self, make_pre_flop_moves, make_flop_moves, make_turn_moves, make_river_moves, strategy_type=None):
+    def __init__(
+        self,
+        make_pre_flop_moves,
+        make_flop_moves,
+        make_turn_moves,
+        make_river_moves,
+        strategy_type=None,
+    ):
         self.make_pre_flop_moves = make_pre_flop_moves
         self.make_flop_moves = make_flop_moves
         self.make_turn_moves = make_turn_moves
         self.make_river_moves = make_river_moves
         self.is_running = False
         self.strategy_type = strategy_type
-        #self._agent_memory = dict()
+        # self._agent_memory = dict()
 
     def startup(self):
         """
@@ -17,22 +28,21 @@ class Agent:
         :return: return successful_action code if all functions are properly set up; otherwise, return failure_code
         """
         if not self.make_pre_flop_moves:
-            logger.debug(f'Agent did not initialized properly. Return failure_code.')
-            return flag_config_dict['failure_code']
+            logger.debug("Agent did not initialized properly. Return failure_code.")
+            return flag_config_dict["failure_code"]
         if not self.make_flop_moves:
-            logger.debug(f'Agent did not initialized properly. Return failure_code.')
-            return flag_config_dict['failure_code']
+            logger.debug("Agent did not initialized properly. Return failure_code.")
+            return flag_config_dict["failure_code"]
         if not self.make_turn_moves:
-            logger.debug(f'Agent did not initialized properly. Return failure_code.')
-            return flag_config_dict['failure_code']
+            logger.debug("Agent did not initialized properly. Return failure_code.")
+            return flag_config_dict["failure_code"]
         if not self.make_river_moves:
-            logger.debug(f'Agent did not initialized properly. Return failure_code.')
-            return flag_config_dict['failure_code']
-        
+            logger.debug("Agent did not initialized properly. Return failure_code.")
+            return flag_config_dict["failure_code"]
 
         # now, all functions are set up properly
         self.is_running = True
-        return flag_config_dict['successful_action']
+        return flag_config_dict["successful_action"]
 
     def shutdown(self):
         """
@@ -43,6 +53,8 @@ class Agent:
         if self.is_running:
             self.is_running = False
         else:
-            logger.debug('Trying to shutdown an agent has been shutdown before. Return failure code.')
-            return flag_config_dict['failure_code']
-        return flag_config_dict['successful_action']
+            logger.debug(
+                "Trying to shutdown an agent has been shutdown before. Return failure code."
+            )
+            return flag_config_dict["failure_code"]
+        return flag_config_dict["successful_action"]

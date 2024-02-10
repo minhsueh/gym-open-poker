@@ -1,38 +1,61 @@
 import gym
 import numpy as np
 import sys
-import copy
-
-import collections
 import logging
 import time
 
 import dealer
-from initialize_game_elements import (_initialize_cards, _initialize_players, _initialize_board,
-                                        _initialize_game_history_structs, _initialize_rules)
+from initialize_game_elements import (
+    _initialize_cards,
+    _initialize_players,
+    _initialize_board,
+    _initialize_game_history_structs,
+    _initialize_rules,
+)
 
-from card_utility_actions import (is_royal_flush, is_straight, is_one_pair, is_two_pair, is_flush, is_full_house,
-                                  is_straight_flush, is_three_of_a_kind, is_four_of_a_kind, is_high_card)
-from card_utility_actions import (get_royal_flush, get_straight, get_flush, get_two_pair, get_one_pair, get_full_house,
-                                  get_high_card, get_straight_flush, get_four_of_a_kind, get_three_of_a_kind)
+from card_utility_actions import (
+    is_royal_flush,
+    is_straight,
+    is_one_pair,
+    is_two_pair,
+    is_flush,
+    is_full_house,
+    is_straight_flush,
+    is_three_of_a_kind,
+    is_four_of_a_kind,
+    is_high_card,
+)
+from card_utility_actions import (
+    get_royal_flush,
+    get_straight,
+    get_flush,
+    get_two_pair,
+    get_one_pair,
+    get_full_house,
+    get_high_card,
+    get_straight_flush,
+    get_four_of_a_kind,
+    get_three_of_a_kind,
+)
 
 from card_utility_actions import get_number_rank
 
 
-logger = logging.getLogger('gym_open_poker.envs.poker_util.logging_info.novelty.rule4')
+logger = logging.getLogger("gym_open_poker.envs.poker_util.logging_info.novelty.rule4")
 
 
 class Rule4(gym.Wrapper):
     """
-    In this novelty, Rule4, introduces a new hand called "all_odd." 
+    In this novelty, Rule4, introduces a new hand called "all_odd."
     This hand, denoted as the highest combination across all hand types
     """
+
     def __init__(self, env):
 
-
         super().__init__(env)
-        sys.modules['initialize_game_elements'].initialize_game_element = getattr(sys.modules[__name__], '_alter_initialize_game_element')
-
+        sys.modules["initialize_game_elements"].initialize_game_element = getattr(
+            sys.modules[__name__], "_alter_initialize_game_element"
+        )
 
 
 def _alter_initialize_game_element(player_decision_agents, customized_arg_dict, random_seed):
@@ -46,114 +69,104 @@ def _alter_initialize_game_element(player_decision_agents, customized_arg_dict, 
         game_element variable which contains all elements to use during the game
 
     Raises:
-      
+
     """
     np.random.seed(random_seed)
     game_elements = dict()
 
+    game_elements["small_blind_amount"] = customized_arg_dict.get(
+        "small_blind", 5
+    )  # this could increase as number of games increase
+    game_elements["big_small_blind_ratio"] = customized_arg_dict.get(
+        "big_small_blind_ratio", 2
+    )  # if small_blind_amount is 1, big blind pay 1 * 2
+    game_elements["big_blind_amount"] = game_elements["small_blind_amount"] * game_elements["big_small_blind_ratio"]
+    game_elements["small_bet"] = game_elements["big_blind_amount"]  # in pre-flop and flop
+    game_elements["big_small_bet_ratio"] = 2
+    game_elements["big_bet"] = game_elements["big_blind_amount"] * game_elements["big_small_bet_ratio"]  # in turn and river
+    game_elements["max_raise_count"] = customized_arg_dict.get("max_raise_count", 3)
 
-    game_elements['small_blind_amount'] = customized_arg_dict.get('small_blind', 5)  # this could increase as number of games increase
-    game_elements['big_small_blind_ratio'] = customized_arg_dict.get('big_small_blind_ratio', 2)  # if small_blind_amount is 1, big blind pay 1 * 2
-    game_elements['big_blind_amount'] = game_elements['small_blind_amount'] * game_elements['big_small_blind_ratio']
-    game_elements['small_bet'] = game_elements['big_blind_amount'] # in pre-flop and flop
-    game_elements['big_small_bet_ratio'] = 2
-    game_elements['big_bet'] = game_elements['big_blind_amount'] * game_elements['big_small_bet_ratio'] # in turn and river
-    game_elements['max_raise_count'] = customized_arg_dict.get('max_raise_count', 3)
+    game_elements["buy_in_amount"] = customized_arg_dict.get("buy_in", 200)
 
-    game_elements['buy_in_amount'] = customized_arg_dict.get("buy_in", 200)
-
-    game_elements['early_stop'] = False
-    
-
+    game_elements["early_stop"] = False
 
     # ------termination conditions------
-    game_elements['game_count'] = 1
-    game_elements['start_time'] = time.time()
-    game_elements['max_game_limitation'] = customized_arg_dict.get("max_game_limitation", np.inf)
-    game_elements['max_time_limitation'] = customized_arg_dict.get("max_time_limitation", np.inf)
-
-
+    game_elements["game_count"] = 1
+    game_elements["start_time"] = time.time()
+    game_elements["max_game_limitation"] = customized_arg_dict.get("max_game_limitation", np.inf)
+    game_elements["max_time_limitation"] = customized_arg_dict.get("max_time_limitation", np.inf)
 
     _initialize_cards(game_elements)
-    logger.debug('Successfully instantiated and initialized cards.')
+    logger.debug("Successfully instantiated and initialized cards.")
 
     # initialized chips when initialized players
     _initialize_players(game_elements, player_decision_agents)
-    logger.debug('Successfully instantiated and initialized players.')
-    np.random.shuffle(game_elements['players'])
+    logger.debug("Successfully instantiated and initialized players.")
+    np.random.shuffle(game_elements["players"])
     player_seq = ""
-    for idx, player in enumerate(game_elements['players']):
+    for idx, player in enumerate(game_elements["players"]):
         player.position = idx
-        player_seq += player.player_name + ' -> '
+        player_seq += player.player_name + " -> "
     logger.debug(player_seq[:-4])
-    game_elements['players_dict'] = {player.player_name:player for player in game_elements['players']}
-    game_elements['total_number_of_players'] = len(game_elements['players_dict'])
-    game_elements['active_player'] = game_elements['total_number_of_players']
-    
+    game_elements["players_dict"] = {player.player_name: player for player in game_elements["players"]}
+    game_elements["total_number_of_players"] = len(game_elements["players_dict"])
+    game_elements["active_player"] = game_elements["total_number_of_players"]
 
     _initialize_board(game_elements)
-    logger.debug('Successfully instantiated and initialized board.')
+    logger.debug("Successfully instantiated and initialized board.")
 
     _initialize_game_history_structs(game_elements)
-    logger.debug('Successfully instantiated game history data structures.')
-
+    logger.debug("Successfully instantiated game history data structures.")
 
     _initialize_rules(game_elements)
-    logger.debug('Successfully instantiated and initialized rules.')
+    logger.debug("Successfully instantiated and initialized rules.")
 
     dealer.print_player_info(game_elements)
 
-
     # define hand rank order
-    game_elements['hand_rank_type'] = {
-        'all_odd': 11, # novelty
-        'royal_flush': 10,
-        'straight_flush': 9,
-        'four_of_a_kind': 8,
-        'full_house': 7,
-        'flush': 6,
-        'straight': 5,
-        'three_of_a_kind': 4,
-        'two_pairs': 3,
-        'one_pair': 2,
-        'high_card': 1
+    game_elements["hand_rank_type"] = {
+        "all_odd": 11,  # novelty
+        "royal_flush": 10,
+        "straight_flush": 9,
+        "four_of_a_kind": 8,
+        "full_house": 7,
+        "flush": 6,
+        "straight": 5,
+        "three_of_a_kind": 4,
+        "two_pairs": 3,
+        "one_pair": 2,
+        "high_card": 1,
     }
-    game_elements['hand_type_list'] = sorted(game_elements['hand_rank_type'].keys(), key=lambda x: game_elements['hand_rank_type'][x], reverse = True)
+    game_elements["hand_type_list"] = sorted(
+        game_elements["hand_rank_type"].keys(), key=lambda x: game_elements["hand_rank_type"][x], reverse=True
+    )
 
     # define hand rank functions
-    game_elements['hand_rank_funcs'] = [
-        (is_all_odd, get_all_odd, 'all_odd'), # novelty
-        (is_royal_flush, get_royal_flush, 'royal_flush'),
-        (is_straight_flush, get_straight_flush, 'straight_flush'),
-        (is_four_of_a_kind, get_four_of_a_kind, 'four_of_a_kind'),
-        (is_full_house, get_full_house, 'full_house'),
-        (is_flush, get_flush, 'flush'),
-        (is_straight, get_straight, 'straight'),
-        (is_three_of_a_kind, get_three_of_a_kind, 'three_of_a_kind'),
-        (is_two_pair, get_two_pair, 'two_pairs'),
-        (is_one_pair, get_one_pair, 'one_pair'),
-        (is_high_card, get_high_card, 'high_card')
+    game_elements["hand_rank_funcs"] = [
+        (is_all_odd, get_all_odd, "all_odd"),  # novelty
+        (is_royal_flush, get_royal_flush, "royal_flush"),
+        (is_straight_flush, get_straight_flush, "straight_flush"),
+        (is_four_of_a_kind, get_four_of_a_kind, "four_of_a_kind"),
+        (is_full_house, get_full_house, "full_house"),
+        (is_flush, get_flush, "flush"),
+        (is_straight, get_straight, "straight"),
+        (is_three_of_a_kind, get_three_of_a_kind, "three_of_a_kind"),
+        (is_two_pair, get_two_pair, "two_pairs"),
+        (is_one_pair, get_one_pair, "one_pair"),
+        (is_high_card, get_high_card, "high_card"),
     ]
 
     # define numbers rank order, initially the number is itself
-    game_elements['numbers_rank_type'] = {i: i for i in range(2, 14)}
-    game_elements['numbers_rank_type'][1] = 14
+    game_elements["numbers_rank_type"] = {i: i for i in range(2, 14)}
+    game_elements["numbers_rank_type"][1] = 14
 
     # extra actions
-    game_elements['extra_action'] = {}
-
-
-
-
-
+    game_elements["extra_action"] = {}
 
     return game_elements
 
 
-
 def is_all_odd(total_hand):
-
-    suits = [card.get_suit() for card in total_hand]
     values = [card.get_number() for card in total_hand]
     count = 0
     for num in values:
@@ -161,9 +174,9 @@ def is_all_odd(total_hand):
             count += 1
 
     if count >= 5:
-        return(True)
+        return True
     else:
-        return(False)
+        return False
 
 
 def get_all_odd(total_hand):
@@ -177,7 +190,6 @@ def get_all_odd(total_hand):
         (list): five cards with value in descending order
 
     """
-    suits = [card.get_suit() for card in total_hand]
     values = [card.get_number() for card in total_hand]
 
     number_rank = get_number_rank()

@@ -1,21 +1,16 @@
 import gym
-import numpy as np
 import sys
-
-import collections
 import logging
-
 from agent import Agent
-from agents import agent_p, agent_dump, agent_random
 
-logger = logging.getLogger('gym_open_poker.envs.poker_util.logging_info.novelty.agent1')
+logger = logging.getLogger("gym_open_poker.envs.poker_util.logging_info.novelty.agent1")
 
 
 class Agent1(gym.Wrapper):
     """
-    This novelty, named Agent1, introduces a modification to one of the player's strategies. 
-    It is important to note that this novelty remains inactive and has no impact 
-    if agents agent_p, agent_random, and agent_dump are not utilized in the tournament. 
+    This novelty, named Agent1, introduces a modification to one of the player's strategies.
+    It is important to note that this novelty remains inactive and has no impact
+    if agents agent_p, agent_random, and agent_dump are not utilized in the tournament.
     In such cases, a warning message will be recorded in the log.
 
     The rules associated with this novelty are as follows:
@@ -23,13 +18,14 @@ class Agent1(gym.Wrapper):
         2. agent_random -> agent_p
         3. agent_dump -> agent_p
     """
+
     def __init__(self, env):
 
         super().__init__(env)
 
         found_substutued_agent = False
         for player_name in env.player_decision_agents:
-            if player_name != 'player_1':
+            if player_name != "player_1":
                 original_stratedy = env.player_decision_agents[player_name].strategy_type
                 if original_stratedy == "agent_p":
                     replacing_strategy = "agent_dump"
@@ -53,4 +49,3 @@ class Agent1(gym.Wrapper):
                     break
         if not found_substutued_agent:
             logger.warn("Cannot find agent_p, agent_random, and agent_dump in the tournament. This novelty has no impact!")
-
