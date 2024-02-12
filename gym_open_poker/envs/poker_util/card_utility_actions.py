@@ -2,9 +2,7 @@ from phase import Phase
 import collections
 import logging
 
-logger = logging.getLogger(
-    "gym_open_poker.envs.poker_util.logging_info.card_utility_actions"
-)
+logger = logging.getLogger("gym_open_poker.envs.poker_util.logging_info.card_utility_actions")
 
 
 def get_number_rank():
@@ -182,29 +180,28 @@ def is_four_of_a_kind(total_hand):
 
 def is_straight_flush(total_hand):
     suits = [card.get_suit() for card in total_hand]
-    values = [card.get_number() for card in total_hand]
+    # values = [card.get_number() for card in total_hand]
 
-    cards = zip(values, suits)
     hand = []
     if suits.count("club") >= 5:
-        for num, suit in cards:
-            if suit == "club":
-                hand.append(num)
+        for card in total_hand:
+            if card.suit == "club":
+                hand.append(card)
     elif suits.count("diamond") >= 5:
-        for num, suit in cards:
-            if suit == "diamond":
-                hand.append(num)
+        for card in total_hand:
+            if card.suit == "diamond":
+                hand.append(card)
     elif suits.count("heart") >= 5:
-        for num, suit in cards:
-            if suit == "heart":
-                hand.append(num)
+        for card in total_hand:
+            if card.suit == "heart":
+                hand.append(card)
     elif suits.count("spade") >= 5:
-        for num, suit in cards:
-            if suit == "spade":
-                hand.append(num)
+        for card in total_hand:
+            if card.suit == "spade":
+                hand.append(card)
     else:
         return False
-    return is_straight(total_hand)
+    return is_straight(hand)
 
 
 def is_royal_flush(total_hand):
