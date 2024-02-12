@@ -10,7 +10,7 @@ import unittest
 
 class TestCardDisHigh(unittest.TestCase):
     def test_CardDisHigh(self):
-        config_path = "./config_CardDisHigh.yaml"
+        config_path = "./config/config_CardDisHigh.yaml"
 
         with open(config_path, "r") as stream:
             try:
