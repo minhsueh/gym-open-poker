@@ -1,5 +1,5 @@
 # import numpy as np
-from gym_open_poker.envs.poker_util.action_choices import (
+from action_choices import (
     call,
     all_in,
     fold,
@@ -8,10 +8,10 @@ from gym_open_poker.envs.poker_util.action_choices import (
     check,
 )
 
-from gym_open_poker.envs.poker_util.card_utility_actions import get_best_hand
+from card_utility_actions import get_best_hand
 
 # from itertools import combinations
-from gym_open_poker.envs.poker_util.agent_helper_function import (
+from agent_helper_function import (
     format_float_precision,
     get_out_probability,
 )
