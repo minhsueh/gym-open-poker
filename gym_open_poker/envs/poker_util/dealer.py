@@ -986,8 +986,9 @@ def log_best_card(current_gameboard):
             total_hand_string += str(card_num)
             total_hand_string += ", "
         total_hand_string = total_hand_string[:-2]
-        if move not in [Action.FOLD, Action.LOST]:
-
+        if move == Action.LOST:
+            continue
+        elif move != Action.FOLD:
             rank_type2, hand2 = get_best_hand(current_gameboard, total_hand)
             best_hand_string = ""
             for best_num in hand2:
@@ -1005,7 +1006,7 @@ def log_best_card(current_gameboard):
             )
 
         else:
-            logger.debug(player.player_name + "is inactive, but has total hands = (" + total_hand_string + ")")
+            logger.debug(player.player_name + " is inactive, but has total hands = (" + total_hand_string + ")")
 
 
 def get_rank_dict(current_gameboard):
