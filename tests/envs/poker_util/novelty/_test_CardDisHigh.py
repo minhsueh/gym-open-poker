@@ -26,7 +26,6 @@ class TestCardDisHigh(unittest.TestCase):
 
         # novelty injection
         ng = NoveltyGenerator()
-        print(ng.get_support_novelties())
 
         # print out supported novelies
         # print(ng.get_support_novelties())

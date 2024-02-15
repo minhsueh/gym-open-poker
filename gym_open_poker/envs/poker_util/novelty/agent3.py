@@ -2,6 +2,7 @@ import gym
 import sys
 import logging
 from agent import Agent
+from agents import agent_dump, agent_random, agent_p
 
 logger = logging.getLogger("gym_open_poker.envs.poker_util.logging_info.novelty.agent3")
 

@@ -27,21 +27,21 @@ background_agents_raw_list:
 # max_time_limitation: 999
 # --------novvelty list--------
 novelty_list:
-  #  - CardDistLow
-  - CardDistHigh
-    #  - Card1
-    # - Action1
-    #  - RANDOM
-    #  - Environment1
-    #  - Environment2
-    #  - Agent1
-    #  - Agent2
-    #  - Agent3
-    #  - Event1
-    #  - Rule1
-    # Rule2
-    #  - Rule3
-    #  - Event2
-    #  - Card2
-    #  - Rule4
-    #  - Card3
+  # - CardDistLow
+  # - CardDistHigh
+  # - Card1
+  # - Action1
+  # - RANDOM
+  # - Environment1
+  # - Environment2
+  # - Agent1
+  # - Agent2
+  # - Agent3
+  # - Event1
+  # - Rule1
+  # - Rule2
+  # - Rule3
+  # - Event2
+  # - Card2
+  - Rule4
+  #  - Card3
