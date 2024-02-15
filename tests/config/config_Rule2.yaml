@@ -1,5 +1,5 @@
 # --------log file path--------
-log_file_path: "./test.log"
+log_file_path: "./tests/testing_log/test_Rule2.log"
 # --------visualization parameters--------
 render_mode: "human" # None or human
 show_all_move_mode: False
@@ -10,11 +10,11 @@ sleep_time: 1
 # --------background agents--------
 background_agents_raw_list:
   - agent_type: "agent_p"
-    number_of_agent: 2
+    number_of_agent: 0
   - agent_type: "agent_dump"
-    number_of_agent: 2
+    number_of_agent: 0
   - agent_type: "agent_random"
-    number_of_agent: 2
+    number_of_agent: 4
 # --------general pokers rules--------
 # max_raise_count: 3
 # small_blind: 5
@@ -23,7 +23,7 @@ background_agents_raw_list:
 # buy_in_amount: 200
 # bankroll_limit: 1500
 # --------termination conditions--------
-# max_game_limitation: 1
+max_game_limitation: 30
 # max_time_limitation: 999
 # --------novvelty list--------
 novelty_list:

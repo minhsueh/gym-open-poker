@@ -1,5 +1,5 @@
 # --------log file path--------
-log_file_path: "./tests/testing_log/test_Agent2.log"
+log_file_path: "./tests/testing_log/test_Event2.log"
 # --------visualization parameters--------
 render_mode: "human" # None or human
 show_all_move_mode: False
@@ -35,13 +35,13 @@ novelty_list:
   # - Environment1
   # - Environment2
   # - Agent1
-  - Agent2
-  #  - Agent3
-  #  - Event1
-  #  - Rule1
-  #  - Rule2
-  #  - Rule3
-  #  - Event2
+  # - Agent2
+  # - Agent3
+  # - Event1
+  # - Rule1
+  # - Rule2
+  # - Rule3
+  - Event2
   #  - Card2
   #  - Rule4
-  #  - Card3
+  - Card3

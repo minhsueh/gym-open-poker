@@ -76,7 +76,10 @@ def _alter_force_small_big_blind_bet(current_gameboard):
                             player.force_bet_big_blind(current_gameboard)
                             logger.debug(f"{player.player_name} currently has ${player.current_cash}.")
                             # novelty
-                            if current_gameboard["board"].players_last_move_list[idx] != Action.ALL_IN:
+                            if (
+                                current_gameboard["board"].players_last_move_list[idx % total_number_of_players]
+                                != Action.ALL_IN
+                            ):
                                 logger.debug(
                                     "Novelty event2: providing additional money to the player in the big blind position."
                                 )
@@ -119,7 +122,10 @@ def _alter_force_small_big_blind_bet(current_gameboard):
                             logger.debug(f"{player.player_name} currently has ${player.current_cash}.")
                             current_gameboard["board"].current_bet_count = 1
                             # novelty
-                            if current_gameboard["board"].players_last_move_list[idx] != Action.ALL_IN:
+                            if (
+                                current_gameboard["board"].players_last_move_list[idx % total_number_of_players]
+                                != Action.ALL_IN
+                            ):
                                 logger.debug(
                                     "Novelty event2: providing additional money to the player in the big blind position."
                                 )

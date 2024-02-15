@@ -9,36 +9,19 @@ import unittest
 import pytest
 
 testing_arg = [
-    ("CardDistHigh", 15),
-    ("CardDistLow", 15),
-    ("Card1", 15),
-    ("Action1", 15),
-    ("RANDOM", 15),
-    ("Environment1", 15),
-    ("Environment2", 15),
-    ("Environment1", 15),
-    ("Agent1", 15),
-    ("Agent2", 15),
-    ("Agent3", 15),
-    ("Event1", 15),
-    ("Rule2", 15),
-    ("Rule3", 15),
-    ("Event2", 15),
-    ("Card2", 15),
-    ("Rule4", 15),
-    ("Card3", 15),
+    "Agent3",
 ]
 
 
-@pytest.mark.parametrize("novelty_name,assert_action_val", testing_arg)
-def test_novelty(novelty_name, assert_action_val):
+@pytest.mark.parametrize("novelty_name", testing_arg)
+def test_novelty(novelty_name):
     with open(f"./tests/config/config_{novelty_name}.yaml", "r") as stream:
         try:
             config_dict = yaml.safe_load(stream)
         except yaml.YAMLError as exc:
             print(exc)
 
-    # config_dict: Dict[str, List] = dict()
+    log_file_path = config_dict["log_file_path"]
 
     # original environment
     env = gym.make("gym_open_poker/OpenPoker-v0", **config_dict)
@@ -55,8 +38,6 @@ def test_novelty(novelty_name, assert_action_val):
 
     # start gaming
     observation, info = env.reset(seed=65)
-
-    count_perform_action = 0
 
     while True:
         print("============================")
@@ -83,9 +64,6 @@ def test_novelty(novelty_name, assert_action_val):
                 else:
                     print("LOST!")
             break
-
-        count_perform_action += 1
-        if count_perform_action == assert_action_val:
-            break
     env.close()
-    assert count_perform_action == assert_action_val
+    assert terminated or truncated
+    assert os.path.isfile(log_file_path)
