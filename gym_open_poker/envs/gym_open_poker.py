@@ -173,6 +173,7 @@ class OpenPokerEnv(gym.Env):
         for player_idx, player in enumerate(self.background_agents_list):
             self.player_decision_agents["player_" + str(player_idx + 2)] = Agent(**player.decision_agent_methods)
         logger.debug("Player_1 is assign as code user.")
+        self._pre_game_last_observation = []  # when the game end, there is no
 
         # ------general poker rules------
         self.buy_in = customized_arg_dict.get("buy_in", 200)
@@ -431,31 +432,11 @@ class OpenPokerEnv(gym.Env):
 
         if not stopped:
             # action_masks
-            player_1 = self.game_elements["players_dict"]["player_1"]
-            if player_1.status == "lost":
-                raise
-
-            if self.game_elements["board"].cur_phase == Phase.PRE_FLOP:
-                allowable_actions = player_1.compute_allowable_pre_flop_actions(self.game_elements)
-            elif self.game_elements["board"].cur_phase == Phase.FLOP:
-                allowable_actions = player_1.compute_allowable_flop_actions(self.game_elements)
-            elif self.game_elements["board"].cur_phase == Phase.TURN:
-                allowable_actions = player_1.compute_allowable_turn_actions(self.game_elements)
-            elif self.game_elements["board"].cur_phase == Phase.RIVER:
-                allowable_actions = player_1.compute_allowable_river_actions(self.game_elements)
-            else:
-                raise
-
-            allowable_string = [action.__name__ for action in allowable_actions]
-            action_masks = []
-            for action in ["call", "bet", "raise_bet", "check", "fold", "all_in"]:
-                if action in allowable_string:
-                    action_masks.append(1)
-                else:
-                    action_masks.append(0)
+            action_masks = self._get_action_mask()
 
         # showdown
         showdown = []
+        pre_game_last_observation = []
         if self.game_elements["board"].previous_showdown:
             for hands in self.game_elements["board"].previous_showdown:
                 tem_hand = []
@@ -465,14 +446,44 @@ class OpenPokerEnv(gym.Env):
                     else:
                         tem_hand.append(-1)
                 showdown.append(tem_hand)
+            self.game_elements["board"].previous_showdown = None
+            pre_game_last_observation = self._pre_game_last_observation
+            self._pre_game_last_observation = []
 
         # return
         output_info_dict["player_name_list"] = player_name_list
         if not stopped:
             output_info_dict["action_masks"] = np.array(action_masks)
         output_info_dict["previous_showdown"] = showdown
+        output_info_dict["pre_game_last_observation"] = pre_game_last_observation
 
         return output_info_dict
+
+    def _get_action_mask(self):
+        # action_masks
+        player_1 = self.game_elements["players_dict"]["player_1"]
+        if player_1.status == "lost":
+            raise
+
+        if self.game_elements["board"].cur_phase == Phase.PRE_FLOP:
+            allowable_actions = player_1.compute_allowable_pre_flop_actions(self.game_elements)
+        elif self.game_elements["board"].cur_phase == Phase.FLOP:
+            allowable_actions = player_1.compute_allowable_flop_actions(self.game_elements)
+        elif self.game_elements["board"].cur_phase == Phase.TURN:
+            allowable_actions = player_1.compute_allowable_turn_actions(self.game_elements)
+        elif self.game_elements["board"].cur_phase == Phase.RIVER:
+            allowable_actions = player_1.compute_allowable_river_actions(self.game_elements)
+        else:
+            raise
+
+        allowable_string = [action.__name__ for action in allowable_actions]
+        action_masks = []
+        for action in ["call", "bet", "raise_bet", "check", "fold", "all_in"]:
+            if action in allowable_string:
+                action_masks.append(1)
+            else:
+                action_masks.append(0)
+        return action_masks
 
     def reset(self, seed=None, options=None):
         # We need the following line to seed self.np_random
@@ -588,6 +599,7 @@ class OpenPokerEnv(gym.Env):
                         dealer.log_best_card(self.game_elements)
                         dealer.log_ranking(self.game_elements)
                     terminated, truncated = dealer.conclude_game(self.game_elements)
+                    self._pre_game_last_observation = self._get_obs()
 
                     if terminated or truncated:
                         dealer.conclude_tournament(self.game_elements)
@@ -1123,7 +1135,7 @@ class OpenPokerEnv(gym.Env):
                 self.game_elements["players"][current_betting_idx].player_name == "player_1"
                 and self.game_elements["board"].players_last_move_list[current_betting_idx] != Action.FOLD
             ):
-                action_masks = self._get_info()["action_masks"].tolist()
+                action_masks = self._get_action_mask()
                 action_list = ["Call(0)", "Bet(1)", "Raise_bet(2)", "Check(3)", "Fold(4)", "ALL IN(5)"]
                 action_box_x_y = [(action_box_x, action_box_y + i * (action_box_height)) for i in range(len(action_list))]
 
