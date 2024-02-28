@@ -32,11 +32,7 @@ print(ng.get_support_novelties())
 # print out supported novelies
 # print(ng.get_support_novelties())
 # injecting
-if (
-    "novelty_list" in config_dict
-    and config_dict["novelty_list"]
-    and len(config_dict["novelty_list"]) > 0
-):
+if "novelty_list" in config_dict and config_dict["novelty_list"] and len(config_dict["novelty_list"]) > 0:
     env = ng.inject(env, config_dict["novelty_list"])
 
 # start gaming
@@ -52,9 +48,7 @@ while True:
     print("Enter your action:")
     user_action = input()
     while int(user_action) not in range(6):
-        print(
-            f"It is not a valid action, current value = {user_action}, please enter 0~5"
-        )
+        print(f"It is not a valid action, current value = {user_action}, please enter 0~5")
         user_action = input()
     # print('----------------')
     observation, reward, terminated, truncated, info = env.step(int(user_action))

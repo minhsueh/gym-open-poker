@@ -14,7 +14,7 @@ background_agents_raw_list:
   - agent_type: "agent_dump"
     number_of_agent: 0
   - agent_type: "agent_random"
-    number_of_agent: 4
+    number_of_agent: 2
   - agent_type: "agent_dqn_4"
     number_of_agent: 0
 # --------general pokers rules--------
@@ -22,7 +22,7 @@ background_agents_raw_list:
 # small_blind: 5
 # big_small_blind_ratio: 2 # big_blind = small_blind * big_small_blind_ratio
 # seed: 15
-# buy_in_amount: 200
+buy_in_amount: 50
 # bankroll_limit: 1500
 # --------termination conditions--------
 max_game_limitation: 30

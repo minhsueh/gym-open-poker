@@ -233,7 +233,7 @@ def conclude_tournament(current_gameboard, early_stop=False):
         cur_game_idx = current_gameboard["board"].game_idx
         # rank_list = get_player_rank_list(current_gameboard)
         rank_list = [-1] * len(current_gameboard["players"])  # By here, player_1 is lost, so there is no point for the ranking
-        current_gameboard["board"].history["rank"][cur_game_idx] = rank_list
+        current_gameboard["history"]["rank"][cur_game_idx] = rank_list
         #  player's cash and status
         player_cash_list = []
         player_status_list = []
@@ -241,8 +241,8 @@ def conclude_tournament(current_gameboard, early_stop=False):
             player = current_gameboard["players_dict"]["player_" + str(player_idx)]
             player_cash_list.append(player.current_cash)
             player_status_list.append(player.status)
-        current_gameboard["board"].history["cash"][cur_game_idx] = player_cash_list
-        current_gameboard["board"].history["player_status"][cur_game_idx] = player_status_list
+        current_gameboard["history"]["cash"][cur_game_idx] = player_cash_list
+        current_gameboard["history"]["player_status"][cur_game_idx] = player_status_list
 
     cash_dict = collections.defaultdict(list)
     for player in current_gameboard["players"]:
@@ -796,7 +796,7 @@ def conclude_game(current_gameboard):
     # player's rank
     cur_game_idx = current_gameboard["board"].game_idx
     rank_list = get_player_rank_list(current_gameboard)
-    current_gameboard["board"].history["rank"][cur_game_idx] = rank_list
+    current_gameboard["history"]["rank"][cur_game_idx] = rank_list
     # player's cash and status
     player_cash_list = []
     player_status_list = []
@@ -804,8 +804,8 @@ def conclude_game(current_gameboard):
         player = current_gameboard["players_dict"]["player_" + str(player_idx)]
         player_cash_list.append(player.current_cash)
         player_status_list.append(player.status)
-    current_gameboard["board"].history["cash"][cur_game_idx] = player_cash_list
-    current_gameboard["board"].history["player_status"][cur_game_idx] = player_status_list
+    current_gameboard["history"]["cash"][cur_game_idx] = player_cash_list
+    current_gameboard["history"]["player_status"][cur_game_idx] = player_status_list
 
     # print(current_gameboard['board'].history)
 

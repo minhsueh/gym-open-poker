@@ -28,9 +28,7 @@ from phase import Phase
 from action import Action
 import action_choices
 import dealer
-
-# from initialize_game_elements import initialize_game_element
-import initialize_game_elements
+from initialize_game_elements import initialize_game_element
 
 from gym_open_poker.envs.poker_util.agents import agent_p, agent_dump, agent_random
 
@@ -176,7 +174,7 @@ class OpenPokerEnv(gym.Env):
         self._pre_game_last_observation = []  # when the game end, there is no
 
         # ------general poker rules------
-        self.buy_in = customized_arg_dict.get("buy_in", 200)
+        self.buy_in = customized_arg_dict.get("buy_in_amount", 200)
         self.bankroll_limit = customized_arg_dict.get("bankroll_limit", self.buy_in * self.number_of_players)
 
         # ------visulaization------
@@ -316,11 +314,11 @@ class OpenPokerEnv(gym.Env):
         for player in self.game_elements["players"]:
             if player.status == "lost":
                 player_status_list.append(0)
-                bankroll_list.append(-1)
+                bankroll_list.append(0)
             else:
                 player_status_list.append(1)
                 bankroll_list.append(player.current_cash)
-        return (np.array(player_status_list, dtype=np.int64), np.array(bankroll_list, dtype=np.int64))
+        return (np.array(player_status_list, dtype=np.int64), np.array(bankroll_list, dtype=np.float64))
 
     def _get_position_info(self):
         # [dealer position, player_position]
@@ -414,9 +412,8 @@ class OpenPokerEnv(gym.Env):
         }
 
     def set_up_board(self, random_seed):
-        return initialize_game_elements.initialize_game_element(
-            self.player_decision_agents, self.customized_arg_dict, random_seed
-        )
+        game_element = initialize_game_element(self.player_decision_agents, self.customized_arg_dict, random_seed)
+        return game_element
 
     def _get_info(self, stopped=False):
         """
@@ -447,8 +444,9 @@ class OpenPokerEnv(gym.Env):
                         tem_hand.append(-1)
                 showdown.append(tem_hand)
             self.game_elements["board"].previous_showdown = None
-            pre_game_last_observation = self._pre_game_last_observation
-            self._pre_game_last_observation = []
+        # pre_game_last_observation
+        pre_game_last_observation = self._pre_game_last_observation
+        self._pre_game_last_observation = []
 
         # return
         output_info_dict["player_name_list"] = player_name_list
@@ -670,7 +668,7 @@ class OpenPokerEnv(gym.Env):
                         return self._get_obs(), self._get_reward(), False, False, self._get_info()
 
     def get_tournament_summary(self):
-        return self.game_elements["board"].history
+        return self.game_elements["history"]
 
     def _execute_player_1_action(self, player, action):
         # action_decode:

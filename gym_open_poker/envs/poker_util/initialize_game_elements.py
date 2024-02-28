@@ -64,7 +64,10 @@ def initialize_game_element(player_decision_agents, customized_arg_dict, random_
     game_elements["big_bet"] = game_elements["big_blind_amount"] * game_elements["big_small_bet_ratio"]  # in turn and river
     game_elements["max_raise_count"] = customized_arg_dict.get("max_raise_count", 3)
 
-    game_elements["buy_in_amount"] = customized_arg_dict.get("buy_in", 200)
+    # print("-------")
+    # print(customized_arg_dict["buy_in_amount"])
+    game_elements["buy_in_amount"] = customized_arg_dict.get("buy_in_amount", 200)
+    # print(game_elements["buy_in_amount"])
 
     game_elements["early_stop"] = False
 
@@ -77,7 +80,6 @@ def initialize_game_element(player_decision_agents, customized_arg_dict, random_
     _initialize_cards(game_elements)
     logger.debug("Successfully instantiated and initialized cards.")
 
-    # initialized chips when initialized players
     _initialize_players(game_elements, player_decision_agents)
     logger.debug("Successfully instantiated and initialized players.")
     np.random.shuffle(game_elements["players"])
@@ -227,6 +229,13 @@ def _initialize_game_history_structs(game_elements):
     game_elements["history"]["function"] = list()
     game_elements["history"]["param"] = list()
     game_elements["history"]["return"] = list()
+
+    game_elements["history"]["cash"] = dict()
+    game_elements["history"]["cash"][0] = game_elements["buy_in_amount"] * len(game_elements["players"])
+    game_elements["history"]["rank"] = dict()
+    game_elements["history"]["rank"][0] = [1] * len(game_elements["players"])
+    game_elements["history"]["player_status"] = dict()
+    game_elements["history"]["player_status"][0] = ["active"] * len(game_elements["players"])
 
 
 def _initialize_rules(game_elements):
