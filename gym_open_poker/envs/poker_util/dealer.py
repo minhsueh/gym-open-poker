@@ -227,7 +227,7 @@ def conclude_tournament(current_gameboard, early_stop=False):
     """
     logger.debug("Concluding tournament:")
 
-    # add into board.history
+    # add into history
     if early_stop:
         #  player's rank
         cur_game_idx = current_gameboard["board"].game_idx
@@ -237,12 +237,18 @@ def conclude_tournament(current_gameboard, early_stop=False):
         #  player's cash and status
         player_cash_list = []
         player_status_list = []
+        player_strategy_list = []
         for player_idx in range(1, current_gameboard["total_number_of_players"] + 1):
             player = current_gameboard["players_dict"]["player_" + str(player_idx)]
             player_cash_list.append(player.current_cash)
             player_status_list.append(player.status)
+            if player_idx == 1:
+                player_strategy_list.append("player_1")
+            else:
+                player_strategy_list.append(player.agent.strategy_type)
         current_gameboard["history"]["cash"][cur_game_idx] = player_cash_list
         current_gameboard["history"]["player_status"][cur_game_idx] = player_status_list
+        current_gameboard["history"]["player_strategy"][cur_game_idx] = player_strategy_list
 
     cash_dict = collections.defaultdict(list)
     for player in current_gameboard["players"]:
@@ -252,6 +258,9 @@ def conclude_tournament(current_gameboard, early_stop=False):
     for rank_idx, cash in enumerate(sorted(cash_dict.keys(), reverse=True)):
         for player_name in cash_dict[cash]:
             logger.debug(f"{player_name} ended up having ${cash} with rank {rank_idx+1}.")
+
+    final_rank_list = get_player_final_rank_list(current_gameboard)
+    current_gameboard["history"]["final_rank_list"] = final_rank_list
 
 
 def betting(current_gameboard, phase):
@@ -724,7 +733,7 @@ def print_single_player_cash_info(current_gameboard, player_name):
 
 def get_player_rank_list(current_gameboard):
     """
-    this function will be called in conclude_game, recording rank into board.history
+    this function will be called in conclude_game, recording rank into history
 
     Returns:
         rank_list(list): following the order as current_gameboard['players'], each element record the rank in this game
@@ -750,6 +759,29 @@ def get_player_rank_list(current_gameboard):
             rank_list.append(0)
 
     return rank_list
+
+
+def get_player_final_rank_list(current_gameboard):
+    """
+    this function will be called in conclude_tournament, recording rank into history
+
+    Returns:
+        final_rank_list(list): following the order as current_gameboard['players'], each element record the rank in this game
+
+    """
+
+    final_rank_list = [-1] * current_gameboard["total_number_of_players"]
+    cash_dict = collections.defaultdict(list)
+    for player in current_gameboard["players"]:
+        cash = round(player.current_cash, 2)
+        cash_dict[cash].append(player.player_name)
+
+    for rank_idx, cash in enumerate(sorted(cash_dict.keys(), reverse=True)):
+        for player_name in cash_dict[cash]:
+            player_idx = int(player_name.replace("player_", ""))
+            final_rank_list[player_idx - 1] = rank_idx + 1
+
+    return final_rank_list
 
 
 def conclude_game(current_gameboard):
@@ -792,7 +824,7 @@ def conclude_game(current_gameboard):
     # print cash info after assign pot to winners
     print_player_info(current_gameboard)
 
-    # add into board.history
+    # add into history
     # player's rank
     cur_game_idx = current_gameboard["board"].game_idx
     rank_list = get_player_rank_list(current_gameboard)
@@ -800,12 +832,18 @@ def conclude_game(current_gameboard):
     # player's cash and status
     player_cash_list = []
     player_status_list = []
+    player_strategy_list = []
     for player_idx in range(1, current_gameboard["total_number_of_players"] + 1):
         player = current_gameboard["players_dict"]["player_" + str(player_idx)]
         player_cash_list.append(player.current_cash)
         player_status_list.append(player.status)
+        if player_idx == 1:
+            player_strategy_list.append("player_1")
+        else:
+            player_strategy_list.append(player.agent.strategy_type)
     current_gameboard["history"]["cash"][cur_game_idx] = player_cash_list
     current_gameboard["history"]["player_status"][cur_game_idx] = player_status_list
+    current_gameboard["history"]["player_strategy"][cur_game_idx] = player_strategy_list
 
     # print(current_gameboard['board'].history)
 

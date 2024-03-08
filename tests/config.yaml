@@ -3,7 +3,7 @@ log_file_path: "./test.log"
 # --------visualization parameters--------
 render_mode: "human" # None or human
 show_all_move_mode: False
-visualize_debug_mode: True
+visualize_debug_mode: False
 # window_width: 1200
 # window_height: 600
 sleep_time: 1
@@ -14,7 +14,7 @@ background_agents_raw_list:
   - agent_type: "agent_dump"
     number_of_agent: 0
   - agent_type: "agent_random"
-    number_of_agent: 2
+    number_of_agent: 5
   - agent_type: "agent_dqn_4"
     number_of_agent: 0
 # --------general pokers rules--------
@@ -22,7 +22,7 @@ background_agents_raw_list:
 # small_blind: 5
 # big_small_blind_ratio: 2 # big_blind = small_blind * big_small_blind_ratio
 # seed: 15
-buy_in_amount: 50
+buy_in_amount: 200
 # bankroll_limit: 1500
 # --------termination conditions--------
 max_game_limitation: 30
@@ -37,7 +37,7 @@ novelty_list:
   #  - Environment1
   #  - Environment2
   #  - Agent1
-  #  - Agent2
+  - Agent2
   #  - Agent3
   #  - Event1
   #  - Rule1
@@ -45,5 +45,5 @@ novelty_list:
   #  - Rule3
   #  - Event2
   #  - Card2
-  - Rule4
+  # - Rule4
   #  - Card3

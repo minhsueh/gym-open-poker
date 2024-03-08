@@ -220,22 +220,20 @@ def _initialize_cards(game_elements):
 
 
 def _initialize_game_history_structs(game_elements):
-    """
-    history key is used to keep record of events happened during the entire game
-    :param game_elements: dictionary of game elements
-    :return: None
-    """
+
     game_elements["history"] = dict()
     game_elements["history"]["function"] = list()
     game_elements["history"]["param"] = list()
     game_elements["history"]["return"] = list()
 
-    game_elements["history"]["cash"] = dict()
-    game_elements["history"]["cash"][0] = game_elements["buy_in_amount"] * len(game_elements["players"])
-    game_elements["history"]["rank"] = dict()
+    game_elements["history"]["cash"] = dict()  # {game_idx: [player_1's cash, player_2's cash, ...]}}
+    game_elements["history"]["cash"][0] = [game_elements["buy_in_amount"]] * len(game_elements["players"])
+    game_elements["history"]["rank"] = dict()  # {game_idx: [player_1's rank, player_2's rank, ...]}}
     game_elements["history"]["rank"][0] = [1] * len(game_elements["players"])
-    game_elements["history"]["player_status"] = dict()
+    game_elements["history"]["final_rank"] = []
+    game_elements["history"]["player_status"] = dict()  # {game_idx: [player_1's status, player_2's status, ...]}}
     game_elements["history"]["player_status"][0] = ["active"] * len(game_elements["players"])
+    game_elements["history"]["player_strategy"] = dict()  # {game_idx: [player_1's strategy, player_2's strategy, ...]}}
 
 
 def _initialize_rules(game_elements):
