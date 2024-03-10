@@ -43,12 +43,10 @@ class Board:
         self.player_pot = collections.defaultdict(int)  # how much did each player spend in the current round
         self.players_last_move_list = [Action.NONE] * num_active_player_on_table  # keep track on last move of each player
         self.players_last_move_list_hist = [Action.NONE] * num_active_player_on_table  # keep track on last move of each player
-        self.pots_amount_list = [0]
+        self.pots_amount_list = []
         # the total amount on the table, it will be update in function conclude round.
         # The size might differ if there are side pot.
-        self.pots_attendee_list = [
-            set(["player_" + str(i) for i in range(1, num_active_player_on_table + 1)])
-        ]  # who is attend in corresponding pot in pots_amount_list. The size should be same as pots_amount_list.
+        self.pots_attendee_list = []
 
         self.buy_in_amount = buy_in_amount
 
@@ -94,14 +92,18 @@ class Board:
         np.random.shuffle(self.deck)
 
         # pots_attendee_list
+        """
         attendee = set()
         for p in current_gameboard["players"]:
             if p.status != "lost":
                 attendee.add(p.player_name)
         current_gameboard["board"].pots_attendee_list = [attendee]
+        """
+        current_gameboard["board"].pots_attendee_list = []
 
         # pots_amount_list
-        current_gameboard["board"].pots_amount_list = [0]
+        # current_gameboard["board"].pots_amount_list = [0]
+        current_gameboard["board"].pots_amount_list = []
 
         # reset players_last_move_list
         for move_idx in range(len(current_gameboard["players"])):

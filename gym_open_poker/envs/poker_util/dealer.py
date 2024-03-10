@@ -408,7 +408,7 @@ def check_betting_over(current_gameboard):
         bool: True if betting is over
 
     """
-    logger.debug("--The dealer is checking if the betting is over.--")
+    # logger.debug("--The dealer is checking if the betting is over.--")
     # logger.debug('The current players_last_move_list is: ' + str(_get_players_last_move_list_string(current_gameboard)))
     #
 
@@ -452,7 +452,7 @@ def check_betting_over(current_gameboard):
         return True
 
     if count_none > 0:
-        logger.debug("At least one player has not moved yet. The betting continues.")
+        # logger.debug("At least one player has not moved yet. The betting continues.")
         return False
 
     logger.debug("All players made the decision, the betting is over.")
@@ -473,7 +473,6 @@ def initialize_round(current_gameboard):
 
 
     """
-
     phase = current_gameboard["board"].cur_phase
 
     # calculate active_players_on_table:
@@ -629,91 +628,94 @@ def conclude_round(current_gameboard):
 
 
     """
-
     # check if there are all-in players
     player_pot = current_gameboard[
         "board"
     ].player_pot  # this is a dictionary with key being player name and value being amount
-
+    early_stop = False
+    if len(player_pot) == 1:
+        early_stop = True
+    # elif len(player_pot) == 0:
+    # it is possible when all players fold except cut-off
+    #
+    #    raise
     all_in_players_list = []  # each element: (player_name, all_in_amount)
     for p_idx, p in enumerate(current_gameboard["players"]):
+        """
         if (
             current_gameboard["board"].players_last_move_list[p_idx] == Action.ALL_IN
             or current_gameboard["board"].players_last_move_list[p_idx] == Action.ALL_IN_ALREADY
         ):
+        """
+        if current_gameboard["board"].players_last_move_list[p_idx] == Action.ALL_IN:
             all_in_players_list.append((p.player_name, player_pot[p.player_name]))
     all_in_players_list.sort(key=lambda x: x[1], reverse=True)  # sort all_in_amount in decending order
-    # All-in -> side pot
-    cur_side_pot_amount_list = []
-    cur_side_pot_attendee_list = []
+
+    cur_pot_amount_list = []
+    cur_pot_attendee_list = []
     if all_in_players_list:
         while all_in_players_list:
             all_in_player, all_in_amount = all_in_players_list.pop()
-            side_attendee = set()
-            for p_idx, p in enumerate(current_gameboard["players"]):
-                if player_pot[p.player_name] > all_in_amount:
-                    player_pot[p.player_name] -= all_in_amount
-                    side_attendee.add(p.player_name)
-            if len(side_attendee) != 0:
-                cur_side_pot_amount_list.append(all_in_amount * len(side_attendee))
-                cur_side_pot_attendee_list.append(side_attendee)
+            # modify all_in_player, if p1 all in $50 and p2 all in $40
+            # the all_in_amount in second iteration should be $10
+            all_in_amount = player_pot[all_in_player]
+            if player_pot[all_in_player] > 0:
+                # it is possible that two players all_in with the same amount
+                side_attendee = set()
+                for p_idx, p in enumerate(current_gameboard["players"]):
+                    if player_pot[p.player_name] >= all_in_amount:
+                        player_pot[p.player_name] -= all_in_amount
+                        side_attendee.add(p.player_name)
+                if len(side_attendee) != 0:
+                    cur_pot_amount_list.append(all_in_amount * len(side_attendee))
+                    cur_pot_attendee_list.append(side_attendee)
+    """
+    three cases that cur_main_pot_amount be 0, but len(cur_main_pot_attendee) != 0
+    1. all other players fold, only one player active (len(cur_main_pot_attendee) = 1)
+    2. all players check (len(cur_main_pot_attendee) > 1)
+    3. all player call on all_in player (len(cur_main_pot_attendee) > 1)
+    """
 
-    # main pot if there is no ALL-IN, or rightmost side pot(only these people are active)
+    count_none = 0
+    count_none_player = []
+    for p_idx, p in enumerate(current_gameboard["players"]):
+        if current_gameboard["board"].players_last_move_list[p_idx] == Action.NONE:
+            count_none += 1
+            count_none_player.append(p.player_name)
+
     cur_main_pot_amount = 0
     cur_main_pot_attendee = set()
-    fold_count = 0
-    lost_count = 0
-    check_count = 0
-    none_count = 0
+    logger.debug(player_pot)
     for p_idx, p in enumerate(current_gameboard["players"]):
-        if current_gameboard["board"].players_last_move_list[p_idx] == Action.LOST:
-            lost_count += 1
-        elif current_gameboard["board"].players_last_move_list[p_idx] == Action.FOLD:
-            fold_count += 1
-        elif p.player_name in player_pot:
-            # might be fold, bet and call
+        if player_pot[p.player_name] > 0 and current_gameboard["board"].players_last_move_list[p_idx] not in [
+            Action.FOLD,
+            Action.LOST,
+        ]:
             cur_main_pot_amount += player_pot[p.player_name]
             cur_main_pot_attendee.add(p.player_name)
+        elif player_pot[p.player_name] > 0:
+            # fold but already put money in pot
+            cur_main_pot_amount += player_pot[p.player_name]
+    if cur_main_pot_amount > 0:
+        if len(cur_main_pot_attendee) == 0:
+            if count_none >= 1:
+                assert len(count_none_player) == 1
+                cur_main_pot_attendee.add(count_none_player[0])
+            else:
+                cur_main_pot_attendee = cur_pot_attendee_list[-1]
 
-        elif current_gameboard["board"].players_last_move_list[p_idx] == Action.CHECK:
-            check_count += 1
-        elif current_gameboard["board"].players_last_move_list[p_idx] in [
-            Action.NONE,
-            Action.BIG_BLIND,
-        ]:
-            none_count += 1
-        else:
-            print(p.player_name)
-            raise
+        cur_pot_attendee_list.append(cur_main_pot_attendee)
+        cur_pot_amount_list.append(cur_main_pot_amount)
 
-    # recheck
-    """
-    print(lost_count)
-    print(fold_count)
-    print(check_count)
-    print(cur_main_pot_attendee)
-    print(current_gameboard['board'].pots_attendee_list)
-    """
-    assert (
-        none_count + lost_count + fold_count + check_count + len(cur_main_pot_attendee)
-        == current_gameboard["total_number_of_players"]
-    )
+    current_gameboard["board"].pots_amount_list.extend(cur_pot_amount_list)
+    current_gameboard["board"].pots_attendee_list.extend(cur_pot_attendee_list)
 
-    # put the above two into current_gameboard['board']['pots_amount_list'] and current_gameboard['pots_attendee_list']
-    # These might inlcude player who is fold, should recheck again in find_winner(conclude_game)
+    logger.debug("-----current pot amount-----")
+    logger.debug(current_gameboard["board"].pots_amount_list)
+    logger.debug("-----current pot players-----")
+    logger.debug(current_gameboard["board"].pots_attendee_list)
 
-    current_gameboard["board"].pots_amount_list[-1] += cur_main_pot_amount
-
-    if cur_side_pot_amount_list:
-        current_gameboard["board"].pots_amount_list += cur_side_pot_amount_list
-        current_gameboard["board"].pots_attendee_list += cur_side_pot_attendee_list
-
-    if len(cur_main_pot_attendee) == 1:
-        return True
-    elif none_count == 1:
-        return True
-    else:
-        return False
+    return early_stop
 
 
 def print_player_info(current_gameboard):
@@ -810,17 +812,22 @@ def conclude_game(current_gameboard):
         truncated(bool): True if meet termination condition
 
     """
-
     #
-
-    main_pot_attendee = current_gameboard["board"].pots_attendee_list[0]
+    pot_attendee = set()
 
     # assign money
     for pot_idx in range(len(current_gameboard["board"].pots_amount_list)):
         money_amount = current_gameboard["board"].pots_amount_list[pot_idx]
         player_list = current_gameboard["board"].pots_attendee_list[pot_idx]
-        winners = find_winner(current_gameboard, player_list)
+        if len(player_list) > 1:
+            winners = find_winner(current_gameboard, player_list)
+        elif len(player_list) == 1:
+            winners = list(player_list)
+        else:
+            raise
         assign_money_to_winners(current_gameboard, winners, money_amount)
+        # update pot_attendee in this game
+        pot_attendee.union(set(player_list))
     # print cash info after assign pot to winners
     print_player_info(current_gameboard)
 
@@ -866,10 +873,10 @@ def conclude_game(current_gameboard):
             player.last_reward = player.current_cash - player.last_game_cash
             player.last_game_cash = player.current_cash
 
-    # showdown: record every player's card in main_pot_attendee
+    # showdown: record every player's card in pot_attendee
     showdown_list = []
     for player in current_gameboard["players"]:
-        if player.player_name in main_pot_attendee:
+        if player.player_name in pot_attendee:
             hands = copy.deepcopy(player.hole_cards)
         else:
             hands = [None, None]

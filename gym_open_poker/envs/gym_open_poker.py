@@ -574,6 +574,7 @@ class OpenPokerEnv(gym.Env):
                 ]:
                     if self.render_mode == "human":
                         self.render()
+                    logger.debug("--------------------")
                     logger.debug(player.player_name + " start to move with cash " + str(player.current_cash))
                     # log bet info
                     self._log_board_before_decision(player)
@@ -662,6 +663,7 @@ class OpenPokerEnv(gym.Env):
                     ]:
                         if self.render_mode == "human":
                             self.render()
+                        logger.debug("--------------------")
                         logger.debug(player.player_name + " start to move with cash " + str(player.current_cash))
                         # log bet info
                         self._log_board_before_decision(player)
@@ -749,7 +751,7 @@ class OpenPokerEnv(gym.Env):
 
         Raises:
         """
-        logger.debug("------------Non-player_1 players start to bet. ------------")
+        # logger.debug("------------Non-player_1 players start to bet. ------------")
 
         # start from current_betting_idx: current_betting_idx + total_number_of_players
         # record every action
@@ -778,7 +780,7 @@ class OpenPokerEnv(gym.Env):
                     self.game_elements["board"].current_betting_idx = current_betting_idx
                     continue
                 else:
-
+                    logger.debug("--------------------")
                     logger.debug(player.player_name + " start to move with cash " + str(player.current_cash))
                     # log bet info
                     self._log_board_before_decision(player)
@@ -802,18 +804,20 @@ class OpenPokerEnv(gym.Env):
                     self.game_elements["board"].players_last_move_list[current_betting_idx] = last_move
                     logger.debug(f"Board: {player.player_name} do the {last_move}")
                     dealer.print_single_player_cash_info(self.game_elements, player.player_name)
+                logger.debug(
+                    "The current players_last_move_list is: " + str(_get_players_last_move_list_string(self.game_elements))
+                )
+                logger.debug(
+                    "The current players_last_move_list_hist is: "
+                    + str(_get_players_last_move_list_hist_string(self.game_elements))
+                )
+            else:
+                logger.debug(f"{player.player_name} is lost!")
             if self.render_mode == "human":
                 self.render()
 
             current_betting_idx = (current_betting_idx + 1) % total_number_of_players
             self.game_elements["board"].current_betting_idx = current_betting_idx
-            logger.debug(
-                "The current players_last_move_list is: " + str(_get_players_last_move_list_string(self.game_elements))
-            )
-            logger.debug(
-                "The current players_last_move_list_hist is: "
-                + str(_get_players_last_move_list_hist_string(self.game_elements))
-            )
         logger.debug("This betting is over.")
         # if self.render_mode == "human":
         #    self.render()

@@ -65,7 +65,19 @@ class Player:
         :param amount:
         :return:
         """
+        if amount <= 0:
+            raise
         self.current_cash -= amount
+
+    def add_current_cash(self, amount):
+        """
+        if bet/raise_bet and all other players fold, then the betting will be returned in conclude_round
+        :param amount:
+        :return:
+        """
+        if amount <= 0:
+            raise
+        self.current_cash += amount
 
     def reset_player_each_game(self, current_gameboard):
         """

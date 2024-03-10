@@ -127,10 +127,7 @@ def raise_bet(current_gameboard, player):
 def fold(current_gameboard, player):
     """
     1. assign current_gameboard['board'].players_last_move_list[player_name] to FOLD
-    2. put amount in player_pot(current spent) into pots_amount_list[-1]
-    current_gameboard['board'].player_pot[player_name]
-    current_gameboard['board'].pots_amount_list
-    3. remove player_name from current_gameboard['board'].pots_attendee_list
+    2. remove the player from current_gameboard["board"].pots_attendee_list
 
 
     criterias:
@@ -154,13 +151,9 @@ def fold(current_gameboard, player):
     dealer.update_player_last_move(current_gameboard, player.player_name, action.Action.FOLD)
 
     # 2.
-    current_gameboard["board"].pots_amount_list[-1] += current_gameboard["board"].player_pot[player.player_name]
-    del current_gameboard["board"].player_pot[player.player_name]
-
-    # 3.
-    for player_set in current_gameboard["board"].pots_attendee_list:
-        if player.player_name in player_set:
-            player_set.remove(player.player_name)
+    for attendee_set in current_gameboard["board"].pots_attendee_list:
+        if player.player_name in attendee_set:
+            attendee_set.remove(player.player_name)
 
     return flag_config_dict["successful_action"]
 
