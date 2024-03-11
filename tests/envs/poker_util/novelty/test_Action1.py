@@ -8,6 +8,8 @@ import numpy as np
 import unittest
 import pytest
 
+os.environ["SDL_VIDEODRIVER"] = "dummy"
+
 testing_arg = [
     "Action1",
 ]

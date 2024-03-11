@@ -9,5 +9,10 @@ IFS=$'\n'  # Set Internal Field Separator to newline to handle file names with s
 for file in $test_files; do
     echo "Processing file: $file"
     # Add your logic here for each file
-    pytest $file
+    pytest -s $file
 done
+
+# Exit with a non-zero status if pytest encounters failures
+if [ $? -ne 0 ]; then
+  exit 1
+fi
