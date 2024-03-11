@@ -1,4 +1,5 @@
 import gym
+import gym_open_poker
 import sys
 import logging
 from agent import Agent

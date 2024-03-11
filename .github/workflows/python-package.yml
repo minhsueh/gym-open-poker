@@ -43,4 +43,5 @@ jobs:
           python3 -m pip install .
       - name: Test with pytest
         run: |
-          pytest .
+          cd tests
+          bash test.sh

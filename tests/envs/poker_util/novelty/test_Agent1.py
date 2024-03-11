@@ -1,6 +1,6 @@
 import gym
 
-# import gym_open_poker
+import gym_open_poker
 import yaml
 import os
 from gym_open_poker.envs.poker_util.novelty_generator import NoveltyGenerator
@@ -15,7 +15,7 @@ testing_arg = [
 
 @pytest.mark.parametrize("novelty_name", testing_arg)
 def test_novelty(novelty_name):
-    with open(f"./tests/config/config_{novelty_name}.yaml", "r") as stream:
+    with open(f"./config/config_{novelty_name}.yaml", "r") as stream:
         try:
             config_dict = yaml.safe_load(stream)
         except yaml.YAMLError as exc:

@@ -1,5 +1,5 @@
 # --------log file path--------
-log_file_path: "./tests/testing_log/test_Card1.log"
+log_file_path: "./testing_log/test_Card1.log"
 # --------visualization parameters--------
 render_mode: "human" # None or human
 show_all_move_mode: False
