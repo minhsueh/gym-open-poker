@@ -56,6 +56,13 @@ def check_and_deal_hole_cards(current_gameboard):
             + "(0-indexed), dealer is "
             + str(current_gameboard["players"][current_gameboard["board"].dealer_position].player_name)
         )
+        logger.debug(
+            "The current current_betting_idx is: "
+            + str(current_gameboard["board"].current_betting_idx)
+            + "(0-indexed), "
+            + str(current_gameboard["players"][current_gameboard["board"].current_betting_idx].player_name)
+            + " start betting"
+        )
         logger.debug("------------ Dealer is dealing hole cards ------------")
 
         # put into local variables for better readability
@@ -448,7 +455,7 @@ def check_betting_over(current_gameboard):
 
     player_stayed_count = total_number_of_players - count_lost - count_fold - count_all_in_already
     if player_stayed_count == 1:
-        logger.debug("Only one player is active, the betting is over.")
+        logger.debug("Only one player is active(except all in players), the betting is over.")
         return True
 
     if count_none > 0:
@@ -505,7 +512,6 @@ def initialize_round(current_gameboard):
                 if counter == position_after_dealer:
                     found = True
                     current_gameboard["board"].current_betting_idx = idx % total_number_of_players
-                    current_betting_idx_player = player.player_name
 
         if not found:
             # just to make sure current_betting_idx is updated
@@ -521,7 +527,7 @@ def initialize_round(current_gameboard):
         else:
             print("This phase is not valid, current phase = " + str(phase))
             raise
-
+        """
         counter = 0
         found = False
         for idx in range(dealer_position + 1, dealer_position + 2 * total_number_of_players + 1):
@@ -537,16 +543,10 @@ def initialize_round(current_gameboard):
         if not found:
             # just to make sure current_betting_idx is updated
             raise ("current_betting_idx is not initializing, please check!")
+        """
 
     else:
         raise
-    logger.debug(
-        "The current current_betting_idx is: "
-        + str(current_gameboard["board"].current_betting_idx)
-        + "(0-indexed), "
-        + current_betting_idx_player
-        + " start betting"
-    )
 
     # initialize player.current_money_in_pot
     current_gameboard["board"].player_pot = collections.defaultdict(int)
@@ -632,13 +632,7 @@ def conclude_round(current_gameboard):
     player_pot = current_gameboard[
         "board"
     ].player_pot  # this is a dictionary with key being player name and value being amount
-    early_stop = False
-    if len(player_pot) == 1:
-        early_stop = True
-    # elif len(player_pot) == 0:
-    # it is possible when all players fold except cut-off
-    #
-    #    raise
+
     all_in_players_list = []  # each element: (player_name, all_in_amount)
     for p_idx, p in enumerate(current_gameboard["players"]):
         """
@@ -685,7 +679,7 @@ def conclude_round(current_gameboard):
 
     cur_main_pot_amount = 0
     cur_main_pot_attendee = set()
-    logger.debug(player_pot)
+    logger.debug(f"Player's pot in this game: {player_pot}")
     for p_idx, p in enumerate(current_gameboard["players"]):
         if player_pot[p.player_name] > 0 and current_gameboard["board"].players_last_move_list[p_idx] not in [
             Action.FOLD,
@@ -714,6 +708,18 @@ def conclude_round(current_gameboard):
     logger.debug(current_gameboard["board"].pots_amount_list)
     logger.debug("-----current pot players-----")
     logger.debug(current_gameboard["board"].pots_attendee_list)
+
+    early_stop = False
+    active_player_count = 0
+    for p_idx, p in enumerate(current_gameboard["players"]):
+        if current_gameboard["board"].players_last_move_list[p_idx] not in [Action.LOST, Action.FOLD]:
+            active_player_count += 1
+    if active_player_count == 1:
+        early_stop = True
+    # elif len(player_pot) == 0:
+    # it is possible when all players fold except cut-off
+    #
+    #    raise
 
     return early_stop
 

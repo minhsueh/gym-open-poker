@@ -723,11 +723,12 @@ class OpenPokerEnv(gym.Env):
         current_raise_count = self.game_elements["board"].current_raise_count
         already_bet = self.game_elements["board"].player_pot[player.player_name]
         bet_to_follow = raise_amount * (current_bet_count + current_raise_count) - already_bet
+        max_raise_count = self.game_elements["max_raise_count"]
         logger.debug("Round = " + str(self.game_elements["board"].cur_phase) + ", bet/raise_bet = " + str(raise_amount))
-        logger.debug("The player already bet = " + str(already_bet))
-        logger.debug("The player has bet_to_follow = " + str(bet_to_follow))
-        logger.debug("current_bet_count = " + str(current_bet_count))
-        logger.debug("current_raise_count = " + str(current_raise_count))
+        logger.debug(f"The player already bet = {already_bet}")
+        logger.debug(f"The player has bet_to_follow = {bet_to_follow}")
+        logger.debug(f"current_bet_count = {current_bet_count} (maximum_bet_count = 1)")
+        logger.debug(f"current_raise_count = {current_raise_count} (maximum_raise_count = {max_raise_count})")
 
     def _betting(self):
         """

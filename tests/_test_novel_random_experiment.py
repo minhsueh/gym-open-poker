@@ -36,8 +36,12 @@ print(ng.get_support_novelties())
 if "novelty_list" in config_dict and config_dict["novelty_list"] and len(config_dict["novelty_list"]) > 0:
     env = ng.inject(env, config_dict["novelty_list"])
 
+seed = 65
+if "seed" in config_dict:
+    seed = config_dict["seed"]
+
 # start gaming
-observation, info = env.reset(seed=65)
+observation, info = env.reset(seed=seed)
 print("============================")
 print("---observation---")
 print(observation)
