@@ -2,16 +2,12 @@ import gym
 import sys
 
 import gym_open_poker
-from gym_open_poker.envs.poker_util.action import Action
-from gym_open_poker.envs.poker_util.action_choices import (
-    call,
-    all_in,
-    raise_bet,
-    bet,
-    check,
-)
-from gym_open_poker.envs.poker_util.phase import Phase
-from gym_open_poker.envs.poker_util.flag_config import flag_config_dict
+from action import Action
+
+# import action_choices
+from action_choices import call, all_in, raise_bet, bet, check, fold
+from phase import Phase
+from flag_config import flag_config_dict
 
 
 import logging
@@ -28,6 +24,7 @@ class Action1(gym.Wrapper):
     def __init__(self, env):
 
         super().__init__(env)
+
         sys.modules["player"].Player.compute_allowable_pre_flop_actions = getattr(
             sys.modules[__name__], "_alter_compute_allowable_pre_flop_actions"
         )
@@ -37,11 +34,13 @@ class Action1(gym.Wrapper):
         sys.modules["player"].Player.compute_allowable_turn_actions = getattr(
             sys.modules[__name__], "_alter_compute_allowable_turn_actions"
         )
+        print(sys.modules["player"].Player.compute_allowable_river_actions)
         sys.modules["player"].Player.compute_allowable_river_actions = getattr(
             sys.modules[__name__], "_alter_compute_allowable_river_actions"
         )
         sys.modules["action_choices"].fold = getattr(sys.modules[__name__], "_alter_fold")
-        sys.modules["action_choices"].fold.__name__ = "fold"
+        # sys.modules["action_choices"].fold.__name__ = "fold"
+        print(sys.modules)
 
 
 def _alter_compute_allowable_pre_flop_actions(self, current_gameboard):
@@ -66,7 +65,7 @@ def _alter_compute_allowable_pre_flop_actions(self, current_gameboard):
     for player_idx, player in enumerate(current_gameboard["players"]):
         if player.player_name == self.player_name:
             break
-
+    logger.debug(current_gameboard["board"].players_last_move_list[player_idx])
     # check if it is fold already
     if current_gameboard["board"].players_last_move_list[player_idx] == Action.FOLD:
         raise
@@ -105,7 +104,8 @@ def _alter_compute_allowable_pre_flop_actions(self, current_gameboard):
 
         is_big_blind = False
         # exception: BB in pre-flop
-        if current_gameboard["board"].players_last_move_list[player_idx] == Action.BIG_BLIND:
+
+        if current_gameboard["board"].players_last_move_list[player_idx].value == Action.BIG_BLIND.value:
             is_big_blind = True
 
         # call, all_in
@@ -113,7 +113,7 @@ def _alter_compute_allowable_pre_flop_actions(self, current_gameboard):
         if (
             current_gameboard["board"].cur_phase == Phase.PRE_FLOP
             and bet_to_follow == 0
-            and current_gameboard["board"].players_last_move_list[player_idx] != Action.BIG_BLIND
+            and current_gameboard["board"].players_last_move_list[player_idx].value != Action.BIG_BLIND.value
         ):
             raise
         if is_big_blind and current_raise_count == 0:
@@ -479,4 +479,5 @@ def _alter_fold(current_gameboard, player):
         flag(flag_config_dict):
 
     """
+    logger.debug("player cannot fold due to the novelty restriction")
     return flag_config_dict["failure_code"]

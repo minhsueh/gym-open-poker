@@ -1,4 +1,5 @@
 from action_choices import call, all_in, fold, raise_bet, bet, check
+import action_choices
 from action import Action
 from phase import Phase
 
@@ -697,9 +698,11 @@ class Player:
         :param current_gameboard:
         :return:
         """
+
+        action_to_execute_funciton = self._action_decoder(action_to_execute)
         logger.debug(f"{self.player_name} executes its _execute_action function")
         if parameters:
-            p = action_to_execute(**parameters)
+            p = action_to_execute_funciton(**parameters)
             # add to game history
             current_gameboard["history"]["function"].append(action_to_execute)
             params = parameters.copy()
@@ -707,7 +710,7 @@ class Player:
             current_gameboard["history"]["return"].append(p)
             return p
         else:
-            p = action_to_execute()
+            p = action_to_execute_funciton()
             # add to game history
             current_gameboard["history"]["function"].append(action_to_execute)
             params = dict()
@@ -715,3 +718,28 @@ class Player:
             current_gameboard["history"]["return"].append(p)
 
             return p
+
+    def _action_decoder(self, action):
+        """
+        Decode integer action into function and the correspongind parameters
+        Args:
+            action(int): the action got from gym user
+        Returns:
+            action_function
+        """
+
+        if action.__name__ == "call":
+            action_function = action_choices.call
+        elif action.__name__ == "bet":
+            action_function = action_choices.bet
+        elif action.__name__ == "raise_bet":
+            action_function = action_choices.raise_bet
+        elif action.__name__ == "check":
+            action_function = action_choices.check
+        elif action.__name__ == "fold":
+            action_function = action_choices.fold
+        elif action.__name__ == "all_in":
+            action_function = action_choices.all_in
+        else:
+            raise
+        return action_function

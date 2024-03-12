@@ -1,7 +1,7 @@
 # --------log file path--------
 log_file_path: "./testing_log/test_Card2.log"
 # --------visualization parameters--------
-render_mode: "human" # None or human
+render_mode: "None" # None or human
 show_all_move_mode: False
 visualize_debug_mode: False
 # window_width: 1200

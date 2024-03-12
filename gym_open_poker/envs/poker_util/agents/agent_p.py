@@ -1,5 +1,5 @@
 # import numpy as np
-from action_choices import (
+from gym_open_poker.envs.poker_util.action_choices import (
     call,
     all_in,
     fold,
@@ -53,6 +53,30 @@ Case2: nothing in hands
 
 DESIRED_PAIR = [[1, 1], [13, 13], [12, 12]]
 DESIRED_OUT_PRABABILITY_THRESHOLD = format_float_precision(2 / 47)
+
+
+def _allowable_actions_encode(allowable_actions):
+    """
+    Params:
+        allowable_actions: allowable_actions returned by Player
+    Returns:
+        encoded_allowable_actions(set)
+    """
+    for action in allowable_actions:
+        if action == 0:
+            action_function = action_choices.call
+        elif action == 1:
+            action_function = action_choices.bet
+        elif action == 2:
+            action_function = action_choices.raise_bet
+        elif action == 3:
+            action_function = action_choices.check
+        elif action == 4:
+            action_function = action_choices.fold
+        elif action == 5:
+            action_function = action_choices.all_in
+        else:
+            raise
 
 
 def make_pre_flop_moves(player, current_gameboard, allowable_actions):
@@ -137,9 +161,7 @@ def make_flop_moves(player, current_gameboard, allowable_actions):
     total_hand = player.hole_cards + current_gameboard["board"].community_cards
 
     cur_rank_type, _ = get_best_hand(current_gameboard, total_hand)
-    out_probability = get_out_probability(
-        current_gameboard, total_hand, desired_hand="three_of_a_kind"
-    )
+    out_probability = get_out_probability(current_gameboard, total_hand, desired_hand="three_of_a_kind")
 
     if hand_rank_type[cur_rank_type] >= hand_rank_type["three_of_a_kind"]:
         has_winnable_hand = True
@@ -211,9 +233,7 @@ def make_turn_moves(player, current_gameboard, allowable_actions):
     total_hand = player.hole_cards + current_gameboard["board"].community_cards
 
     cur_rank_type, _ = get_best_hand(current_gameboard, total_hand)
-    out_probability = get_out_probability(
-        current_gameboard, total_hand, desired_hand="three_of_a_kind"
-    )
+    out_probability = get_out_probability(current_gameboard, total_hand, desired_hand="three_of_a_kind")
 
     if hand_rank_type[cur_rank_type] >= hand_rank_type["three_of_a_kind"]:
         has_winnable_hand = True

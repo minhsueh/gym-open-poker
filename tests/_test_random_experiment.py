@@ -17,8 +17,12 @@ else:
     config_dict = dict()
 
 env = gym.make("gym_open_poker/OpenPoker-v0", **config_dict)
+seed = 42
+if "seed" in config_dict:
+    seed = config_dict["seed"]
+
 # env = CardDistLow(gym.make("gym_open_poker/OpenPoker-v0", **config_dict))
-observation, info = env.reset(seed=42)
+observation, info = env.reset(seed=seed)
 print("============================")
 print("---observation---")
 print(observation)
