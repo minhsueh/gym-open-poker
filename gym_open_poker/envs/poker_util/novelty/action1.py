@@ -39,8 +39,6 @@ class Action1(gym.Wrapper):
             sys.modules[__name__], "_alter_compute_allowable_river_actions"
         )
         sys.modules["action_choices"].fold = getattr(sys.modules[__name__], "_alter_fold")
-        # sys.modules["action_choices"].fold.__name__ = "fold"
-        print(sys.modules)
 
 
 def _alter_compute_allowable_pre_flop_actions(self, current_gameboard):
@@ -65,7 +63,7 @@ def _alter_compute_allowable_pre_flop_actions(self, current_gameboard):
     for player_idx, player in enumerate(current_gameboard["players"]):
         if player.player_name == self.player_name:
             break
-    logger.debug(current_gameboard["board"].players_last_move_list[player_idx])
+
     # check if it is fold already
     if current_gameboard["board"].players_last_move_list[player_idx] == Action.FOLD:
         raise
@@ -145,10 +143,6 @@ def _alter_compute_allowable_pre_flop_actions(self, current_gameboard):
 
     else:
         raise
-
-    logger.debug("allowable_actions = " + ", ".join([action.__name__ for action in allowable_actions]))
-
-    return allowable_actions
 
     logger.debug("allowable_actions = " + ", ".join([action.__name__ for action in allowable_actions]))
 
@@ -251,10 +245,6 @@ def _alter_compute_allowable_flop_actions(self, current_gameboard):
 
     else:
         raise
-
-    logger.debug("allowable_actions = " + ", ".join([action.__name__ for action in allowable_actions]))
-
-    return allowable_actions
 
     logger.debug("allowable_actions = " + ", ".join([action.__name__ for action in allowable_actions]))
 
@@ -479,5 +469,6 @@ def _alter_fold(current_gameboard, player):
         flag(flag_config_dict):
 
     """
+    logger.debug(f"{player.player_name} decides to --- Fold ---")
     logger.debug("player cannot fold due to the novelty restriction")
     return flag_config_dict["failure_code"]

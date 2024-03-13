@@ -47,59 +47,58 @@ def _alter_conclude_game(current_gameboard):
         truncated(bool): True if meet termination condition
 
     """
-
     #
-
-    main_pot_attendee = current_gameboard["board"].pots_attendee_list[0]
-
-    # novlety
-    main_pot_winner = None
-    main_pot_amount = None
-    #
+    pot_attendee = set()
 
     # assign money
     for pot_idx in range(len(current_gameboard["board"].pots_amount_list)):
         money_amount = current_gameboard["board"].pots_amount_list[pot_idx]
         player_list = current_gameboard["board"].pots_attendee_list[pot_idx]
-        winners = find_winner(current_gameboard, player_list)
+        if len(player_list) > 1:
+            winners = find_winner(current_gameboard, player_list)
+        elif len(player_list) == 1:
+            winners = list(player_list)
+        else:
+            raise
+        assign_money_to_winners(current_gameboard, winners, money_amount)
+        # update pot_attendee in this game
+
         # novlety
-        if pot_idx == 0:
-            main_pot_winner = winners
-            main_pot_amount = money_amount
+        # the main pot's winner should tip the dealer 10% of the winning amount.
+        dealer = current_gameboard["players"][current_gameboard["board"].dealer_position]
+        tip = round(money_amount / len(winners) / 10, 2)
+        for player_name in winners:
+            cur_player = current_gameboard["players_dict"][player_name]
+            cur_player.current_cash -= tip
+            dealer.current_cash += tip
+            logger.debug(f"Novelty rule2: {player_name} give dealer {dealer.player_name} tip ${tip}!")
         #
 
-        assign_money_to_winners(current_gameboard, winners, money_amount)
-
-    # novlety
-    # the main pot's winner should tip the dealer 10% of the winning amount.
-    if not main_pot_winner and not main_pot_amount:
-        raise
-    dealer = current_gameboard["players"][current_gameboard["board"].dealer_position]
-    tip = round(money_amount / len(winners) / 10, 2)
-    for player_name in main_pot_winner:
-        cur_player = current_gameboard["players_dict"][player_name]
-        cur_player.current_cash -= tip
-        dealer.current_cash += tip
-        logger.debug(f"Novelty rule2: {player_name} give dealer {dealer.player_name} tip ${tip}!")
-    #
+        pot_attendee.union(set(player_list))
 
     # print cash info after assign pot to winners
     print_player_info(current_gameboard)
 
-    # add into board.history
+    # add into history
     # player's rank
     cur_game_idx = current_gameboard["board"].game_idx
     rank_list = get_player_rank_list(current_gameboard)
-    current_gameboard["board"].history["rank"][cur_game_idx] = rank_list
+    current_gameboard["history"]["rank"][cur_game_idx] = rank_list
     # player's cash and status
     player_cash_list = []
     player_status_list = []
+    player_strategy_list = []
     for player_idx in range(1, current_gameboard["total_number_of_players"] + 1):
         player = current_gameboard["players_dict"]["player_" + str(player_idx)]
         player_cash_list.append(player.current_cash)
         player_status_list.append(player.status)
-    current_gameboard["board"].history["cash"][cur_game_idx] = player_cash_list
-    current_gameboard["board"].history["player_status"][cur_game_idx] = player_status_list
+        if player_idx == 1:
+            player_strategy_list.append("player_1")
+        else:
+            player_strategy_list.append(player.agent.strategy_type)
+    current_gameboard["history"]["cash"][cur_game_idx] = player_cash_list
+    current_gameboard["history"]["player_status"][cur_game_idx] = player_status_list
+    current_gameboard["history"]["player_strategy"][cur_game_idx] = player_strategy_list
 
     # print(current_gameboard['board'].history)
 
@@ -122,10 +121,10 @@ def _alter_conclude_game(current_gameboard):
             player.last_reward = player.current_cash - player.last_game_cash
             player.last_game_cash = player.current_cash
 
-    # showdown: record every player's card in main_pot_attendee
+    # showdown: record every player's card in pot_attendee
     showdown_list = []
     for player in current_gameboard["players"]:
-        if player.player_name in main_pot_attendee:
+        if player.player_name in pot_attendee:
             hands = copy.deepcopy(player.hole_cards)
         else:
             hands = [None, None]

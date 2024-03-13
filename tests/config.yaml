@@ -34,15 +34,15 @@ novelty_list:
   #  - Card1
   # - Action1
   #  - RANDOM
-  #  - Environment1
-  #  - Environment2
+  - Environment1
+  # - Environment2
   #  - Agent1
   #  - Agent2
   #  - Agent3
   #  - Event1
   #  - Rule1
-  #  - Rule2
-  #  - Rule3
+  # - Rule2
+  # - Rule3
   #  - Event2
   #  - Card2
   # - Rule4
