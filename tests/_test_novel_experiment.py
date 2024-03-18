@@ -4,6 +4,7 @@ import gym
 import yaml
 import os
 from gym_open_poker.envs.poker_util.novelty_generator import NoveltyGenerator
+import numpy as np
 
 # from typing import Dict, List
 
@@ -45,6 +46,10 @@ print(info)
 
 while True:
     print("============================")
+    action_mask = info["action_masks"].astype(bool)
+    all_action_list = np.array(list(range(6)))
+    allowable_actions = all_action_list[action_mask]
+    print(f"allowable_actions = {allowable_actions}")
     print("Enter your action:")
     user_action = input()
     while int(user_action) not in range(6):

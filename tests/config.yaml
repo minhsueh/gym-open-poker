@@ -10,11 +10,11 @@ sleep_time: 1
 # --------background agents--------
 background_agents_raw_list:
   - agent_type: "agent_p"
-    number_of_agent: 1
+    number_of_agent: 4
   - agent_type: "agent_dump"
-    number_of_agent: 1
+    number_of_agent: 0
   - agent_type: "agent_random"
-    number_of_agent: 1
+    number_of_agent: 0
   - agent_type: "agent_dqn_4"
     number_of_agent: 0
 # --------general pokers rules--------
@@ -32,9 +32,9 @@ novelty_list:
   #  - CardDistLow
   #  - CardDistHigh
   #  - Card1
-  # - Action1
+  - Action1
   #  - RANDOM
-  - Environment1
+  # - Environment1
   # - Environment2
   #  - Agent1
   #  - Agent2

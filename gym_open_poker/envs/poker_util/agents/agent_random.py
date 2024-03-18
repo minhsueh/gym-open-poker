@@ -23,12 +23,7 @@ def make_pre_flop_moves(player, current_gameboard, allowable_actions):
         function
     """
 
-    # parameters the agent need to take actions with
-    params = dict()
-    params["current_gameboard"] = current_gameboard
-    params["player"] = player
-
-    return np.random.choice(list(allowable_actions)), params
+    return np.random.choice(list(allowable_actions))
 
 
 def make_flop_moves(player, current_gameboard, allowable_actions):
@@ -42,12 +37,8 @@ def make_flop_moves(player, current_gameboard, allowable_actions):
     Returns:
         function
     """
-    # parameters the agent need to take actions with
-    params = dict()
-    params["current_gameboard"] = current_gameboard
-    params["player"] = player
 
-    return np.random.choice(list(allowable_actions)), params
+    return np.random.choice(list(allowable_actions))
 
 
 def make_turn_moves(player, current_gameboard, allowable_actions):
@@ -61,12 +52,7 @@ def make_turn_moves(player, current_gameboard, allowable_actions):
         function
     """
 
-    # parameters the agent need to take actions with
-    params = dict()
-    params["current_gameboard"] = current_gameboard
-    params["player"] = player
-
-    return np.random.choice(list(allowable_actions)), params
+    return np.random.choice(list(allowable_actions))
 
 
 def make_river_moves(player, current_gameboard, allowable_actions):
@@ -81,12 +67,7 @@ def make_river_moves(player, current_gameboard, allowable_actions):
         function
     """
 
-    # parameters the agent need to take actions with
-    params = dict()
-    params["current_gameboard"] = current_gameboard
-    params["player"] = player
-
-    return np.random.choice(list(allowable_actions)), params
+    return np.random.choice(list(allowable_actions))
 
 
 def _build_decision_agent_methods_dict():

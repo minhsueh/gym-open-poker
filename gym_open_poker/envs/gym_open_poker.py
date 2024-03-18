@@ -30,7 +30,7 @@ import action_choices
 import dealer
 from initialize_game_elements import initialize_game_element
 
-from gym_open_poker.envs.poker_util.agents import agent_p, agent_dump, agent_random
+from gym_open_poker.envs.poker_util.agents import agent_p, agent_dump, agent_random, agent_dqn_4
 
 # from gym_open_poker.envs.poker_util.agents import *
 
@@ -230,17 +230,17 @@ class OpenPokerEnv(gym.Env):
         parameters["current_gameboard"] = self.game_elements
 
         if action == 0:
-            action_function = action_choices.call
+            action_function = Action.CALL
         elif action == 1:
-            action_function = action_choices.bet
+            action_function = Action.BET
         elif action == 2:
-            action_function = action_choices.raise_bet
+            action_function = Action.RAISE_BET
         elif action == 3:
-            action_function = action_choices.check
+            action_function = Action.CHECK
         elif action == 4:
-            action_function = action_choices.fold
+            action_function = Action.FOLD
         elif action == 5:
-            action_function = action_choices.all_in
+            action_function = Action.ALL_IN
         else:
             raise
         return (action_function, parameters)
@@ -474,9 +474,9 @@ class OpenPokerEnv(gym.Env):
         else:
             raise
 
-        allowable_string = [action.__name__ for action in allowable_actions]
+        allowable_string = [action for action in allowable_actions]
         action_masks = []
-        for action in ["call", "bet", "raise_bet", "check", "fold", "all_in"]:
+        for action in [Action.CALL, Action.BET, Action.RAISE_BET, Action.CHECK, Action.FOLD, Action.ALL_IN]:
             if action in allowable_string:
                 action_masks.append(1)
             else:
@@ -673,12 +673,33 @@ class OpenPokerEnv(gym.Env):
         return self.game_elements["history"]
 
     def _execute_player_1_action(self, player, action):
+
+        # allowable_actions
+        if self.game_elements["board"].cur_phase == Phase.PRE_FLOP:
+            allowable_actions = player.compute_allowable_pre_flop_actions(self.game_elements)
+        elif self.game_elements["board"].cur_phase == Phase.FLOP:
+            allowable_actions = player.compute_allowable_flop_actions(self.game_elements)
+        elif self.game_elements["board"].cur_phase == Phase.TURN:
+            allowable_actions = player.compute_allowable_turn_actions(self.game_elements)
+        elif self.game_elements["board"].cur_phase == Phase.RIVER:
+            allowable_actions = player.compute_allowable_river_actions(self.game_elements)
+        else:
+            raise
+        logger.debug("allowable_actions = " + ", ".join([ac.name for ac in allowable_actions]))
+
         # action_decode:
         action_to_execute, parameters = self._action_decoder(player, action)
 
+        # action_validator
+        modify_action_to_execute = player._action_validator(action_to_execute, allowable_actions)
+
+        # update invalid reward
+        if action_to_execute not in allowable_actions:
+            player.last_reward = -999
+
         # execute player_1's action
-        code = player._execute_action(action_to_execute, parameters, self.game_elements)
-        last_move = Action[action_to_execute.__name__.upper()]
+        code = player._execute_action(modify_action_to_execute, parameters, self.game_elements)
+        last_move = Action[action_to_execute.name.upper()]
         current_betting_idx = self.game_elements["board"].current_betting_idx
         total_number_of_players = self.game_elements["total_number_of_players"]
 

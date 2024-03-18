@@ -1,9 +1,4 @@
-from gym_open_poker.envs.poker_util.action_choices import (
-    call,
-    all_in,
-    fold,
-    check,
-)
+from action import Action
 
 # from gym_open_poker.envs.poker_util.card_utility_actions import *
 # from itertools import combinations
@@ -12,70 +7,47 @@ from gym_open_poker.envs.poker_util.action_choices import (
 
 
 def make_pre_flop_moves(player, current_gameboard, allowable_actions):
-
-    params = dict()
-    params["player"] = player
-    params["current_gameboard"] = current_gameboard
-    allowable_actions_list = [action.__name__ for action in allowable_actions]
-
-    if "all_in" in allowable_actions_list:
-        return all_in, params
-    elif "check" in allowable_actions_list:
-        return check, params
-    elif "call" in allowable_actions_list:
-        return call, params
+    if Action.ALL_IN in allowable_actions:
+        return Action.ALL_IN
+    elif Action.CHECK in allowable_actions:
+        return Action.CHECK
+    elif Action.CALL in allowable_actions:
+        return Action.CALL
     else:
-        return fold, params
+        return Action.FOLD
 
 
 def make_flop_moves(player, current_gameboard, allowable_actions):
-    params = dict()
-    params["player"] = player
-    params["current_gameboard"] = current_gameboard
-    allowable_actions_list = [action.__name__ for action in allowable_actions]
-
-    if "all_in" in allowable_actions_list:
-        return all_in, params
-    elif "check" in allowable_actions_list:
-        return check, params
-    elif "call" in allowable_actions_list:
-        return call, params
+    if Action.ALL_IN in allowable_actions:
+        return Action.ALL_IN
+    elif Action.CHECK in allowable_actions:
+        return Action.CHECK
+    elif Action.CALL in allowable_actions:
+        return Action.CALL
     else:
-        return fold, params
+        return Action.FOLD
 
 
 def make_turn_moves(player, current_gameboard, allowable_actions):
-
-    params = dict()
-    params["player"] = player
-    params["current_gameboard"] = current_gameboard
-    allowable_actions_list = [action.__name__ for action in allowable_actions]
-
-    if "all_in" in allowable_actions_list:
-        return all_in, params
-    elif "check" in allowable_actions_list:
-        return check, params
-    elif "call" in allowable_actions_list:
-        return call, params
+    if Action.ALL_IN in allowable_actions:
+        return Action.ALL_IN
+    elif Action.CHECK in allowable_actions:
+        return Action.CHECK
+    elif Action.CALL in allowable_actions:
+        return Action.CALL
     else:
-        return fold, params
+        return Action.FOLD
 
 
 def make_river_moves(player, current_gameboard, allowable_actions):
-
-    params = dict()
-    params["player"] = player
-    params["current_gameboard"] = current_gameboard
-    allowable_actions_list = [action.__name__ for action in allowable_actions]
-
-    if "all_in" in allowable_actions_list:
-        return all_in, params
-    elif "check" in allowable_actions_list:
-        return check, params
-    elif "call" in allowable_actions_list:
-        return call, params
+    if Action.ALL_IN in allowable_actions:
+        return Action.ALL_IN
+    elif Action.CHECK in allowable_actions:
+        return Action.CHECK
+    elif Action.CALL in allowable_actions:
+        return Action.CALL
     else:
-        return fold, params
+        return Action.FOLD
 
 
 def _build_decision_agent_methods_dict():

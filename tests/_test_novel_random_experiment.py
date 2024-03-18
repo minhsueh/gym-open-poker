@@ -53,7 +53,10 @@ while True:
     print("Enter your action:")
     action_mask = info["action_masks"].astype(bool)
     all_action_list = np.array(list(range(6)))
-    user_action = np.random.choice(all_action_list[action_mask], size=1).item()
+    allowable_actions = all_action_list[action_mask]
+    print(f"allowable_actions = {allowable_actions}")
+    user_action = np.random.choice(allowable_actions, size=1).item()
+    print(user_action)
     # print('----------------')
     observation, reward, terminated, truncated, info = env.step(int(user_action))
     print("---observation---")

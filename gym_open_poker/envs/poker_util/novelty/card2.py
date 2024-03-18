@@ -12,7 +12,7 @@ logger = logging.getLogger("gym_open_poker.envs.poker_util.logging_info.novelty.
 
 class Card2(gym.Wrapper):
     """
-    This novelty, named 'Card2', alters the card distribution by showing all odd cards first.
+    This novelty, named 'Card2', alters the card distribution by showing all highest odd cards first.
     """
 
     def __init__(self, env):

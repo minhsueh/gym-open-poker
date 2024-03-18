@@ -1,12 +1,5 @@
 # import numpy as np
-from gym_open_poker.envs.poker_util.action_choices import (
-    call,
-    all_in,
-    fold,
-    raise_bet,
-    bet,
-    check,
-)
+from action import Action
 
 from card_utility_actions import get_best_hand
 
@@ -83,33 +76,28 @@ def make_pre_flop_moves(player, current_gameboard, allowable_actions):
     has_pair = True if len(set(values)) == 1 else False
     has_suit = True if len(set(suits)) == 1 else False
 
-    # parameters the agent need to take actions with
-    params = dict()
-    params["current_gameboard"] = current_gameboard
-    params["player"] = player
-
     # Case 1
     if has_desired_pair:
-        if all_in in allowable_actions:
-            return all_in, params
-        elif raise_bet in allowable_actions:
-            return raise_bet, params
-        elif call in allowable_actions:
-            return call, params
-        elif check in allowable_actions:
-            return check, params
+        if Action.ALL_IN in allowable_actions:
+            return Action.ALL_IN
+        elif Action.RAISE_BET in allowable_actions:
+            return Action.RAISE_BET
+        elif Action.CALL in allowable_actions:
+            return Action.CALL
+        elif Action.CHECK in allowable_actions:
+            return Action.CHECK
 
     # Case 2
     if has_pair or has_suit:
-        if all_in in allowable_actions:
-            return all_in, params
-        elif call in allowable_actions:
-            return call, params
-        elif check in allowable_actions:
-            return check, params
+        if Action.ALL_IN in allowable_actions:
+            return Action.ALL_IN
+        elif Action.CALL in allowable_actions:
+            return Action.CALL
+        elif Action.CHECK in allowable_actions:
+            return Action.CHECK
 
     # Case 3
-    return fold, params
+    return Action.FOLD
 
 
 def make_flop_moves(player, current_gameboard, allowable_actions):
@@ -144,43 +132,38 @@ def make_flop_moves(player, current_gameboard, allowable_actions):
     else:
         has_winnable_hand = False
 
-    # parameters for take actions
-    params = dict()
-    params["current_gameboard"] = current_gameboard
-    params["player"] = player
-
     # Case1: if it has the hand ahead to three_of_a_kind, then it believe 100% win, so it will bet/raise_bet.
     if has_winnable_hand:
-        if all_in in allowable_actions:
-            return all_in, params
-        elif raise_bet in allowable_actions:
-            return raise_bet, params
-        elif bet in allowable_actions:
-            return bet, params
-        elif call in allowable_actions:
-            return call, params
-        elif check in allowable_actions:
-            return check, params
+        if Action.ALL_IN in allowable_actions:
+            return Action.ALL_IN
+        elif Action.RAISE_BET in allowable_actions:
+            return Action.RAISE_BET
+        elif Action.BET in allowable_actions:
+            return Action.BET
+        elif Action.CALL in allowable_actions:
+            return Action.CALL
+        elif Action.CHECK in allowable_actions:
+            return Action.CHECK
         else:
-            return fold, params
+            return Action.FOLD
 
     if out_probability >= DESIRED_OUT_PRABABILITY_THRESHOLD:
         # Case2: if the out_probability >= 2/47
-        if all_in in allowable_actions:
-            return all_in, params
-        elif call in allowable_actions:
-            return call, params
-        elif check in allowable_actions:
-            return check, params
+        if Action.ALL_IN in allowable_actions:
+            return Action.ALL_IN
+        elif Action.CALL in allowable_actions:
+            return Action.CALL
+        elif Action.CHECK in allowable_actions:
+            return Action.CHECK
         else:
-            return fold, params
+            return Action.FOLD
 
     else:
         # Case3: if the out_probability < 2/47
-        if check in allowable_actions:
-            return check, params
+        if Action.CHECK in allowable_actions:
+            return Action.CHECK
         else:
-            return fold, params
+            return Action.FOLD
 
 
 def make_turn_moves(player, current_gameboard, allowable_actions):
@@ -216,43 +199,38 @@ def make_turn_moves(player, current_gameboard, allowable_actions):
     else:
         has_winnable_hand = False
 
-    # parameters for take actions
-    params = dict()
-    params["current_gameboard"] = current_gameboard
-    params["player"] = player
-
     # Case1: if it has the hand ahead to three_of_a_kind, then it believe 100% win, so it will bet/raise_bet.
     if has_winnable_hand:
-        if all_in in allowable_actions:
-            return all_in, params
-        elif raise_bet in allowable_actions:
-            return raise_bet, params
-        elif bet in allowable_actions:
-            return bet, params
-        elif call in allowable_actions:
-            return call, params
-        elif check in allowable_actions:
-            return check, params
+        if Action.ALL_IN in allowable_actions:
+            return Action.ALL_IN
+        elif Action.RAISE_BET in allowable_actions:
+            return Action.RAISE_BET
+        elif Action.BET in allowable_actions:
+            return Action.BET
+        elif Action.CALL in allowable_actions:
+            return Action.CALL
+        elif Action.CHECK in allowable_actions:
+            return Action.CHECK
         else:
-            return fold, params
+            return Action.FOLD
 
     if out_probability >= DESIRED_OUT_PRABABILITY_THRESHOLD:
         # Case2: if the out_probability >= 2/47
-        if all_in in allowable_actions:
-            return all_in, params
-        elif call in allowable_actions:
-            return call, params
-        elif check in allowable_actions:
-            return check, params
+        if Action.ALL_IN in allowable_actions:
+            return Action.ALL_IN
+        elif Action.CALL in allowable_actions:
+            return Action.CALL
+        elif Action.CHECK in allowable_actions:
+            return Action.CHECK
         else:
-            return fold, params
+            return Action.FOLD
 
     else:
         # Case3: if the out_probability < 2/47
-        if check in allowable_actions:
-            return check, params
+        if Action.CHECK in allowable_actions:
+            return Action.CHECK
         else:
-            return fold, params
+            return Action.FOLD
 
 
 def make_river_moves(player, current_gameboard, allowable_actions):
@@ -288,32 +266,27 @@ def make_river_moves(player, current_gameboard, allowable_actions):
     else:
         has_winnable_hand = False
 
-    # parameters for take actions
-    params = dict()
-    params["current_gameboard"] = current_gameboard
-    params["player"] = player
-
     if has_winnable_hand:
         # Case1: if it has the hand ahead to three_of_a_kind, then it believe 100% win, so it will bet/raise_bet.
-        if all_in in allowable_actions:
-            return all_in, params
-        elif raise_bet in allowable_actions:
-            return raise_bet, params
-        elif bet in allowable_actions:
-            return bet, params
-        elif call in allowable_actions:
-            return call, params
-        elif check in allowable_actions:
-            return check, params
+        if Action.ALL_IN in allowable_actions:
+            return Action.ALL_IN
+        elif Action.RAISE_BET in allowable_actions:
+            return Action.RAISE_BET
+        elif Action.BET in allowable_actions:
+            return Action.BET
+        elif Action.CALL in allowable_actions:
+            return Action.CALL
+        elif Action.CHECK in allowable_actions:
+            return Action.CHECK
         else:
-            return fold, params
+            return Action.FOLD
 
     else:
         # Case2: nothing in hands
-        if check in allowable_actions:
-            return check, params
+        if Action.CHECK in allowable_actions:
+            return Action.CHECK
         else:
-            return fold, params
+            return Action.FOLD
 
 
 def _build_decision_agent_methods_dict():

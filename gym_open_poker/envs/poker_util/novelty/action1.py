@@ -69,18 +69,13 @@ def _alter_compute_allowable_pre_flop_actions(self, current_gameboard):
         raise
 
     # 1. fold
-    # allowable_actions.add(fold)  # can fold at any time
+    # allowable_actions.add(Action.FOLD)  # can fold at any time
 
     # bet, raise_bet, call, chcek, all_in
-    if current_gameboard["board"].cur_phase.value in [
-        Phase.PRE_FLOP.value,
-        Phase.FLOP.value,
-    ]:
+
+    if current_gameboard["board"].cur_phase in [Phase.PRE_FLOP, Phase.FLOP]:
         raise_amount = current_gameboard["small_bet"]
-    elif current_gameboard["board"].cur_phase.value in [
-        Phase.TURN.value,
-        Phase.RIVER.value,
-    ]:
+    elif current_gameboard["board"].cur_phase in [Phase.TURN, Phase.RIVER]:
         raise_amount = current_gameboard["big_bet"]
     else:
         raise
@@ -92,18 +87,17 @@ def _alter_compute_allowable_pre_flop_actions(self, current_gameboard):
     if current_bet_count == 0:
         # bet(all_in)
         if self.current_cash <= raise_amount:
-            allowable_actions.add(all_in)
+            allowable_actions.add(Action.ALL_IN)
         else:
-            allowable_actions.add(bet)
+            allowable_actions.add(Action.BET)
         # check
-        allowable_actions.add(check)
+        allowable_actions.add(Action.CHECK)
 
     elif current_bet_count == 1 and current_raise_count < current_gameboard["max_raise_count"]:
 
         is_big_blind = False
         # exception: BB in pre-flop
-
-        if current_gameboard["board"].players_last_move_list[player_idx].value == Action.BIG_BLIND.value:
+        if current_gameboard["board"].players_last_move_list[player_idx] == Action.BIG_BLIND:
             is_big_blind = True
 
         # call, all_in
@@ -111,23 +105,23 @@ def _alter_compute_allowable_pre_flop_actions(self, current_gameboard):
         if (
             current_gameboard["board"].cur_phase == Phase.PRE_FLOP
             and bet_to_follow == 0
-            and current_gameboard["board"].players_last_move_list[player_idx].value != Action.BIG_BLIND.value
+            and current_gameboard["board"].players_last_move_list[player_idx] != Action.BIG_BLIND
         ):
             raise
         if is_big_blind and current_raise_count == 0:
-            allowable_actions.add(check)
+            allowable_actions.add(Action.CHECK)
         else:
             if self.current_cash <= bet_to_follow:
-                allowable_actions.add(all_in)
+                allowable_actions.add(Action.ALL_IN)
             else:
-                allowable_actions.add(call)
+                allowable_actions.add(Action.CALL)
 
         # raise_bet, all_in
         required_raise_amount = raise_amount * (current_bet_count + current_raise_count + 1) - already_bet
         if self.current_cash <= required_raise_amount:
-            allowable_actions.add(all_in)
+            allowable_actions.add(Action.ALL_IN)
         else:
-            allowable_actions.add(raise_bet)
+            allowable_actions.add(Action.RAISE_BET)
 
     elif current_bet_count == 1 and current_raise_count == current_gameboard["max_raise_count"]:
         # call, all_in
@@ -137,14 +131,14 @@ def _alter_compute_allowable_pre_flop_actions(self, current_gameboard):
             raise
 
         if self.current_cash <= bet_to_follow:
-            allowable_actions.add(all_in)
+            allowable_actions.add(Action.ALL_IN)
         else:
-            allowable_actions.add(call)
+            allowable_actions.add(Action.CALL)
 
     else:
         raise
 
-    logger.debug("allowable_actions = " + ", ".join([action.__name__ for action in allowable_actions]))
+    # logger.debug("allowable_actions = " + ", ".join([action.name for action in allowable_actions]))
 
     return allowable_actions
 
@@ -174,19 +168,13 @@ def _alter_compute_allowable_flop_actions(self, current_gameboard):
         raise
 
     # 1. fold
-    # allowable_actions.add(fold)  # can fold at any time
+    # allowable_actions.add(Action.FOLD)  # can fold at any time
 
     # bet, raise_bet, call, chcek, all_in
 
-    if current_gameboard["board"].cur_phase.value in [
-        Phase.PRE_FLOP.value,
-        Phase.FLOP.value,
-    ]:
+    if current_gameboard["board"].cur_phase in [Phase.PRE_FLOP, Phase.FLOP]:
         raise_amount = current_gameboard["small_bet"]
-    elif current_gameboard["board"].cur_phase.value in [
-        Phase.TURN.value,
-        Phase.RIVER.value,
-    ]:
+    elif current_gameboard["board"].cur_phase in [Phase.TURN, Phase.RIVER]:
         raise_amount = current_gameboard["big_bet"]
     else:
         raise
@@ -198,21 +186,20 @@ def _alter_compute_allowable_flop_actions(self, current_gameboard):
     if current_bet_count == 0:
         # bet(all_in)
         if self.current_cash <= raise_amount:
-            allowable_actions.add(all_in)
+            allowable_actions.add(Action.ALL_IN)
         else:
-            allowable_actions.add(bet)
+            allowable_actions.add(Action.BET)
         # check
-        allowable_actions.add(check)
+        allowable_actions.add(Action.CHECK)
 
     elif current_bet_count == 1 and current_raise_count < current_gameboard["max_raise_count"]:
-
         # exception: BB in pre-flop
         if (
             current_gameboard["board"].cur_phase == Phase.PRE_FLOP
             and current_raise_count == 0
             and current_gameboard["board"].players_last_move_list[player_idx] == Action.BIG_BLIND
         ):
-            allowable_actions.add(check)
+            allowable_actions.add(Action.CHECK)
 
         # call, all_in
         bet_to_follow = raise_amount * (current_bet_count + current_raise_count) - already_bet
@@ -220,16 +207,16 @@ def _alter_compute_allowable_flop_actions(self, current_gameboard):
             raise
 
         if self.current_cash <= bet_to_follow:
-            allowable_actions.add(all_in)
+            allowable_actions.add(Action.ALL_IN)
         else:
-            allowable_actions.add(call)
+            allowable_actions.add(Action.CALL)
 
         # raise_bet, all_in
         required_raise_amount = raise_amount * (current_bet_count + current_raise_count + 1) - already_bet
         if self.current_cash <= required_raise_amount:
-            allowable_actions.add(all_in)
+            allowable_actions.add(Action.ALL_IN)
         else:
-            allowable_actions.add(raise_bet)
+            allowable_actions.add(Action.RAISE_BET)
 
     elif current_bet_count == 1 and current_raise_count == current_gameboard["max_raise_count"]:
         # call, all_in
@@ -239,14 +226,14 @@ def _alter_compute_allowable_flop_actions(self, current_gameboard):
             raise
 
         if self.current_cash <= bet_to_follow:
-            allowable_actions.add(all_in)
+            allowable_actions.add(Action.ALL_IN)
         else:
-            allowable_actions.add(call)
+            allowable_actions.add(Action.CALL)
 
     else:
         raise
 
-    logger.debug("allowable_actions = " + ", ".join([action.__name__ for action in allowable_actions]))
+    # logger.debug("allowable_actions = " + ", ".join([action.name for action in allowable_actions]))
 
     return allowable_actions
 
@@ -277,19 +264,13 @@ def _alter_compute_allowable_turn_actions(self, current_gameboard):
         raise
 
     # 1. fold
-    # allowable_actions.add(fold)  # can fold at any time
+    # allowable_actions.add(Action.FOLD)  # can fold at any time
 
     # bet, raise_bet, call, chcek, all_in
 
-    if current_gameboard["board"].cur_phase.value in [
-        Phase.PRE_FLOP.value,
-        Phase.FLOP.value,
-    ]:
+    if current_gameboard["board"].cur_phase in [Phase.PRE_FLOP, Phase.FLOP]:
         raise_amount = current_gameboard["small_bet"]
-    elif current_gameboard["board"].cur_phase.value in [
-        Phase.TURN.value,
-        Phase.RIVER.value,
-    ]:
+    elif current_gameboard["board"].cur_phase in [Phase.TURN, Phase.RIVER]:
         raise_amount = current_gameboard["big_bet"]
     else:
         raise
@@ -301,11 +282,11 @@ def _alter_compute_allowable_turn_actions(self, current_gameboard):
     if current_bet_count == 0:
         # bet(all_in)
         if self.current_cash <= raise_amount:
-            allowable_actions.add(all_in)
+            allowable_actions.add(Action.ALL_IN)
         else:
-            allowable_actions.add(bet)
+            allowable_actions.add(Action.BET)
         # check
-        allowable_actions.add(check)
+        allowable_actions.add(Action.CHECK)
 
     elif current_bet_count == 1 and current_raise_count < current_gameboard["max_raise_count"]:
 
@@ -315,7 +296,7 @@ def _alter_compute_allowable_turn_actions(self, current_gameboard):
             and current_raise_count == 0
             and current_gameboard["board"].players_last_move_list[player_idx] == Action.BIG_BLIND
         ):
-            allowable_actions.add(check)
+            allowable_actions.add(Action.CHECK)
 
         # call, all_in
         bet_to_follow = raise_amount * (current_bet_count + current_raise_count) - already_bet
@@ -323,16 +304,16 @@ def _alter_compute_allowable_turn_actions(self, current_gameboard):
             raise
 
         if self.current_cash <= bet_to_follow:
-            allowable_actions.add(all_in)
+            allowable_actions.add(Action.ALL_IN)
         else:
-            allowable_actions.add(call)
+            allowable_actions.add(Action.CALL)
 
         # raise_bet, all_in
         required_raise_amount = raise_amount * (current_bet_count + current_raise_count + 1) - already_bet
         if self.current_cash <= required_raise_amount:
-            allowable_actions.add(all_in)
+            allowable_actions.add(Action.ALL_IN)
         else:
-            allowable_actions.add(raise_bet)
+            allowable_actions.add(Action.RAISE_BET)
 
     elif current_bet_count == 1 and current_raise_count == current_gameboard["max_raise_count"]:
         # call, all_in
@@ -342,14 +323,14 @@ def _alter_compute_allowable_turn_actions(self, current_gameboard):
             raise
 
         if self.current_cash <= bet_to_follow:
-            allowable_actions.add(all_in)
+            allowable_actions.add(Action.ALL_IN)
         else:
-            allowable_actions.add(call)
+            allowable_actions.add(Action.CALL)
 
     else:
         raise
 
-    logger.debug("allowable_actions = " + ", ".join([action.__name__ for action in allowable_actions]))
+    # logger.debug("allowable_actions = " + ", ".join([action.name for action in allowable_actions]))
 
     return allowable_actions
 
@@ -380,19 +361,13 @@ def _alter_compute_allowable_river_actions(self, current_gameboard):
         raise
 
     # 1. fold
-    # allowable_actions.add(fold)  # can fold at any time
+    # allowable_actions.add(Action.FOLD)  # can fold at any time
 
     # bet, raise_bet, call, chcek, all_in
 
-    if current_gameboard["board"].cur_phase.value in [
-        Phase.PRE_FLOP.value,
-        Phase.FLOP.value,
-    ]:
+    if current_gameboard["board"].cur_phase in [Phase.PRE_FLOP, Phase.FLOP]:
         raise_amount = current_gameboard["small_bet"]
-    elif current_gameboard["board"].cur_phase.value in [
-        Phase.TURN.value,
-        Phase.RIVER.value,
-    ]:
+    elif current_gameboard["board"].cur_phase in [Phase.TURN, Phase.RIVER]:
         raise_amount = current_gameboard["big_bet"]
     else:
         raise
@@ -404,11 +379,11 @@ def _alter_compute_allowable_river_actions(self, current_gameboard):
     if current_bet_count == 0:
         # bet(all_in)
         if self.current_cash <= raise_amount:
-            allowable_actions.add(all_in)
+            allowable_actions.add(Action.ALL_IN)
         else:
-            allowable_actions.add(bet)
+            allowable_actions.add(Action.BET)
         # check
-        allowable_actions.add(check)
+        allowable_actions.add(Action.CHECK)
 
     elif current_bet_count == 1 and current_raise_count < current_gameboard["max_raise_count"]:
 
@@ -418,7 +393,7 @@ def _alter_compute_allowable_river_actions(self, current_gameboard):
             and current_raise_count == 0
             and current_gameboard["board"].players_last_move_list[player_idx] == Action.BIG_BLIND
         ):
-            allowable_actions.add(check)
+            allowable_actions.add(Action.CHECK)
 
         # call, all_in
         bet_to_follow = raise_amount * (current_bet_count + current_raise_count) - already_bet
@@ -426,16 +401,16 @@ def _alter_compute_allowable_river_actions(self, current_gameboard):
             raise
 
         if self.current_cash <= bet_to_follow:
-            allowable_actions.add(all_in)
+            allowable_actions.add(Action.ALL_IN)
         else:
-            allowable_actions.add(call)
+            allowable_actions.add(Action.CALL)
 
         # raise_bet, all_in
         required_raise_amount = raise_amount * (current_bet_count + current_raise_count + 1) - already_bet
         if self.current_cash <= required_raise_amount:
-            allowable_actions.add(all_in)
+            allowable_actions.add(Action.ALL_IN)
         else:
-            allowable_actions.add(raise_bet)
+            allowable_actions.add(Action.RAISE_BET)
 
     elif current_bet_count == 1 and current_raise_count == current_gameboard["max_raise_count"]:
         # call, all_in
@@ -445,14 +420,14 @@ def _alter_compute_allowable_river_actions(self, current_gameboard):
             raise
 
         if self.current_cash <= bet_to_follow:
-            allowable_actions.add(all_in)
+            allowable_actions.add(Action.ALL_IN)
         else:
-            allowable_actions.add(call)
+            allowable_actions.add(Action.CALL)
 
     else:
         raise
 
-    logger.debug("allowable_actions = " + ", ".join([action.__name__ for action in allowable_actions]))
+    # logger.debug("allowable_actions = " + ", ".join([action.name for action in allowable_actions]))
 
     return allowable_actions
 
