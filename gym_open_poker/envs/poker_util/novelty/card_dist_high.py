@@ -5,6 +5,8 @@ from card import Card
 from action import Action
 import collections
 import logging
+import initialize_game_elements
+
 
 logger = logging.getLogger("gym_open_poker.envs.poker_util.logging_info.novelty.card_dist_high")
 
@@ -26,8 +28,9 @@ class CardDistHigh(gym.Wrapper):
     def __init__(self, env):
 
         super().__init__(env)
-        sys.modules["initialize_game_elements"]._initialize_cards = getattr(sys.modules[__name__], "_alter_initialize_cards")
+
         sys.modules["board"].Board.reset_board_each_game = getattr(sys.modules[__name__], "_alter_reset_board_each_game")
+        sys.modules["initialize_game_elements"]._initialize_cards = getattr(sys.modules[__name__], "_alter_initialize_cards")
 
 
 def _alter_reset_board_each_game(self, current_gameboard):
@@ -43,7 +46,6 @@ def _alter_reset_board_each_game(self, current_gameboard):
         None
 
     """
-
     # deck
     self.deck_idx = 0
     self.community_cards = list()
@@ -55,6 +57,7 @@ def _alter_reset_board_each_game(self, current_gameboard):
     np.random.shuffle(first_portion)
     np.random.shuffle(second_portion)
     self.deck = first_portion + second_portion
+
     #
 
     # pots_attendee_list

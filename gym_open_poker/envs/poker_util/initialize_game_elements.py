@@ -29,6 +29,7 @@ from collections import deque
 import dealer
 import numpy as np
 import time
+import sys
 
 import logging
 
@@ -170,7 +171,6 @@ def _initialize_players(game_elements, player_decision_agents):
     :param player_decision_agents: dict of player name as its corresponding agent object
     :return: None
     """
-
     players = deque()
     for player_name, agent in player_decision_agents.items():
         player_args = dict()
@@ -234,6 +234,9 @@ def _initialize_game_history_structs(game_elements):
     game_elements["history"]["player_status"] = dict()  # {game_idx: [player_1's status, player_2's status, ...]}}
     game_elements["history"]["player_status"][0] = ["active"] * len(game_elements["players"])
     game_elements["history"]["player_strategy"] = dict()  # {game_idx: [player_1's strategy, player_2's strategy, ...]}}
+    game_elements["history"][
+        "action_history"
+    ] = dict()  # {game_idx: {player_1: [action1, action2 ...], player2: [action1, action2 ...]}}}
 
 
 def _initialize_rules(game_elements):

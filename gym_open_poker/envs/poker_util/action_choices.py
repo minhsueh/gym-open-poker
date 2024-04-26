@@ -20,7 +20,7 @@ def call(current_gameboard, player):
         flag(flag_config_dict):
 
     """
-
+    player.action_history.append(action.Action.CALL.name)
     logger.debug(f"{player.player_name} decides to make a --- Call ---")
 
     # Basic criteria:
@@ -75,6 +75,7 @@ def raise_bet(current_gameboard, player):
         flag(flag_config_dict):
 
     """
+    player.action_history.append(action.Action.RAISE_BET.name)
     logger.debug(f"{player.player_name} decides to --- Raise Bet ---")
 
     if current_gameboard["board"].current_bet_count == 0:
@@ -142,6 +143,7 @@ def fold(current_gameboard, player):
         flag(flag_config_dict):
 
     """
+    player.action_history.append(action.Action.FOLD.name)
     logger.debug(f"{player.player_name} decides to --- Fold ---")
     if player.is_fold:
         logger.debug(f"{player.player_name}: already fold in previous round, cannot fold again")
@@ -169,6 +171,7 @@ def check(current_gameboard, player):
         flag(flag_config_dict):
 
     """
+    player.action_history.append(action.Action.CHECK.name)
     logger.debug(f"{player.player_name} decides to --- Check ---")
 
     for player_idx in range(len(current_gameboard["board"].players_last_move_list)):
@@ -199,6 +202,7 @@ def bet(current_gameboard, player):
         flag(flag_config_dict):
 
     """
+    player.action_history.append(action.Action.BET.name)
     logger.debug(f"{player.player_name} decides to --- Bet ---")
 
     if current_gameboard["board"].current_bet_count == 1:
@@ -253,6 +257,7 @@ def all_in(current_gameboard, player):
 
 
     """
+    player.action_history.append(action.Action.ALL_IN.name)
     logger.debug(f"{player.player_name} decides to --- All-in --- with amount ${player.current_cash}!")
 
     if player.current_cash <= 0:

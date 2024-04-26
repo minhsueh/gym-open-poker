@@ -13,8 +13,9 @@ import time
 
 import gym_open_poker.envs.poker_util as poker_util
 from gym_open_poker.default import default_config_dict
-import sys
 import os
+import importlib
+import sys
 
 sys.path.append(os.path.dirname(poker_util.__file__))
 
@@ -139,6 +140,33 @@ class OpenPokerEnv(gym.Env):
         max_time_limitation = 999
 
         """
+        # reload all open, in case, there is novelty generator modify function before
+        """
+        gym_open_poker_module_list = []
+        for k, v in sys.modules.items():
+            if k.startswith("gym_open_poker"):
+                gym_open_poker_module_list.append(k)
+        for module_name in gym_open_poker_module_list:
+            importlib.reload(sys.modules[module_name])
+        """
+        # importlib.reload(sys.modules["action_choices"])
+        # importlib.reload(sys.modules["player"])
+        # importlib.reload(sys.modules["initialize_game_elements"])
+        # importlib.reload(sys.modules["board"])
+        # importlib.reload(sys.modules["dealer"])
+        """
+        utils_path = os.path.dirname(os.path.abspath(__file__)) + "/poker_util/"
+        for module_file in os.listdir(utils_path):
+            if module_file.endswith(".py"):
+                module_name = module_file[:-3]  # Remove the '.py' extension
+                if module_name != "__init__":
+                    module_path = os.path.join(utils_path, module_file)
+                    if module_name in sys.modules:
+                        module = sys.modules[module_name]
+                        importlib.reload(module)
+                    else:
+                        importlib.import_module(module_name)
+        """
 
         global logger
         # remove existed logger
@@ -196,6 +224,9 @@ class OpenPokerEnv(gym.Env):
                 "action": spaces.Box(-1, 5, shape=(self.number_of_players,), dtype=np.int64),
                 "pot_amount": spaces.Box(0, self.bankroll_limit, shape=(1,), dtype=np.int64),
                 "game_idx": spaces.Box(1, 999, shape=(1,), dtype=np.int64),
+                "buy_in": spaces.Box(1, 2000, shape=(1,), dtype=np.int64),
+                "big_blind": spaces.Box(1, 2000, shape=(1,), dtype=np.int64),
+                "small_blind": spaces.Box(1, 2000, shape=(1,), dtype=np.int64),
             }
         )
 
@@ -385,6 +416,15 @@ class OpenPokerEnv(gym.Env):
     def _get_game_index(self):
         return np.array([self.game_elements["board"].game_idx])
 
+    def _get_buy_in(self):
+        return np.array([self.game_elements["board"].buy_in_amount])
+
+    def _get_big_blind(self):
+        return np.array([self.game_elements["big_blind_amount"]])
+
+    def _get_small_blind(self):
+        return np.array([self.game_elements["small_blind_amount"]])
+
     def _get_reward(self):
         if self.game_elements["board"].game_idx <= 1 or self.game_elements["board"].cur_phase in [
             Phase.FLOP,
@@ -409,9 +449,13 @@ class OpenPokerEnv(gym.Env):
             "action": self._get_action_info(),
             "pot_amount": self._get_pot_amount(),
             "game_idx": self._get_game_index(),
+            "buy_in": self._get_buy_in(),
+            "big_blind": self._get_big_blind(),
+            "small_blind": self._get_small_blind(),
         }
 
     def set_up_board(self, random_seed):
+        #
         game_element = initialize_game_element(self.player_decision_agents, self.customized_arg_dict, random_seed)
         return game_element
 
@@ -1137,8 +1181,13 @@ class OpenPokerEnv(gym.Env):
         # phase
         game_info_list.append(str(self.game_elements["board"].cur_phase.name))
         # bet and raise number
-        bet_count_string = "  Bet count: " + str(self.game_elements["board"].current_bet_count)
-        raise_bet_count_string = "  Raise_bet count: " + str(self.game_elements["board"].current_raise_count)
+        bet_count_string = "  Bet count: " + str(self.game_elements["board"].current_bet_count) + "/1"
+        raise_bet_count_string = (
+            "  Raise_bet count: "
+            + str(self.game_elements["board"].current_raise_count)
+            + "/"
+            + str(self.game_elements["max_raise_count"])
+        )
         game_info_list.append(bet_count_string)
         game_info_list.append(raise_bet_count_string)
 
@@ -1184,6 +1233,31 @@ class OpenPokerEnv(gym.Env):
     def close(self):
         pass
         """
+        cur_module = set(sys.modules)
+        to_remove_module = cur_module.intersection(self.preload_module)
+        utils_path = os.path.dirname(os.path.abspath(__file__)) + "/poker_util/"
+        for module_file in os.listdir(utils_path):
+            if module_file.endswith(".py"):
+                module_name = module_file[:-3]  # Remove the '.py' extension
+                if module_name != "__init__":
+                    module_path = os.path.join(utils_path, module_file)
+                    if module_name in sys.modules:
+                        print(module_name)
+                        print(id(sys.modules[module_name]))
+                        importlib.reload(sys.modules[module_name])
+                        print(id(sys.modules[module_name]))
+                        if module_name == "phase":
+                            print("------~~")
+                            print(id(Phase.PRE_FLOP))
+                            print(id(sys.modules[module_name].Phase.PRE_FLOP))
+        
+        for module in to_remove_module:
+            if module == "sys":
+                continue
+            print(module)
+            del sys.modules[module]
+
+        
         if self.window is not None:
             pygame.display.quit()
             pygame.quit()

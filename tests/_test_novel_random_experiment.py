@@ -55,7 +55,8 @@ while True:
     all_action_list = np.array(list(range(6)))
     allowable_actions = all_action_list[action_mask]
     print(f"allowable_actions = {allowable_actions}")
-    user_action = np.random.choice(allowable_actions, size=1).item()
+    # user_action = np.random.choice(allowable_actions, size=1).item()
+    user_action = input()
     print(user_action)
     # print('----------------')
     observation, reward, terminated, truncated, info = env.step(int(user_action))
@@ -77,6 +78,11 @@ while True:
             else:
                 print("LOST!")
         break
+
+
+history = env.get_tournament_summary()
+action_history = history["action_history"]
+print(action_history)
 
 
 # env.close()

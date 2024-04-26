@@ -16,7 +16,7 @@ class Agent3(gym.Wrapper):
 
         super().__init__(env)
 
-        add_player_number = 15
+        add_player_number = 5
 
         # add one new player
         last_player_index = env.number_of_players

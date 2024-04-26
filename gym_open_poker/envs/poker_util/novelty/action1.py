@@ -8,6 +8,7 @@ from action import Action
 from action_choices import call, all_in, raise_bet, bet, check, fold
 from phase import Phase
 from flag_config import flag_config_dict
+from player import Player
 
 
 import logging
@@ -34,7 +35,6 @@ class Action1(gym.Wrapper):
         sys.modules["player"].Player.compute_allowable_turn_actions = getattr(
             sys.modules[__name__], "_alter_compute_allowable_turn_actions"
         )
-        print(sys.modules["player"].Player.compute_allowable_river_actions)
         sys.modules["player"].Player.compute_allowable_river_actions = getattr(
             sys.modules[__name__], "_alter_compute_allowable_river_actions"
         )

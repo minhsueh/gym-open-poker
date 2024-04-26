@@ -44,9 +44,11 @@ class NoveltyGenerator:
             for novelty_string in novelty_list:
                 novelty = getattr(novelty_module, novelty_string, None)
                 self._logging(novelty, novelty_index)
-                novel_env = novelty(env)
+                if novelty_index == 1:
+                    novel_env = novelty(env)
+                else:
+                    novel_env = novelty(novel_env)
                 novelty_index += 1
-
         return novel_env
 
     def _logging(self, novelty, novelty_index=None):

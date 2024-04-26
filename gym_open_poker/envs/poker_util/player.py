@@ -30,6 +30,8 @@ class Player:
         self.last_game_cash = current_cash
         self.last_reward = 0
 
+        self.action_history = []
+
     def assign_hole_cards(self, cards):
         """
         assign hole cards to player from board

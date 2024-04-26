@@ -84,10 +84,13 @@ def _alter_conclude_game(current_gameboard):
     player_cash_list = []
     player_status_list = []
     player_strategy_list = []
+    player_action_dict = dict()
     for player_idx in range(1, current_gameboard["total_number_of_players"] + 1):
         player = current_gameboard["players_dict"]["player_" + str(player_idx)]
         player_cash_list.append(player.current_cash)
         player_status_list.append(player.status)
+        player_action_dict["player_" + str(player_idx)] = player.action_history
+        player.action_history = []
         if player_idx == 1:
             player_strategy_list.append("player_1")
         else:
@@ -95,6 +98,7 @@ def _alter_conclude_game(current_gameboard):
     current_gameboard["history"]["cash"][cur_game_idx] = player_cash_list
     current_gameboard["history"]["player_status"][cur_game_idx] = player_status_list
     current_gameboard["history"]["player_strategy"][cur_game_idx] = player_strategy_list
+    current_gameboard["history"]["action_history"][cur_game_idx] = player_action_dict
 
     # print(current_gameboard['board'].history)
 
