@@ -29,7 +29,7 @@ from phase import Phase
 from action import Action
 import action_choices
 import dealer
-from initialize_game_elements import initialize_game_element
+import initialize_game_elements
 
 from gym_open_poker.envs.poker_util.agents import agent_p, agent_dump, agent_random, agent_dqn_4
 
@@ -456,7 +456,9 @@ class OpenPokerEnv(gym.Env):
 
     def set_up_board(self, random_seed):
         #
-        game_element = initialize_game_element(self.player_decision_agents, self.customized_arg_dict, random_seed)
+        game_element = initialize_game_elements.initialize_game_element(
+            self.player_decision_agents, self.customized_arg_dict, random_seed
+        )
         return game_element
 
     def _get_info(self, stopped=False):

@@ -13,7 +13,7 @@ def call(current_gameboard, player):
     """
     Args:
         current_gameboard
-        player
+        player (Player)
 
 
     Returns:

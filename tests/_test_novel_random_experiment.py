@@ -21,6 +21,7 @@ else:
     config_dict = dict()
 
 # config_dict: Dict[str, List] = dict()
+print(config_dict)
 
 # original environment
 env = gym.make("gym_open_poker/OpenPoker-v0", **config_dict)
@@ -31,7 +32,7 @@ ng = NoveltyGenerator()
 print(ng.get_support_novelties())
 
 # print out supported novelies
-# print(ng.get_support_novelties())
+print(ng.get_support_novelties())
 # injecting
 if "novelty_list" in config_dict and config_dict["novelty_list"] and len(config_dict["novelty_list"]) > 0:
     env = ng.inject(env, config_dict["novelty_list"])
@@ -55,8 +56,8 @@ while True:
     all_action_list = np.array(list(range(6)))
     allowable_actions = all_action_list[action_mask]
     print(f"allowable_actions = {allowable_actions}")
-    # user_action = np.random.choice(allowable_actions, size=1).item()
-    user_action = input()
+    user_action = np.random.choice(allowable_actions, size=1).item()
+    # user_action = input()
     print(user_action)
     # print('----------------')
     observation, reward, terminated, truncated, info = env.step(int(user_action))
@@ -82,7 +83,7 @@ while True:
 
 history = env.get_tournament_summary()
 action_history = history["action_history"]
-print(action_history)
+# print(action_history)
 
 
 # env.close()
