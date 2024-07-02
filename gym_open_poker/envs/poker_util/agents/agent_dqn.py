@@ -12,7 +12,7 @@ Note that DQN is trained by playing with 4 agent_p.
 np.random.seed(15)
 
 current_path = os.path.dirname(os.path.realpath(__file__))
-read_dqn_path = current_path + "/agent_dqn_4/dqn_100.keras"
+read_dqn_path = current_path + "/agentDQN/DQN.keras"
 DQN = tf.keras.saving.load_model(read_dqn_path)
 EPSILON = 0
 
@@ -265,7 +265,7 @@ def _get_info(current_gameboard, player_name, stopped=False):
         else:
             raise
 
-        allowable_string = [action.__name__ for action in allowable_actions]
+        allowable_string = [action.name for action in allowable_actions]
         action_masks = []
         for action in ["call", "bet", "raise_bet", "check", "fold", "all_in"]:
             if action in allowable_string:
