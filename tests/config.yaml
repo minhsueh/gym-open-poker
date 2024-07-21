@@ -1,7 +1,7 @@
 # --------log file path--------
-log_file_path: './test.log'
+log_file_path: "./test.log"
 # --------visualization parameters--------
-render_mode: 'human'  # None or human
+render_mode: "human" # None or human
 show_all_move_mode: False
 visualize_debug_mode: True
 # window_width: 1200
@@ -10,38 +10,85 @@ sleep_time: 1
 # --------background agents--------
 background_agents_raw_list:
   - agent_type: "agent_p"
-    number_of_agent: 1
+    number_of_agent: 0
   - agent_type: "agent_dump"
-    number_of_agent: 2
+    number_of_agent: 0
   - agent_type: "agent_random"
+    number_of_agent: 0
+  - agent_type: "agent_dqn"
     number_of_agent: 1
 # --------general pokers rules--------
 # max_raise_count: 3
 # small_blind: 5
 # big_small_blind_ratio: 2 # big_blind = small_blind * big_small_blind_ratio
-# seed: 15
-# buy_in_amount: 200
+seed: 30
+buy_in_amount: 200
 # bankroll_limit: 1500
 # --------termination conditions--------
-# max_game_limitation: 1
+max_game_limitation: 30
 # max_time_limitation: 999
 # --------novvelty list--------
 novelty_list:
-#  - CardDistLow
-#  - CardDistHigh
-#  - Card1
-  - Action1
-#  - RANDOM
-#  - Environment1
-#  - Environment2
-#  - Agent1
-#  - Agent2
-#  - Agent3
-#  - Event1
-#  - Rule1
-#  - Rule2
-#  - Rule3
-#  - Event2
-#  - Card2
-#  - Rule4
-#  - Card3
+  # - novelty_name: card.CardDistHigh
+  # - novelty_name: card.CardDistLow
+  # - novelty_name: card.CardDistSuit
+  #    param:
+  #      prohibit_suit: "diamond"
+  # - novelty_name: card.CardDistOdd
+  #   param:
+  #    prohibit_parity: "odd"
+  - novelty_name: card.CardDistColor
+  #  param:
+  #    prohibit_color: "red"
+
+  # - novelty_name: conclude_game.Incentive
+  #   param:
+  #     amount: -100
+  # - novelty_name: conclude_game.Tipping
+  #   param:
+  #    ratio: 0.5
+  # - novelty_name: conclude_game.SeatChanging
+  # - novelty_name: conclude_game.LuckySeven
+  #   param:
+  #     amount: 100
+  # - novelty_name:
+  #    conclude_game.HiddenCard
+
+  # - novelty_name: game_element.AllOdd
+  # - novelty_name: game_element.BigBlindChange
+  #   param:
+  #     big_small_blind_ratio: 4
+  # - novelty_name: game_element.BigBetChange
+  #   param:
+  #     big_small_bet_ratio: 4
+  # - novelty_name: game_element.BuyIn
+  #   param:
+  #     buy_in_amount: 1000
+  # - novelty_name: game_element.TournamentLength
+  #  param:
+  #    max_game_limitation: 10
+  # - novelty_name: agent.AgentExchange
+
+  # - novelty_name: agent.AddAgentR
+  #   param:
+  #     add_player_number: 2
+  # - novelty_name: agent.AddAgentConservative
+  #   param:
+  #     add_player_number: 2
+  # - novelty_name: agent.AddAgentAggressive
+  #   param:
+  #     add_player_number: 2
+  # - novelty_name: agent.AddAgentStirring
+  #   param:
+  #     add_player_number: 2
+
+  # - novelty_name: action.GameFoldRestrict
+  # - novelty_name: action.NoFreeLunch
+  # - novelty_name: action.ActionHierarchy
+  # - novelty_name: action.WealthTax
+  #   param:
+  #      tax_ratio: 2
+  # - novelty_name: action.RoundActionReStrict
+  #   param:
+  #     restricted_action: "fold"
+  #     restricted_phase: "pre-flop"

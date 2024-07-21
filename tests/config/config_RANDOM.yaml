@@ -1,0 +1,47 @@
+# --------log file path--------
+log_file_path: "./testing_log/test_RANDOM.log"
+# --------visualization parameters--------
+render_mode: "None" # None or human
+show_all_move_mode: False
+visualize_debug_mode: False
+# window_width: 1200
+# window_height: 600
+sleep_time: 1
+# --------background agents--------
+background_agents_raw_list:
+  - agent_type: "agent_p"
+    number_of_agent: 0
+  - agent_type: "agent_dump"
+    number_of_agent: 0
+  - agent_type: "agent_random"
+    number_of_agent: 4
+# --------general pokers rules--------
+# max_raise_count: 3
+# small_blind: 5
+# big_small_blind_ratio: 2 # big_blind = small_blind * big_small_blind_ratio
+# seed: 15
+# buy_in_amount: 200
+# bankroll_limit: 1500
+# --------termination conditions--------
+max_game_limitation: 30
+# max_time_limitation: 999
+# --------novvelty list--------
+novelty_list:
+  #  - CardDistLow
+  # - CardDistHigh
+  # - Card1
+  # - Action1
+  - RANDOM
+  #  - Environment1
+  #  - Environment2
+  #  - Agent1
+  #  - Agent2
+  #  - Agent3
+  #  - Event1
+  #  - Rule1
+  # Rule2
+  #  - Rule3
+  #  - Event2
+  #  - Card2
+  #  - Rule4
+  #  - Card3

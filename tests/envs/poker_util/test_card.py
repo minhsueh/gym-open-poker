@@ -348,6 +348,14 @@ class TestIs(unittest.TestCase):
                       Card('diamond', 10),
                       Card('diamond', 11)]
         self.assertEqual(is_royal_flush(total_hand), False, "No straight")
+        total_hand = [Card('heart', 1),
+                      Card('diamond', 2),
+                      Card('heart', 3),
+                      Card('heart', 4),
+                      Card('heart', 5),
+                      Card('diamond', 7),
+                      Card('heart', 9)]
+        self.assertEqual(is_royal_flush(total_hand), False, "No flush at 2")
 
 
 class TestGet(unittest.TestCase):
