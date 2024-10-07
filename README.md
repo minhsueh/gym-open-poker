@@ -218,11 +218,16 @@ git clone https://github.com/minhsueh/gym-open-poker.git
 ```
 cd gym-open-poker
 ```
-3. Install the package in editable mode:
+3. Create virtual environment 
+```
+python3 -m venv .env
+source .env/bin/activate
+```
+4. Install the package in editable mode:
 ```
 pip3 install -e .
 ```
-4. Install additional dependencies:
+5. Install additional dependencies:
 ```
 pip3 install -r requirements.txt
 ```
