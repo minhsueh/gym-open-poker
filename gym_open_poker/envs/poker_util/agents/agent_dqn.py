@@ -5,39 +5,32 @@ from action import Action
 import action_choices
 import os
 
+
+from .agent_q_reward_shaping_with_replay_frame import AgentDQNReplayFrame
+
 """
 This agent use DQN to perform the best action.
-Note that DQN is trained by playing with 4 agent_p.
+0517_r0_d0_p9_T300_replay_frame_lr0.0001_delta0.9.keras
 """
 np.random.seed(15)
 
 current_path = os.path.dirname(os.path.realpath(__file__))
-read_dqn_path = current_path + "/agentDQN/DQN.keras"
-DQN = tf.keras.saving.load_model(read_dqn_path)
+read_dqn_path = current_path + "/agent_dqn/0517_r0_d0_p9_T300_replay_frame_lr0.0001_delta0.9.keras"
+DQN = AgentDQNReplayFrame()
+DQN.initialize(learning=False, read_dqn_path=read_dqn_path)
+
 EPSILON = 0
 
 
 def make_decision(current_gameboard, player_name):
     observation, info = get_observation_info(current_gameboard, player_name)
+    print(info)
+    action_mask = info["action_masks"]
     action_mask_bool = info["action_masks"].astype(bool)
     all_action_list = np.array(list(range(6)))
     allowable_actions = all_action_list[action_mask_bool]
 
-    encoding_observation = observation_encoder(observation, info)
-    predicted = DQN.predict(encoding_observation)
-
-    # epsilon_greedy
-    p = np.random.random()
-    if p < EPSILON:
-        user_action = np.random.choice(allowable_actions)
-    else:
-        sorted_predicted = tf.argsort(predicted, direction="DESCENDING").numpy()
-
-        for action_idx in np.nditer(sorted_predicted):
-            # if action_mask[action_idx].item() == 1:
-            if action_idx in allowable_actions:
-                user_action = action_idx
-                break
+    user_action = DQN.action(observation, 0, False, False, info)
     return user_action
 
 
@@ -51,15 +44,7 @@ def make_pre_flop_moves(player, current_gameboard, allowable_actions):
     Returns:
         function
     """
-    user_action = make_decision(current_gameboard, player.player_name)
-    action_function = _action_decoder(user_action)
-
-    # parameters the agent need to take actions with
-    params = dict()
-    params["current_gameboard"] = current_gameboard
-    params["player"] = player
-
-    return action_function, params
+    return make_decision(current_gameboard, player.player_name)
 
 
 def make_flop_moves(player, current_gameboard, allowable_actions):
@@ -74,16 +59,7 @@ def make_flop_moves(player, current_gameboard, allowable_actions):
         function
     """
     # parameters the agent need to take actions with
-    user_action = make_decision(current_gameboard, player.player_name)
-    action_function = _action_decoder(user_action)
-
-    # parameters the agent need to take actions with
-    params = dict()
-    params["current_gameboard"] = current_gameboard
-    params["player"] = player
-
-    return action_function, params
-
+    return make_decision(current_gameboard, player.player_name)
 
 def make_turn_moves(player, current_gameboard, allowable_actions):
     """Strategies for agent in flop round
@@ -97,15 +73,7 @@ def make_turn_moves(player, current_gameboard, allowable_actions):
     """
 
     # parameters the agent need to take actions with
-    user_action = make_decision(current_gameboard, player.player_name)
-    action_function = _action_decoder(user_action)
-
-    # parameters the agent need to take actions with
-    params = dict()
-    params["current_gameboard"] = current_gameboard
-    params["player"] = player
-
-    return action_function, params
+    return make_decision(current_gameboard, player.player_name)
 
 
 def make_river_moves(player, current_gameboard, allowable_actions):
@@ -119,15 +87,7 @@ def make_river_moves(player, current_gameboard, allowable_actions):
     Returns:
         function
     """
-    user_action = make_decision(current_gameboard, player.player_name)
-    action_function = _action_decoder(user_action)
-
-    # parameters the agent need to take actions with
-    params = dict()
-    params["current_gameboard"] = current_gameboard
-    params["player"] = player
-
-    return action_function, params
+    return make_decision(current_gameboard, player.player_name)
 
 
 def _build_decision_agent_methods_dict():
@@ -155,71 +115,6 @@ def get_observation_info(current_gameboard, player_name):
 
     return observation, info
 
-
-def observation_encoder(observation, info):
-    """
-    Args:
-        observation(np.array): the observation returned by gym
-        info(np.array): the info returned by gym
-    Return:
-        (keras tensor)
-    """
-    """
-    In this agent, I just use fully connected layer, so the order of inpuut does not matter.
-    1. game index: size 1: potential values (1~30)
-    2. phase: size 1 with 4 potential values
-    3. pot amount: size 1: potential values (0~1600)
-    4. community cards: size 5 with 53 potential valus (-1 in pre-flop) 
-    5. position: size 2
-    6. hole cards: size 2 with 53 potential valus (-1 in pre-flop)
-    7. player's bankroll: size 10 (defualt that there are 10 players in game, -1 if no player)
-    8. player's action: size 10 (defualt that there are 10 players in game, -1 if no player)
-    """
-
-    # 1. game_index
-    game_index = observation["game_idx"].tolist()
-    # 2. phase
-    if observation["community_card"][4] != -1:
-        # river
-        phase = [3]
-    elif observation["community_card"][3] != -1:
-        # turn
-        phase = [2]
-    elif observation["community_card"][0] != -1:
-        # flop
-        phase = [1]
-    elif observation["community_card"][0] == -1:
-        # pre-flop
-        phase = [0]
-    else:
-        raise
-    # 3. pot amount
-    pot_amount = observation["pot_amount"].tolist()
-    # 4. community cards:
-    community_card = observation["community_card"].tolist()
-    # 5. position
-    position = observation["position"].tolist()
-    # 6. hole cards:
-    hole_cards = observation["hole_cards"].tolist()
-    # 7. player's bankroll
-    bankroll_raw = observation["bankroll"].tolist()
-    if len(bankroll_raw) <= 10:
-        bankroll = bankroll_raw + [-1] * (10 - len(bankroll_raw))
-    else:
-        bankroll = bankroll_raw[:10]
-    # 8. player's action
-    player_action_raw = observation["action"].tolist()
-    if len(bankroll_raw) <= 10:
-        player_action = player_action_raw + [-1] * (10 - len(player_action_raw))
-    else:
-        player_action = player_action_raw[:10]
-
-    observation_encoded_list = (
-        game_index + phase + pot_amount + community_card + position + hole_cards + bankroll + player_action
-    )
-    observation_encoded = tf.convert_to_tensor(observation_encoded_list, dtype=tf.float32)
-    observation_encoded_reshape = tf.expand_dims(observation_encoded, axis=0)
-    return observation_encoded_reshape
 
 
 def _get_obs(current_gameboard, player_name, stopped=False):
@@ -267,7 +162,7 @@ def _get_info(current_gameboard, player_name, stopped=False):
 
         allowable_string = [action.name for action in allowable_actions]
         action_masks = []
-        for action in ["call", "bet", "raise_bet", "check", "fold", "all_in"]:
+        for action in ["CALL", "BET", "RAISE_BET", "CHECK", "FOLD", "ALL_IN"]:
             if action in allowable_string:
                 action_masks.append(1)
             else:
@@ -292,6 +187,7 @@ def _get_info(current_gameboard, player_name, stopped=False):
     output_info_dict["previous_showdown"] = showdown
 
     return output_info_dict
+
 
 
 def _get_status_and_bankroll_info(current_gameboard):

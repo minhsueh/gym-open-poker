@@ -10,13 +10,11 @@ sleep_time: 1
 # --------background agents--------
 background_agents_raw_list:
   - agent_type: "agent_p"
-    number_of_agent: 0
+    number_of_agent: 2
   - agent_type: "agent_dump"
-    number_of_agent: 0
+    number_of_agent: 2
   - agent_type: "agent_random"
-    number_of_agent: 0
-  - agent_type: "agent_dqn"
-    number_of_agent: 1
+    number_of_agent: 2
 # --------general pokers rules--------
 # max_raise_count: 3
 # small_blind: 5
