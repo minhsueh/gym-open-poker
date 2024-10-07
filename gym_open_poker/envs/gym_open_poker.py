@@ -31,7 +31,7 @@ import action_choices
 import dealer
 import initialize_game_elements
 
-from gym_open_poker.envs.poker_util.agents import agent_p, agent_dump, agent_random, agent_dqn
+from gym_open_poker.envs.poker_util.agents import agent_p, agent_dump, agent_random
 
 # from gym_open_poker.envs.poker_util.agents import *
 
