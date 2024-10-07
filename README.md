@@ -218,11 +218,16 @@ git clone https://github.com/minhsueh/gym-open-poker.git
 ```
 cd gym-open-poker
 ```
-3. Install the package in editable mode:
+3. Create virtual environment 
+```
+python3 -m venv .env
+source .env/bin/activate
+```
+4. Install the package in editable mode:
 ```
 pip3 install -e .
 ```
-4. Install additional dependencies:
+5. Install additional dependencies:
 ```
 pip3 install -r requirements.txt
 ```
@@ -230,16 +235,16 @@ pip3 install -r requirements.txt
 ### Development Execution
 1. Navigate to the testing directory:
 ```
-cd test
+cd tests
 ```
 2. Execute the simulator
 original poker:
 ```
-python3 test_experiment.py
+python3 test_experiment_original.py
 ```
 novel poker: (Can you detect the difference from the original one?)
 ```
-python3 test_novel_experiment.py
+python3 test_experiment_novel_user_action.py
 ```
 3. Post-analysis:
 ```
