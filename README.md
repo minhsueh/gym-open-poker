@@ -42,7 +42,7 @@ Within this software package, the implementation of Limit Texas Hold'em is provi
 - Python 3.9 or above
 
 
-### General User Installation
+### General User
 
 1. Create virtual environment in your desired folder
 ```
@@ -232,7 +232,7 @@ For example, setting ```visualize_debug_mode: True``` enables developers to dire
 <p style="text-align: center;">The visualization of debug game mode.</p>
 
 
-### Development Installation
+### Developer 
 1. Clone the repository:
 ```
 git clone https://github.com/minhsueh/gym-open-poker.git
@@ -255,7 +255,7 @@ pip3 install -e .
 pip3 install -r requirements.txt
 ```
 
-### Development Execution
+### Developer Execution
 1. Navigate to the testing directory:
 ```
 cd tests
