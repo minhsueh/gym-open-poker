@@ -63,6 +63,7 @@ if os.path.exists(config_path):
             config_dict = yaml.safe_load(stream)
         except yaml.YAMLError as exc:
             print(exc)
+            raise ValueError (f"{exc}")
 else:
     config_dict = dict()
 
