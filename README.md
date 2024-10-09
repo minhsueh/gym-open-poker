@@ -41,6 +41,12 @@ Within this software package, the implementation of Limit Texas Hold'em is provi
 ### Prerequisites
 - Python 3.9 or above
 
+### Create virtual environment in your desired folder
+```
+python3 -m venv .env
+source .env/bin/activate
+```
+
 ### User Installation
 ```
 pip3 install gym-open-poker
