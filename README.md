@@ -47,7 +47,11 @@ pip3 install gym-open-poker
 ```
 
 ### User Execution
-Sample script for running the simulator
+Create execution file
+```
+touch exe.py
+```
+Copy the following into `exe.py`
 ```
 import gym
 import gym_open_poker
@@ -62,7 +66,6 @@ if os.path.exists(config_path):
         try:
             config_dict = yaml.safe_load(stream)
         except yaml.YAMLError as exc:
-            print(exc)
             raise ValueError (f"{exc}")
 else:
     config_dict = dict()
@@ -113,6 +116,12 @@ while(True):
         break
 ```
 It is also possible to customize the parameters within the configuration file. You can make modifications to the following settings, save the file as config.yaml, and place it alongside the executable file.
+
+Create config file
+```
+touch config.yaml
+```
+Copy the following into `config.yaml`
 ```
 # --------log file path--------
 log_file_path: './test.log'
@@ -204,6 +213,13 @@ novelty_list:
   #     restricted_phase: "pre-flop"
 
 ```
+
+Finally, execute pokerOWL by:
+```
+python3 exe.py
+```
+
+
 For example, setting ```visualize_debug_mode: True``` enables developers to directly see all players' cards, making it easier for development, as illustrated below:
 
 ![alt text](./videos/trim_debug_mode.gif)
