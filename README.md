@@ -41,13 +41,19 @@ Within this software package, the implementation of Limit Texas Hold'em is provi
 ### Prerequisites
 - Python 3.9 or above
 
-### User Installation
+
+### General User
+
+1. Create virtual environment in your desired folder
+```
+python3 -m venv .env
+source .env/bin/activate
+```
+2. User Installation
 ```
 pip3 install gym-open-poker
 ```
-
-### User Execution
-Create execution file
+3. Create execution file
 ```
 touch exe.py
 ```
@@ -117,7 +123,7 @@ while(True):
 ```
 It is also possible to customize the parameters within the configuration file. You can make modifications to the following settings, save the file as config.yaml, and place it alongside the executable file.
 
-Create config file
+5. Create config file
 ```
 touch config.yaml
 ```
@@ -214,7 +220,7 @@ novelty_list:
 
 ```
 
-Finally, execute pokerOWL by:
+6. execute pokerOWL
 ```
 python3 exe.py
 ```
@@ -226,7 +232,7 @@ For example, setting ```visualize_debug_mode: True``` enables developers to dire
 <p style="text-align: center;">The visualization of debug game mode.</p>
 
 
-### Development Installation
+### Developer 
 1. Clone the repository:
 ```
 git clone https://github.com/minhsueh/gym-open-poker.git
@@ -249,7 +255,7 @@ pip3 install -e .
 pip3 install -r requirements.txt
 ```
 
-### Development Execution
+### Developer Execution
 1. Navigate to the testing directory:
 ```
 cd tests
