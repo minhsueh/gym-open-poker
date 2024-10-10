@@ -276,8 +276,26 @@ cat test.log
 
 
 
-Note:
+Final notes:
 - You can modify the game parameters in config.yaml
+- To ensure smooth execution when running multiple experiments with different novelties, it is recommended to manage the experiment process using Bash scripts. This approach is beneficial because the novelty generator alters the imported objects and functions in the code. Re-importing them is necessary to restore the original functions between experiments, ensuring consistent behavior.
+
+The following Bash script `exe.sh` helps streamline the process of running experiments with different novelty names as input arguments. The script invokes the Python script `exe_with_input.py`, passing the novelty names directly as arguments.
+``` bash
+novelty_array=(
+    card.CardDistColor
+    conclude_game.Incentive
+)
+for((ni = 0; ni < ${#novelty_array[@]}; ni++))
+do
+    n1=${novelty_array[${ni}]}
+    python3 exe_with_input.py "${ni}"
+done
+```
+Execute bash file:
+``` bash
+bash exe.sh
+```
 
 ## Authors
 - Min-Hsueh Chiu - [GitHub](https://github.com/minhsueh)
