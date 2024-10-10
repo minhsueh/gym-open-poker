@@ -41,7 +41,7 @@ class NoveltyGenerator:
                 # novelty_category, novelty_string = novelty_string_raw.split(".")
 
                 # if novelty_category not in self._novelties or novelty_string not in self._novelties[novelty_category]:
-                print(novelty_dict)
+                # print(novelty_dict)
                 if novelty_dict["novelty_name"] not in self._novelties:
                     novelty_string = novelty_dict["novelty_name"]
                     raise ValueError(

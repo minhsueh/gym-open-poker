@@ -87,7 +87,7 @@ for cls in locals_values:
         __all__.append(f"{novelty_category}.{novelty_string}")
 
 NOVELTY_LIST = __all__
-print(NOVELTY_LIST)
+# print(NOVELTY_LIST)
 # print(NOVELTY_DICT)
 """
 
