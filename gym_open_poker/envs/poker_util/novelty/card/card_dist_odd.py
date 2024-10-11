@@ -47,11 +47,12 @@ def _alter_reset_board_each_game(self, current_gameboard):
     self.community_cards = list()
 
     # novelty
+    self.random_func.set_state(self.random_state)
     first_x_card = 4 * 7  # 7 odd numbers, 4 suits for each number
     first_portion = self.deck[:first_x_card]
     second_portion = self.deck[first_x_card:]
-    np.random.shuffle(first_portion)
-    np.random.shuffle(second_portion)
+    self.random_func.shuffle(first_portion)
+    self.random_func.shuffle(second_portion)
     self.deck = first_portion + second_portion
     #
 

@@ -146,7 +146,9 @@ def _alter_conclude_game(current_gameboard):
     logger.debug(f"The player sequence before novelty: {player_seq_before_novelty}")
     logger.debug("Novelty rule3: all players randomly change their seats")
 
-    np.random.shuffle(current_gameboard["players"])
+
+    current_gameboard['board'].random_func.set_state(current_gameboard['board'].random_state)
+    current_gameboard['board'].random_func.shuffle(current_gameboard["players"])
 
     player_seq_after_novelty = get_player_sequence(current_gameboard)
     logger.debug(f"The player sequence after novelty: {player_seq_after_novelty}")

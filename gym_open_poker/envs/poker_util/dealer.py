@@ -596,7 +596,6 @@ def initialize_game(current_gameboard):
     # game index
 
     current_gameboard["board"].game_idx += 1
-
     # reset board
     current_gameboard["board"].reset_board_each_game(current_gameboard)
 

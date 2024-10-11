@@ -9,8 +9,8 @@ import numpy as np
 """
 This agent randomly select one action from allowable_actions.
 """
-np.random.seed(15)
-
+RANDOM_SEED = 15
+rng = np.random.default_rng(RANDOM_SEED)
 
 def make_pre_flop_moves(player, current_gameboard, allowable_actions):
     """Strategies for agent in pre-flop round
@@ -22,8 +22,9 @@ def make_pre_flop_moves(player, current_gameboard, allowable_actions):
     Returns:
         function
     """
-
-    return np.random.choice(list(allowable_actions))
+    aa_list = list(allowable_actions)
+    aa_list.sort(key = lambda x: x.value)
+    return rng.choice(aa_list)
 
 
 def make_flop_moves(player, current_gameboard, allowable_actions):
@@ -37,8 +38,9 @@ def make_flop_moves(player, current_gameboard, allowable_actions):
     Returns:
         function
     """
-
-    return np.random.choice(list(allowable_actions))
+    aa_list = list(allowable_actions)
+    aa_list.sort(key = lambda x: x.value)
+    return rng.choice(aa_list)
 
 
 def make_turn_moves(player, current_gameboard, allowable_actions):
@@ -51,8 +53,9 @@ def make_turn_moves(player, current_gameboard, allowable_actions):
     Returns:
         function
     """
-
-    return np.random.choice(list(allowable_actions))
+    aa_list = list(allowable_actions)
+    aa_list.sort(key = lambda x: x.value)
+    return rng.choice(aa_list)
 
 
 def make_river_moves(player, current_gameboard, allowable_actions):
@@ -66,8 +69,9 @@ def make_river_moves(player, current_gameboard, allowable_actions):
     Returns:
         function
     """
-
-    return np.random.choice(list(allowable_actions))
+    aa_list = list(allowable_actions)
+    aa_list.sort(key = lambda x: x.value)
+    return rng.choice(aa_list)
 
 
 def _build_decision_agent_methods_dict():

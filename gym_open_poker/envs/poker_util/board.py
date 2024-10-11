@@ -22,6 +22,7 @@ class Board:
         deck,
         deck_idx,
         num_active_player_on_table,
+        random_func
     ):
         # self.dealer = dealer_name
         # self.total_cash_on_table = total_cash
@@ -65,6 +66,9 @@ class Board:
         self.history["player_status"] = dict()
         self.history["player_status"][0] = ["active"] * num_active_player_on_table
 
+        self.random_func = random_func
+        self.random_state = self.random_func.get_state()
+
     def assign_deck_idx(self, num):
         """
         increase deck index to choose proper cards from deck
@@ -89,7 +93,7 @@ class Board:
         # deck
         self.deck_idx = 0
         self.community_cards = list()
-        np.random.shuffle(self.deck)
+        self.random_func.shuffle(self.deck)
 
         # pots_attendee_list
         """
