@@ -230,6 +230,14 @@ class OpenPokerEnv(gym.Env):
             }
         )
 
+        # ------general poker rules------
+        self.seed = customized_arg_dict.get("seed", 15)
+        np.random.seed(self.seed)
+        self.np_random_fnc = np.random
+        self.random_state = self.np_random_fnc.get_state()
+
+
+
         # We have 5 actions, corresponding to "call", "bet", "raise", "check", "fold"
         self.action_space = spaces.Discrete(6, start=0)
 
@@ -457,7 +465,7 @@ class OpenPokerEnv(gym.Env):
     def set_up_board(self, random_seed):
         #
         game_element = initialize_game_elements.initialize_game_element(
-            self.player_decision_agents, self.customized_arg_dict, random_seed
+            self.player_decision_agents, self.customized_arg_dict, self.np_random_fnc
         )
         return game_element
 
@@ -531,11 +539,11 @@ class OpenPokerEnv(gym.Env):
 
     def reset(self, seed=None, options=None):
         # We need the following line to seed self.np_random
-        super().reset(seed=seed)
-        np.random.seed(seed)
+        # super().reset(seed=seed)
+        # np.random.seed(seed)
         self.game_elements = self.set_up_board(random_seed=seed)
 
-        logger.debug("This tournament uses random_seed = " + str(seed))
+        logger.debug("This tournament uses random_seed = " + str(self.seed))
 
         if self.render_mode == "human":
             self.render()

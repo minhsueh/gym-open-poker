@@ -51,7 +51,7 @@ class BuyIn(gym.Wrapper):
         BUY_IN_AMOUNT = buy_in_amount
 
 
-def _alter_initialize_game_element(player_decision_agents, customized_arg_dict, random_seed):
+def _alter_initialize_game_element(player_decision_agents, customized_arg_dict, random_func):
     """Initialization function for cards, player, board, history, and rules
 
     Args:
@@ -64,7 +64,6 @@ def _alter_initialize_game_element(player_decision_agents, customized_arg_dict, 
     Raises:
 
     """
-    np.random.seed(random_seed)
 
     game_elements = dict()
     game_elements["small_blind_amount"] = customized_arg_dict.get(
@@ -96,7 +95,7 @@ def _alter_initialize_game_element(player_decision_agents, customized_arg_dict, 
 
     initialize_game_elements._initialize_players(game_elements, player_decision_agents)
     logger.debug("Successfully instantiated and initialized players.")
-    np.random.shuffle(game_elements["players"])
+    random_func.shuffle(game_elements["players"])
     player_seq = ""
     for idx, player in enumerate(game_elements["players"]):
         player.position = idx
@@ -106,7 +105,7 @@ def _alter_initialize_game_element(player_decision_agents, customized_arg_dict, 
     game_elements["total_number_of_players"] = len(game_elements["players_dict"])
     game_elements["active_player"] = game_elements["total_number_of_players"]
 
-    initialize_game_elements._initialize_board(game_elements)
+    initialize_game_elements._initialize_board(game_elements, random_func)
     logger.debug("Successfully instantiated and initialized board.")
 
     initialize_game_elements._initialize_game_history_structs(game_elements)
