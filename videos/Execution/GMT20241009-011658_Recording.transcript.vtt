@@ -1,0 +1,322 @@
+WEBVTT
+
+1
+00:00:01.670 --> 00:00:05.849
+Min-Hsueh Chiu: Okay? So then demonstrate how I will use poker out.
+
+2
+00:00:06.560 --> 00:00:15.889
+Min-Hsueh Chiu: So there's 2 type of user. One is general user. And I put some of learning instruction on remit
+
+3
+00:00:16.200 --> 00:00:21.010
+Min-Hsueh Chiu: and another one will be developer. There's also instruction for this.
+
+4
+00:00:21.050 --> 00:00:22.690
+Min-Hsueh Chiu: And so
+
+5
+00:00:22.710 --> 00:00:27.710
+Min-Hsueh Chiu: here I just demonstrate how general User can use.
+
+6
+00:00:27.840 --> 00:00:35.730
+Min-Hsueh Chiu: So as you can see, here's my local command line, and this is the corresponding fold post folder.
+
+7
+00:00:36.070 --> 00:00:42.870
+Min-Hsueh Chiu: Right? This is a download poker out. So what I need to do is just follow
+
+8
+00:00:44.660 --> 00:00:49.659
+Min-Hsueh Chiu: follow the instruction. So let me just do it right now.
+
+9
+00:00:50.160 --> 00:00:53.989
+Min-Hsueh Chiu: So 1st of all, let us. Create a
+
+10
+00:00:54.120 --> 00:00:57.499
+Min-Hsueh Chiu: virtual environment, which is a good practice.
+
+11
+00:00:58.200 --> 00:01:02.719
+Min-Hsueh Chiu: and then I will install. Broker. All
+
+12
+00:01:06.270 --> 00:01:12.720
+Min-Hsueh Chiu: okay, cool. So right. Now let me generate the execution file.
+
+13
+00:01:13.230 --> 00:01:15.020
+Min-Hsueh Chiu: So, as you can see.
+
+14
+00:01:15.070 --> 00:01:17.800
+Min-Hsueh Chiu: there's an empty file here.
+
+15
+00:01:18.450 --> 00:01:19.610
+Min-Hsueh Chiu: and
+
+16
+00:01:19.950 --> 00:01:21.690
+Min-Hsueh Chiu: but I need to do
+
+17
+00:01:21.960 --> 00:01:24.210
+Min-Hsueh Chiu: is to copy
+
+18
+00:01:24.530 --> 00:01:27.859
+Min-Hsueh Chiu: the following execution, file here
+
+19
+00:01:28.210 --> 00:01:29.340
+Min-Hsueh Chiu: and save
+
+20
+00:01:30.290 --> 00:01:31.090
+Min-Hsueh Chiu: okay?
+
+21
+00:01:31.920 --> 00:01:34.530
+Min-Hsueh Chiu: And the other one will be
+
+22
+00:01:35.330 --> 00:01:37.800
+Min-Hsueh Chiu: generate config file.
+
+23
+00:01:39.570 --> 00:01:40.900
+Min-Hsueh Chiu: Similarly.
+
+24
+00:01:42.290 --> 00:01:43.280
+Min-Hsueh Chiu: copy
+
+25
+00:01:43.890 --> 00:01:46.469
+Min-Hsueh Chiu: to config camera file.
+
+26
+00:01:48.763 --> 00:01:50.870
+Min-Hsueh Chiu: Okay, so
+
+27
+00:01:51.100 --> 00:01:52.130
+Min-Hsueh Chiu: and comment
+
+28
+00:01:52.720 --> 00:01:56.979
+Min-Hsueh Chiu: this one. So this will have no novelty. Generate
+
+29
+00:01:57.460 --> 00:01:58.350
+Min-Hsueh Chiu: here.
+
+30
+00:01:59.830 --> 00:02:01.840
+Min-Hsueh Chiu: Okay? And
+
+31
+00:02:02.510 --> 00:02:03.770
+Min-Hsueh Chiu: finally
+
+32
+00:02:04.220 --> 00:02:05.770
+Min-Hsueh Chiu: execute it.
+
+33
+00:02:07.199 --> 00:02:12.829
+Min-Hsueh Chiu: So this might take a bit longer for the 1st time running.
+
+34
+00:02:13.770 --> 00:02:16.809
+Min-Hsueh Chiu: But I think it will be
+
+35
+00:02:17.460 --> 00:02:18.450
+Min-Hsueh Chiu: person.
+
+36
+00:02:18.640 --> 00:02:19.450
+Min-Hsueh Chiu: Okay.
+
+37
+00:02:19.850 --> 00:02:20.790
+Min-Hsueh Chiu: here we go.
+
+38
+00:02:22.000 --> 00:02:23.419
+Min-Hsueh Chiu: so as you can see
+
+39
+00:02:23.470 --> 00:02:25.400
+Min-Hsueh Chiu: that here's the border.
+
+40
+00:02:26.950 --> 00:02:28.389
+Min-Hsueh Chiu: Let me see
+
+41
+00:02:28.830 --> 00:02:29.730
+Min-Hsueh Chiu: soon.
+
+42
+00:02:29.900 --> 00:02:34.280
+Min-Hsueh Chiu: Okay, here's the board, and here's the allowable
+
+43
+00:02:34.680 --> 00:02:35.930
+Min-Hsueh Chiu: execute
+
+44
+00:02:36.665 --> 00:02:39.839
+Min-Hsueh Chiu: action. So let me execute
+
+45
+00:02:40.340 --> 00:02:41.480
+Min-Hsueh Chiu: raw speed.
+
+46
+00:02:42.850 --> 00:02:45.129
+Min-Hsueh Chiu: and the corresponding
+
+47
+00:02:46.710 --> 00:02:47.850
+Min-Hsueh Chiu: action
+
+48
+00:02:48.980 --> 00:02:50.219
+Min-Hsueh Chiu: will be performed
+
+49
+00:02:52.160 --> 00:02:54.339
+Min-Hsueh Chiu: all the way to your next move.
+
+50
+00:02:54.450 --> 00:02:58.049
+Min-Hsueh Chiu: Right? So this is the basic use case.
+
+51
+00:02:58.630 --> 00:03:05.200
+Min-Hsueh Chiu: Okay, so how about we are going to generate an inject novelty.
+
+52
+00:03:05.230 --> 00:03:08.339
+Min-Hsueh Chiu: So let me open up our configuration.
+
+53
+00:03:09.000 --> 00:03:11.491
+Min-Hsueh Chiu: So before that, there's some
+
+54
+00:03:12.760 --> 00:03:18.849
+Min-Hsueh Chiu: There are some customized parameter. So, for example, this visualize debug mode
+
+55
+00:03:18.930 --> 00:03:20.820
+Min-Hsueh Chiu: that I can see
+
+56
+00:03:21.320 --> 00:03:23.290
+Min-Hsueh Chiu: every player's card
+
+57
+00:03:25.460 --> 00:03:26.230
+Min-Hsueh Chiu: okay.
+
+58
+00:03:26.450 --> 00:03:27.610
+Min-Hsueh Chiu: and
+
+59
+00:03:28.780 --> 00:03:31.049
+Min-Hsueh Chiu: the other parameter here
+
+60
+00:03:31.160 --> 00:03:33.719
+Min-Hsueh Chiu: is allowing you
+
+61
+00:03:34.130 --> 00:03:35.849
+Min-Hsueh Chiu: to face forward
+
+62
+00:03:36.440 --> 00:03:38.599
+Min-Hsueh Chiu: to your next move.
+
+63
+00:03:38.940 --> 00:03:41.709
+Min-Hsueh Chiu: So you don't need to wait for other
+
+64
+00:03:42.640 --> 00:03:44.559
+Min-Hsueh Chiu: to take action.
+
+65
+00:03:45.430 --> 00:03:46.230
+Min-Hsueh Chiu: Okay.
+
+66
+00:03:46.830 --> 00:03:47.840
+Min-Hsueh Chiu: so
+
+67
+00:03:48.230 --> 00:03:50.360
+Min-Hsueh Chiu: this one will be the original
+
+68
+00:03:51.358 --> 00:03:55.740
+Min-Hsueh Chiu: environment. So let me choose one of the environments. Let me
+
+69
+00:03:57.715 --> 00:03:58.560
+Min-Hsueh Chiu: uncommon
+
+70
+00:03:59.030 --> 00:04:00.150
+Min-Hsueh Chiu: this one.
+
+71
+00:04:00.920 --> 00:04:09.000
+Min-Hsueh Chiu: Okay? So right now, supposedly. I will generate card distribution color, this novelty.
+
+72
+00:04:09.930 --> 00:04:13.520
+Min-Hsueh Chiu: So I think you are able to
+
+73
+00:04:13.790 --> 00:04:16.810
+Min-Hsueh Chiu: to find out what novelty it is.
+
+74
+00:04:19.029 --> 00:04:19.870
+Min-Hsueh Chiu: Right?
+
+75
+00:04:20.839 --> 00:04:22.590
+Min-Hsueh Chiu: So, as you can see
+
+76
+00:04:22.800 --> 00:04:26.480
+Min-Hsueh Chiu: that it is all black color card.
+
+77
+00:04:27.490 --> 00:04:29.504
+Min-Hsueh Chiu: So that is how I will.
+
+78
+00:04:30.780 --> 00:04:32.549
+Min-Hsueh Chiu: I would I would use
+
+79
+00:04:32.620 --> 00:04:33.534
+Min-Hsueh Chiu: this.
+
+80
+00:04:35.000 --> 00:04:37.500
+Min-Hsueh Chiu: yeah, this is how I will use the poke around.
+

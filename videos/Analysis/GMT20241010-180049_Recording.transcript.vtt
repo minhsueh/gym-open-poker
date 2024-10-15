@@ -1,0 +1,154 @@
+WEBVTT
+
+1
+00:00:02.330 --> 00:00:19.120
+Min-Hsueh Chiu: Okay. So in the last video, I show you how to execute poker out. And in this video I'll show you a little advanced about execution and how we analyze the the result. So let us have a closer look
+
+2
+00:00:19.290 --> 00:00:21.350
+Min-Hsueh Chiu: about executes file.
+
+3
+00:00:21.990 --> 00:00:27.299
+Min-Hsueh Chiu: So in this script you can see users should manually
+
+4
+00:00:27.750 --> 00:00:30.969
+Min-Hsueh Chiu: to input their action. Right?
+
+5
+00:00:31.900 --> 00:00:50.140
+Min-Hsueh Chiu: So basically, what I'm saying is, you have to put your action in a in the command line, and then it will it will perform the the action. But what you can do is, let's say.
+
+6
+00:00:50.751 --> 00:01:04.559
+Min-Hsueh Chiu: I want to let it automatically running. So in this. In this code, you can see, I just randomly choose whatever action is loud.
+
+7
+00:01:04.610 --> 00:01:05.630
+Min-Hsueh Chiu: So
+
+8
+00:01:06.050 --> 00:01:08.842
+Min-Hsueh Chiu: you can see that
+
+9
+00:01:10.060 --> 00:01:16.210
+Min-Hsueh Chiu: basically it will run the the game will continue running itself.
+
+10
+00:01:16.320 --> 00:01:22.780
+Min-Hsueh Chiu: Okay. So in this way you can create your own you can create your own.
+
+11
+00:01:23.472 --> 00:01:27.090
+Min-Hsueh Chiu: Strategy. And then putting in program.
+
+12
+00:01:27.220 --> 00:01:30.210
+Min-Hsueh Chiu: Okay, so let me put it back again.
+
+13
+00:01:30.900 --> 00:01:41.229
+Min-Hsueh Chiu: So right now let me show you, how are we going to analyze the result? So there's 2 way the 1st way is
+
+14
+00:01:42.092 --> 00:01:58.949
+Min-Hsueh Chiu: you can directly record the information here for for so, for example, in every step you have the observation, you have the reward you have. Is. It's terminates, and the information so you can record here by yourself.
+
+15
+00:01:59.080 --> 00:02:00.015
+Min-Hsueh Chiu: or
+
+16
+00:02:01.050 --> 00:02:04.529
+Min-Hsueh Chiu: we have put in law.
+
+17
+00:02:04.730 --> 00:02:07.889
+Min-Hsueh Chiu: So you can see
+
+18
+00:02:08.300 --> 00:02:10.068
+Min-Hsueh Chiu: here will be the
+
+19
+00:02:10.710 --> 00:02:13.690
+Min-Hsueh Chiu: the every step in a in a game.
+
+20
+00:02:13.870 --> 00:02:30.019
+Min-Hsueh Chiu: So, for example, let's say, everything is initialized, and there's a cash right? And the dealer, dollar dealer card, so you can see this will be the card for every player, and then
+
+21
+00:02:30.420 --> 00:02:34.380
+Min-Hsueh Chiu: whatever the player make a move, and it will be record.
+
+22
+00:02:34.790 --> 00:02:36.879
+Min-Hsueh Chiu: So this is the second way.
+
+23
+00:02:37.260 --> 00:02:51.220
+Min-Hsueh Chiu: And how are we going to change? The file name. So in the config file, you can see, here is the log file path, so you can do it manually.
+
+24
+00:02:51.830 --> 00:02:54.570
+Min-Hsueh Chiu: So let's me
+
+25
+00:02:54.990 --> 00:02:56.120
+Min-Hsueh Chiu: delete it.
+
+26
+00:02:57.420 --> 00:03:00.170
+Min-Hsueh Chiu: And so you can see
+
+27
+00:03:03.060 --> 00:03:09.770
+Min-Hsueh Chiu: here. So here's the new generate test test log right?
+
+28
+00:03:09.810 --> 00:03:15.250
+Min-Hsueh Chiu: And it is consistent with the current state.
+
+29
+00:03:15.980 --> 00:03:19.049
+Min-Hsueh Chiu: But let's say, I want to
+
+30
+00:03:19.180 --> 00:03:20.449
+Min-Hsueh Chiu: make a move.
+
+31
+00:03:22.070 --> 00:03:23.650
+Min-Hsueh Chiu: Okay, so
+
+32
+00:03:23.850 --> 00:03:24.980
+Min-Hsueh Chiu: now this
+
+33
+00:03:25.550 --> 00:03:27.780
+Min-Hsueh Chiu: make a move right now
+
+34
+00:03:28.220 --> 00:03:32.050
+Min-Hsueh Chiu: let me put race beat here.
+
+35
+00:03:32.550 --> 00:03:33.900
+Min-Hsueh Chiu: Oops. Sorry.
+
+36
+00:03:36.960 --> 00:03:37.810
+Min-Hsueh Chiu: Okay.
+
+37
+00:03:38.090 --> 00:03:39.339
+Min-Hsueh Chiu: let me put.
+
+38
+00:03:40.310 --> 00:03:54.590
+Min-Hsueh Chiu: And you can see the new action is logging log into this Doc file. So that is how you you can make your own strategy. And also you can analyze the data here.
+
