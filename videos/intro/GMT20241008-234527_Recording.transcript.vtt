@@ -1,0 +1,42 @@
+WEBVTT
+
+1
+00:00:01.890 --> 00:00:04.840
+Min-Hsueh Chiu: Hi, let me introduce you. Poker owl.
+
+2
+00:00:04.870 --> 00:00:11.620
+Min-Hsueh Chiu: So poker all is basically a poker simulator. But it's feature. Open word. So what is open world.
+
+3
+00:00:11.850 --> 00:00:20.050
+Min-Hsueh Chiu: Open word is an unexpected situation that often conflict with existing knowledge.
+
+4
+00:00:20.430 --> 00:00:24.070
+Min-Hsueh Chiu: and it has happened all the time in the real world
+
+5
+00:00:24.220 --> 00:00:28.669
+Min-Hsueh Chiu: how human are able to generalize the concept
+
+6
+00:00:30.053 --> 00:00:47.790
+Min-Hsueh Chiu: and adapt to such situation. However, a system will have a hard time because it require a fixed rules. So let me show you an example. Here is a normal poker, poker, table, and player playing with each other.
+
+7
+00:00:49.320 --> 00:00:54.700
+Min-Hsueh Chiu: and here is a novel situation, as you can see, it is very crowded on the table.
+
+8
+00:00:54.910 --> 00:01:03.510
+Min-Hsueh Chiu: and it's typically only have 8 to 10 people on the table. So in this novel situation
+
+9
+00:01:04.048 --> 00:01:11.080
+Min-Hsueh Chiu: player have to modify their strategy, to either win more or remain or or
+
+10
+00:01:11.180 --> 00:01:20.059
+Min-Hsueh Chiu: maintain a good performance. So that is why we are trying to build this repo for the research usage.
+

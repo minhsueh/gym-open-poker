@@ -1,0 +1,114 @@
+WEBVTT
+
+1
+00:00:01.760 --> 00:00:06.689
+Min-Hsueh Chiu: So in this video, I'm going to show you how to generate novelty.
+
+2
+00:00:06.830 --> 00:00:11.020
+Min-Hsueh Chiu: So here's the execute file. Let me break it down for you.
+
+3
+00:00:11.810 --> 00:00:19.540
+Min-Hsueh Chiu: So in the 1st portion you are going to import the config file with the config Yama, which is
+
+4
+00:00:19.560 --> 00:00:22.790
+Min-Hsueh Chiu: the Yama file you copied earlier.
+
+5
+00:00:23.110 --> 00:00:28.530
+Min-Hsueh Chiu: and then you will generate the original environment with this config file.
+
+6
+00:00:29.742 --> 00:00:33.440
+Min-Hsueh Chiu: So here we will have the base environment.
+
+7
+00:00:33.480 --> 00:00:37.639
+Min-Hsueh Chiu: And then you are going to initiate a novelty generator.
+
+8
+00:00:39.950 --> 00:00:45.530
+Min-Hsueh Chiu: So now the generator will take in the original environment
+
+9
+00:00:45.740 --> 00:00:54.039
+Min-Hsueh Chiu: and with the novelty list, so it can multiply environments and then return the multiplying environments back.
+
+10
+00:00:54.110 --> 00:00:59.770
+Min-Hsueh Chiu: So that is where we can get the novel environment.
+
+11
+00:00:59.960 --> 00:01:07.050
+Min-Hsueh Chiu: And you can see here will be the support the current supporting novelty.
+
+12
+00:01:07.110 --> 00:01:09.950
+Min-Hsueh Chiu: and I already put them in a config file.
+
+13
+00:01:10.020 --> 00:01:11.250
+Min-Hsueh Chiu: so
+
+14
+00:01:12.400 --> 00:01:15.879
+Min-Hsueh Chiu: as you can see that this is one of the novelty.
+
+15
+00:01:16.060 --> 00:01:31.060
+Min-Hsueh Chiu: But some of novelty might have argument inside. So, for example, in this card distribution color, we'll have arguments that it prohibits the red color occur
+
+16
+00:01:31.070 --> 00:01:39.290
+Min-Hsueh Chiu: right? So if we execute, so you can see that only black color card occur.
+
+17
+00:01:39.420 --> 00:01:41.399
+Min-Hsueh Chiu: But let's see
+
+18
+00:01:41.810 --> 00:01:44.199
+Min-Hsueh Chiu: if I want to prohibit black color.
+
+19
+00:01:45.860 --> 00:01:53.499
+Min-Hsueh Chiu: There we go, so everything, every every card is red color here. So that is how you can customize your novelty
+
+20
+00:01:53.810 --> 00:01:59.489
+Min-Hsueh Chiu: and for whom? Want to look into
+
+21
+00:02:00.400 --> 00:02:01.680
+Min-Hsueh Chiu: the novelty
+
+22
+00:02:01.890 --> 00:02:03.810
+Min-Hsueh Chiu: and novelty generator.
+
+23
+00:02:03.970 --> 00:02:07.009
+Min-Hsueh Chiu: You can go into the report.
+
+24
+00:02:07.760 --> 00:02:08.870
+Min-Hsueh Chiu: So
+
+25
+00:02:09.470 --> 00:02:12.119
+Min-Hsueh Chiu: in the poker utility
+
+26
+00:02:12.210 --> 00:02:13.250
+Min-Hsueh Chiu: folder.
+
+27
+00:02:13.490 --> 00:02:18.229
+Min-Hsueh Chiu: you can see that here is the existing novelty
+
+28
+00:02:19.010 --> 00:02:27.309
+Min-Hsueh Chiu: and novelty generator will be here, so you might want to look into here. If you want to make some modification.
+

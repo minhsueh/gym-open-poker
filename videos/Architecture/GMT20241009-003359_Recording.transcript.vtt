@@ -1,0 +1,166 @@
+WEBVTT
+
+1
+00:00:02.970 --> 00:00:06.160
+Min-Hsueh Chiu: So let me walk you through. Poke all architecture.
+
+2
+00:00:06.310 --> 00:00:14.167
+Min-Hsueh Chiu: So inside the gene open poker you can see here is the top in it. So
+
+3
+00:00:14.860 --> 00:00:21.320
+Min-Hsueh Chiu: this project is built on geneticism, and it is a standard api for reinforcement learning.
+
+4
+00:00:21.330 --> 00:00:26.710
+Min-Hsueh Chiu: So this top layer is the configuration for the generalism
+
+5
+00:00:27.060 --> 00:00:31.860
+Min-Hsueh Chiu: and inside the environment. This is the main poker environment.
+
+6
+00:00:31.990 --> 00:00:36.130
+Min-Hsueh Chiu: So you can see, here is a June poker
+
+7
+00:00:36.140 --> 00:00:38.399
+Min-Hsueh Chiu: ajin openpoker.py.
+
+8
+00:00:38.440 --> 00:00:43.620
+Min-Hsueh Chiu: this is the main flow, main-came flow and the visualization.
+
+9
+00:00:44.170 --> 00:00:46.269
+Min-Hsueh Chiu: So in an image
+
+10
+00:00:46.500 --> 00:00:48.840
+Min-Hsueh Chiu: you can see it is
+
+11
+00:00:49.030 --> 00:00:50.599
+Min-Hsueh Chiu: card visualization.
+
+12
+00:00:51.880 --> 00:00:55.549
+Min-Hsueh Chiu: And here is the Oaker utility.
+
+13
+00:00:55.930 --> 00:01:06.200
+Min-Hsueh Chiu: So let me simulate the game playing, so you can map into the different object and functionality inside this folder.
+
+14
+00:01:06.400 --> 00:01:10.609
+Min-Hsueh Chiu: So, for example, I'm a player. So there's a player object
+
+15
+00:01:10.830 --> 00:01:14.139
+Min-Hsueh Chiu: right? And I'm going to sit at the table.
+
+16
+00:01:14.190 --> 00:01:16.179
+Min-Hsueh Chiu: So here is the board
+
+17
+00:01:16.230 --> 00:01:18.600
+Min-Hsueh Chiu: which contain board information
+
+18
+00:01:19.990 --> 00:01:21.055
+Min-Hsueh Chiu: and
+
+19
+00:01:22.710 --> 00:01:36.340
+Min-Hsueh Chiu: and so there's another player are going sit at a table as well. Right? So here we have the agent folder, and this 6 type of background agent will play with you.
+
+20
+00:01:37.510 --> 00:01:40.640
+Min-Hsueh Chiu: Okay, so this will be the background agent.
+
+21
+00:01:41.010 --> 00:01:55.579
+Min-Hsueh Chiu: and then once everybody sit down. Right? Then the game start. So there's a initialized game element. For example, player object can get buying amount of money
+
+22
+00:01:56.560 --> 00:02:01.570
+Min-Hsueh Chiu: right? And after initialized game element, the dealer.
+
+23
+00:02:01.720 --> 00:02:04.229
+Min-Hsueh Chiu: So here's the dealer.
+
+24
+00:02:04.310 --> 00:02:07.160
+Min-Hsueh Chiu: right dealer are going to tilt the car.
+
+25
+00:02:07.410 --> 00:02:10.739
+Min-Hsueh Chiu: So there's a card in card object here.
+
+26
+00:02:10.979 --> 00:02:13.910
+Min-Hsueh Chiu: and after dealer, build the card
+
+27
+00:02:14.090 --> 00:02:17.810
+Min-Hsueh Chiu: player are going to perform action.
+
+28
+00:02:18.010 --> 00:02:23.220
+Min-Hsueh Chiu: So here is one is the action state, the other one will be the action function
+
+29
+00:02:24.260 --> 00:02:25.040
+Min-Hsueh Chiu: right?
+
+30
+00:02:25.230 --> 00:02:29.209
+Min-Hsueh Chiu: And after everybody betting.
+
+31
+00:02:29.720 --> 00:02:32.749
+Min-Hsueh Chiu: then the dealer are going to change phase
+
+32
+00:02:33.380 --> 00:02:36.300
+Min-Hsueh Chiu: to from preflop to flaw
+
+33
+00:02:36.540 --> 00:02:38.969
+Min-Hsueh Chiu: right and then can continue.
+
+34
+00:02:39.210 --> 00:02:46.980
+Min-Hsueh Chiu: So. I think this pretty much cover? Every object and functionality in this folder.
+
+35
+00:02:47.750 --> 00:02:58.150
+Min-Hsueh Chiu: But there's another very important thing. Here will be a novelty generator. Right? So here's a novelty generator. And this novelty generator are
+
+36
+00:02:58.320 --> 00:03:03.319
+Min-Hsueh Chiu: the functionality that can generate can can inject novelty
+
+37
+00:03:03.400 --> 00:03:04.730
+Min-Hsueh Chiu: before
+
+38
+00:03:05.451 --> 00:03:13.870
+Min-Hsueh Chiu: before the game started. Right? So this of the generator are going to use
+
+39
+00:03:14.140 --> 00:03:17.909
+Min-Hsueh Chiu: list of can can use this of learning novelties.
+
+40
+00:03:18.610 --> 00:03:21.443
+Min-Hsueh Chiu: So this is pretty much
+
+41
+00:03:22.210 --> 00:03:24.630
+Min-Hsueh Chiu: The architecture in the poker hall.
+
